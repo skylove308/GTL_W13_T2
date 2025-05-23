@@ -1,6 +1,8 @@
 ﻿#pragma once
+
 #include "RenderPassBase.h"
 
+struct ID3D11SamplerState;
 
 class FDepthOfFieldRenderPass : public FRenderPassBase
 {
@@ -18,4 +20,7 @@ protected:
     virtual void CleanUpRender(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
 
     virtual void CreateResource() override;
+
+private:
+    ID3D11SamplerState* SamplerState_DownSample2x;
 };

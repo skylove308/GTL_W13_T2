@@ -1,5 +1,5 @@
 
-Texture2D DownSampleTarget : register(t0);
+Texture2D DownSampleTarget : register(t100);
 SamplerState DownSampleSampler : register(s0);
 
 cbuffer ViewMode : register(b0)
