@@ -27,6 +27,8 @@ void FRenderPassBase::Initialize(FDXDBufferManager* InBufferManager, FGraphicsDe
     Graphics = InGraphics;
     ShaderManager = InShaderManage;
 
+    CreateResource();
+
     for (IRenderPass* RenderPass : ChildRenderPasses)
     {
         RenderPass->Initialize(BufferManager, Graphics, ShaderManager);
@@ -166,11 +168,11 @@ void FRenderPassBase::RenderSkeletalMesh_Internal(const FSkeletalMeshRenderData*
     constexpr UINT Offset = 0;
 
     FCPUSkinningConstants CPUSkinningData;
-    CPUSkinningData.bCPUSKinning = USkeletalMeshComponent::GetCPUSkinning();
+    CPUSkinningData.bCPUSkinning = USkeletalMeshComponent::GetCPUSkinning();
     BufferManager->UpdateConstantBuffer(TEXT("FCPUSkinningConstants"), CPUSkinningData);
     
     FVertexInfo VertexInfo;
-    if (CPUSkinningData.bCPUSKinning)
+    if (CPUSkinningData.bCPUSkinning)
     {
         BufferManager->CreateDynamicVertexBuffer(RenderData->ObjectName, RenderData->Vertices, VertexInfo);
         BufferManager->UpdateDynamicVertexBuffer(RenderData->ObjectName, RenderData->Vertices);

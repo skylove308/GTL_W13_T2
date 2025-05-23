@@ -10,11 +10,9 @@
 void FCameraEffectRenderPass::Initialize(FDXDBufferManager* InBufferManager, FGraphicsDevice* InGraphics, FDXDShaderManager* InShaderManager)
 {
     FRenderPassBase::Initialize(InBufferManager, InGraphics, InShaderManager);
-    
-    CreateShader();
 }
 
-void FCameraEffectRenderPass::CreateShader()
+void FCameraEffectRenderPass::CreateResource()
 {
     ShaderManager->AddVertexShader(L"CameraEffectVertexShader", L"Shaders/CameraEffectShader.hlsl", "mainVS");
     ShaderManager->AddPixelShader(L"CameraEffectPixelShader", L"Shaders/CameraEffectShader.hlsl", "mainPS");

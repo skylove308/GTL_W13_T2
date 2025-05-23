@@ -28,6 +28,8 @@ public:
     RenderPassType* AddRenderPass();
 
 protected:
+    virtual void CreateResource() override {}
+    
     void UpdateObjectConstant(const FMatrix& WorldMatrix, const FVector4& UUIDColor, bool bIsSelected) const;
 
     void RenderStaticMesh_Internal(const FStaticMeshRenderData* RenderData, TArray<FStaticMaterial*> Materials, TArray<UMaterial*> OverrideMaterials, int32 SelectedSubMeshIndex);

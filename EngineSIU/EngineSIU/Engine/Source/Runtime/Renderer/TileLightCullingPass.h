@@ -58,7 +58,6 @@ public:
     virtual void ClearRenderArr() override;
     virtual void Render(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
 
-    void CreateShader();
     void CreatePointLightBufferGPU();
     void CreateSpotLightBufferGPU();
     void CreateViews();
@@ -88,6 +87,8 @@ public:
 protected:
     virtual void PrepareRender(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
     virtual void CleanUpRender(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
+    
+    virtual void CreateResource() override;
     
 private:
     ID3D11ComputeShader* ComputeShader;

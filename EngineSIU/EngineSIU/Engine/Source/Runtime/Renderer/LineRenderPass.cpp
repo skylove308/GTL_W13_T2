@@ -27,8 +27,6 @@ FLineRenderPass::FLineRenderPass()
 void FLineRenderPass::Initialize(FDXDBufferManager* InBufferManager, FGraphicsDevice* InGraphics, FDXDShaderManager* InShaderManager)
 {
     FRenderPassBase::Initialize(InBufferManager, InGraphics, InShaderManager);
-    
-    CreateShader();
 }
 
 void FLineRenderPass::PrepareRenderArr()
@@ -40,7 +38,7 @@ void FLineRenderPass::ClearRenderArr()
     // 필요에 따라 내부 배열을 초기화
 }
 
-void FLineRenderPass::CreateShader()
+void FLineRenderPass::CreateResource()
 {
     HRESULT Result = ShaderManager->AddVertexShader(L"VertexLineShader", L"Shaders/ShaderLine.hlsl", "mainVS");
     Result = ShaderManager->AddPixelShader(L"PixelLineShader", L"Shaders/ShaderLine.hlsl", "mainPS");

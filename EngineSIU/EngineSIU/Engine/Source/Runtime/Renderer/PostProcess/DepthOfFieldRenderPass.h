@@ -7,7 +7,7 @@ class FDepthOfFieldRenderPass : public FRenderPassBase
 public:
     FDepthOfFieldRenderPass() = default;
     virtual ~FDepthOfFieldRenderPass() override = default;
-    
+
     virtual void Initialize(FDXDBufferManager* InBufferManager, FGraphicsDevice* InGraphics, FDXDShaderManager* InShaderManage) override;
     virtual void PrepareRenderArr() override;
     virtual void ClearRenderArr() override;
@@ -16,4 +16,6 @@ public:
 protected:
     virtual void PrepareRender(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
     virtual void CleanUpRender(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
+
+    virtual void CreateResource() override;
 };

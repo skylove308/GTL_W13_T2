@@ -19,7 +19,7 @@ private:
     virtual void PrepareRender(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
     virtual void CleanUpRender(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
     
-    void CreateShader();
+    virtual void CreateResource() override;
 
     void UpdateCameraEffectConstant(const std::shared_ptr<FEditorViewportClient>& Viewport);
 };

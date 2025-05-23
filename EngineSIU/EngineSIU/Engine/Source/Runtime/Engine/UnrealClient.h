@@ -27,6 +27,8 @@ enum class EResourceType : uint8
     ERT_Gizmo,
     ERT_Overlay,
     ERT_PostProcessCompositing,
+    ERT_DownSample2x,
+    ERT_DownSample4x,
     ERT_MAX,
 };
 
@@ -98,10 +100,10 @@ public:
     ////////
     /// Depth Stencil
     ////////
-    HRESULT CreateDepthStencil(EResourceType Type, uint32 ResolutionScaleDivisor = 1);
+    HRESULT CreateDepthStencil(EResourceType Type, uint32 DownSampleScale = 1);
     
     // 해당 타입의 리소스를 리턴. 없는 경우에는 생성해서 리턴.
-    FDepthStencilRHI* GetDepthStencil(EResourceType Type, uint32 ResolutionScaleDivisor = 1);
+    FDepthStencilRHI* GetDepthStencil(EResourceType Type, uint32 DownSampleScale = 1);
 
     bool HasDepthStencil(EResourceType Type) const;
 
@@ -115,10 +117,10 @@ public:
     ////////
     /// Render Target
     ////////
-    HRESULT CreateRenderTarget(EResourceType Type, uint32 ResolutionScaleDivisor = 1);
+    HRESULT CreateRenderTarget(EResourceType Type, uint32 DownSampleScale = 1);
     
     // 해당 타입의 리소스를 리턴. 없는 경우에는 생성해서 리턴.
-    FRenderTargetRHI* GetRenderTarget(EResourceType Type, uint32 ResolutionScaleDivisor = 1);
+    FRenderTargetRHI* GetRenderTarget(EResourceType Type, uint32 DownSampleScale = 1);
 
     bool HasRenderTarget(EResourceType Type) const;
 

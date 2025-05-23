@@ -1,5 +1,7 @@
 ﻿#include "DepthOfFieldRenderPass.h"
 
+#include "D3D11RHI/DXDShaderManager.h"
+
 void FDepthOfFieldRenderPass::Initialize(FDXDBufferManager* InBufferManager, FGraphicsDevice* InGraphics, FDXDShaderManager* InShaderManage)
 {
     FRenderPassBase::Initialize(InBufferManager, InGraphics, InShaderManage);
@@ -37,4 +39,19 @@ void FDepthOfFieldRenderPass::PrepareRender(const std::shared_ptr<FEditorViewpor
 
 void FDepthOfFieldRenderPass::CleanUpRender(const std::shared_ptr<FEditorViewportClient>& Viewport)
 {
+}
+
+void FDepthOfFieldRenderPass::CreateResource()
+{
+    HRESULT hr = ShaderManager->AddVertexShader(L"DownSampleVertexShader", L"Shaders/DownSampleShader.hlsl", "mainVS");
+    if (FAILED(hr))
+    {
+        
+    }
+    
+    hr = ShaderManager->AddPixelShader(L"DownSamplePixelShader", L"Shaders/DownSampleShader.hlsl", "mainPS");
+    if (FAILED(hr))
+    {
+        
+    }
 }
