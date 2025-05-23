@@ -19,6 +19,9 @@ protected:
     virtual void PrepareRender(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
     virtual void CleanUpRender(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
 
+    void PrepareDownSample(const std::shared_ptr<FEditorViewportClient>& Viewport);
+    void CleanUpDownSample(const std::shared_ptr<FEditorViewportClient>& Viewport);
+    
     virtual void CreateResource() override;
 
 private:

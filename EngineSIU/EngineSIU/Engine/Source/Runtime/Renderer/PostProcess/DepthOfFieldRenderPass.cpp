@@ -32,12 +32,17 @@ void FDepthOfFieldRenderPass::Render(const std::shared_ptr<FEditorViewportClient
      *       4. 커널 블러 결과를 다시 2배 크기로 업 샘플링
      *       5. 합성
      */
+    PrepareDownSample(Viewport);
     Graphics->DeviceContext->Draw(6, 0);
+    CleanUpDownSample(Viewport);
 
     CleanUpRender(Viewport);
 }
 
-void FDepthOfFieldRenderPass::PrepareRender(const std::shared_ptr<FEditorViewportClient>& Viewport)
+void FDepthOfFieldRenderPass::PrepareRender(const std::shared_ptr<FEditorViewportClient>& Viewport) {}
+void FDepthOfFieldRenderPass::CleanUpRender(const std::shared_ptr<FEditorViewportClient>& Viewport) {}
+
+void FDepthOfFieldRenderPass::PrepareDownSample(const std::shared_ptr<FEditorViewportClient>& Viewport)
 {
     FViewportResource* ViewportResource = Viewport->GetViewportResource();
     if (!ViewportResource)
@@ -73,7 +78,7 @@ void FDepthOfFieldRenderPass::PrepareRender(const std::shared_ptr<FEditorViewpor
     Graphics->DeviceContext->PSSetSamplers(0, 1, &SamplerState_DownSample2x);
 }
 
-void FDepthOfFieldRenderPass::CleanUpRender(const std::shared_ptr<FEditorViewportClient>& Viewport)
+void FDepthOfFieldRenderPass::CleanUpDownSample(const std::shared_ptr<FEditorViewportClient>& Viewport)
 {
     Graphics->DeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
 
