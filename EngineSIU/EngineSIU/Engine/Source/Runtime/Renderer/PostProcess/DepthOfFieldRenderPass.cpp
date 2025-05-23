@@ -36,6 +36,16 @@ void FDepthOfFieldRenderPass::Render(const std::shared_ptr<FEditorViewportClient
     Graphics->DeviceContext->Draw(6, 0);
     CleanUpDownSample(Viewport);
 
+    PrepareHorizontalBlur(Viewport);
+    Graphics->DeviceContext->Draw(6, 0);
+    CleanUpHorizontalBlur(Viewport);
+
+    /*
+    PrepareVerticalBlur(Viewport);
+    Graphics->DeviceContext->Draw(6, 0);
+    CleanUpVerticalBlur(Viewport);
+    */
+
     CleanUpRender(Viewport);
 }
 
@@ -75,7 +85,7 @@ void FDepthOfFieldRenderPass::PrepareDownSample(const std::shared_ptr<FEditorVie
     Graphics->DeviceContext->PSSetShader(PixelShader, nullptr, 0);
     Graphics->DeviceContext->IASetInputLayout(nullptr);
 
-    Graphics->DeviceContext->PSSetSamplers(0, 1, &SamplerState_DownSample2x);
+    Graphics->DeviceContext->PSSetSamplers(0, 1, &Graphics->SamplerState_LinearClamp);
 }
 
 void FDepthOfFieldRenderPass::CleanUpDownSample(const std::shared_ptr<FEditorViewportClient>& Viewport)
@@ -84,6 +94,55 @@ void FDepthOfFieldRenderPass::CleanUpDownSample(const std::shared_ptr<FEditorVie
 
     ID3D11ShaderResourceView* NullSRV[1] = { nullptr };
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, NullSRV);
+}
+
+void FDepthOfFieldRenderPass::PrepareHorizontalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport)
+{
+    FViewportResource* ViewportResource = Viewport->GetViewportResource();
+    if (!ViewportResource)
+    {
+        return;
+    }
+
+    FRenderTargetRHI* RenderTargetRHI_DownSample2x = ViewportResource->GetRenderTarget(EResourceType::ERT_DownSample2x, 2);
+    FRenderTargetRHI* RenderTargetRHI_Blur = ViewportResource->GetRenderTarget(EResourceType::ERT_Blur, 2);
+    
+    Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI_Blur->RTV, nullptr);
+
+    Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, &RenderTargetRHI_DownSample2x->SRV);
+    
+    //ID3D11VertexShader* VertexShader = ShaderManager->GetVertexShaderByKey(L"DownSampleVertexShader");
+    ID3D11PixelShader* PixelShader = ShaderManager->GetPixelShaderByKey(L"HorizontalBlurPixelShader");
+    //Graphics->DeviceContext->VSSetShader(VertexShader, nullptr, 0);
+    Graphics->DeviceContext->PSSetShader(PixelShader, nullptr, 0);
+    Graphics->DeviceContext->IASetInputLayout(nullptr);
+
+    Graphics->DeviceContext->PSSetSamplers(0, 1, &Graphics->SamplerState_LinearClamp);
+
+    BufferManager->BindConstantBuffer("FViewportSize", 0, EShaderStage::Pixel);
+
+    const FRect ViewportRect = Viewport->GetViewport()->GetRect();
+    FViewportSize TextureSize = {};
+    TextureSize.ViewportSize.X = static_cast<float>(FMath::FloorToInt(ViewportRect.Width / 2));
+    TextureSize.ViewportSize.Y = static_cast<float>(FMath::FloorToInt(ViewportRect.Height / 2));
+    
+    BufferManager->UpdateConstantBuffer("FViewportSize", TextureSize);
+}
+
+void FDepthOfFieldRenderPass::CleanUpHorizontalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport)
+{
+    Graphics->DeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
+
+    ID3D11ShaderResourceView* NullSRV[1] = { nullptr };
+    Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, NullSRV);
+}
+
+void FDepthOfFieldRenderPass::PrepareVerticalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport)
+{
+}
+
+void FDepthOfFieldRenderPass::CleanUpVerticalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport)
+{
 }
 
 void FDepthOfFieldRenderPass::CreateResource()
@@ -102,19 +161,10 @@ void FDepthOfFieldRenderPass::CreateResource()
         return;
     }
 
-    D3D11_SAMPLER_DESC SamplerDesc = {};
-    SamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-    SamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-    SamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-    SamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-    SamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-    SamplerDesc.MinLOD = 0;
-    SamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-    hr = Graphics->Device->CreateSamplerState(&SamplerDesc, &SamplerState_DownSample2x);
+    hr = ShaderManager->AddPixelShader(L"HorizontalBlurPixelShader", L"Shaders/GaussianBlurShader.hlsl", "mainPS");
     if (FAILED(hr))
     {
-        MessageBox(nullptr, L"Failed to Create SamplerState DownSample2x", L"Error", MB_ICONERROR | MB_OK);
+        MessageBox(nullptr, L"Failed to Compile HorizontalBlurPixelShader", L"Error", MB_ICONERROR | MB_OK);
         return;
     }
 }

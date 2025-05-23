@@ -19,11 +19,14 @@ protected:
     virtual void PrepareRender(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
     virtual void CleanUpRender(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
 
+    virtual void CreateResource() override;
+
     void PrepareDownSample(const std::shared_ptr<FEditorViewportClient>& Viewport);
     void CleanUpDownSample(const std::shared_ptr<FEditorViewportClient>& Viewport);
     
-    virtual void CreateResource() override;
-
-private:
-    ID3D11SamplerState* SamplerState_DownSample2x;
+    void PrepareHorizontalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
+    void CleanUpHorizontalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
+    
+    void PrepareVerticalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
+    void CleanUpVerticalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
 };

@@ -382,7 +382,6 @@ void FGraphicsDevice::CreateSamplerState()
     SamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
     SamplerDesc.MinLOD = 0;
     SamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
     HRESULT hr = Device->CreateSamplerState(&SamplerDesc, &SamplerState_LinearWrap);
     if (FAILED(hr))
     {
@@ -390,8 +389,23 @@ void FGraphicsDevice::CreateSamplerState()
     }
 
     SamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-
     hr = Device->CreateSamplerState(&SamplerDesc, &SamplerState_PointWrap);
+    if (FAILED(hr))
+    {
+        MessageBox(nullptr, L"SamplerState 생성에 실패했습니다!", L"Error", MB_ICONERROR | MB_OK);
+    }
+    
+    SamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+    SamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+    SamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    hr = Device->CreateSamplerState(&SamplerDesc, &SamplerState_PointClamp);
+    if (FAILED(hr))
+    {
+        MessageBox(nullptr, L"SamplerState 생성에 실패했습니다!", L"Error", MB_ICONERROR | MB_OK);
+    }
+    
+    SamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    hr = Device->CreateSamplerState(&SamplerDesc, &SamplerState_LinearClamp);
     if (FAILED(hr))
     {
         MessageBox(nullptr, L"SamplerState 생성에 실패했습니다!", L"Error", MB_ICONERROR | MB_OK);

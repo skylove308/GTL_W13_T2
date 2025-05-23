@@ -2,12 +2,6 @@
 Texture2D DownSampleTarget : register(t100);
 SamplerState DownSampleSampler : register(s0);
 
-cbuffer ViewMode : register(b0)
-{
-    uint ViewMode; 
-    float3 Padding;
-}
-
 struct PS_Input
 {
     float4 Position : SV_POSITION;
