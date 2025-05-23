@@ -14,11 +14,37 @@ FRenderPassBase::FRenderPassBase()
 {
 }
 
+FRenderPassBase::~FRenderPassBase()
+{
+    Release();
+}
+
 void FRenderPassBase::Initialize(FDXDBufferManager* InBufferManager, FGraphicsDevice* InGraphics, FDXDShaderManager* InShaderManage)
 {
     BufferManager = InBufferManager;
     Graphics = InGraphics;
     ShaderManager = InShaderManage;
+
+    for (IRenderPass* RenderPass : ChildRenderPasses)
+    {
+        RenderPass->Initialize(BufferManager, Graphics, ShaderManager);
+    }
+}
+
+void FRenderPassBase::PrepareRenderArr()
+{
+    for (IRenderPass* RenderPass : ChildRenderPasses)
+    {
+        RenderPass->PrepareRenderArr();
+    }
+}
+
+void FRenderPassBase::ClearRenderArr()
+{
+    for (IRenderPass* RenderPass : ChildRenderPasses)
+    {
+        RenderPass->ClearRenderArr();
+    }
 }
 
 void FRenderPassBase::UpdateObjectConstant(const FMatrix& WorldMatrix, const FVector4& UUIDColor, bool bIsSelected) const
@@ -209,4 +235,12 @@ void FRenderPassBase::UpdateBones(const USkeletalMeshComponent* SkeletalMeshComp
     }
 
     BufferManager->UpdateStructuredBuffer(TEXT("BoneBuffer"), FinalBoneMatrices);
+}
+
+void FRenderPassBase::Release()
+{
+    for (const IRenderPass* RenderPass : ChildRenderPasses)
+    {
+        delete RenderPass;
+    }
 }

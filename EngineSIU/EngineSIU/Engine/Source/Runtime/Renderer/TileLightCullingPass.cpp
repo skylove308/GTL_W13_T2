@@ -420,6 +420,8 @@ void FTileLightCullingPass::CreateBuffers(uint32 InWidth, uint32 InHeight)
 
 void FTileLightCullingPass::Release()
 {
+    FRenderPassBase::Release();
+    
     // Compute Shader Release는 ShaderManager에서 관리
     SAFE_RELEASE(PerTilePointLightIndexMaskBuffer)
     SAFE_RELEASE(PerTilePointLightIndexMaskBufferUAV)
