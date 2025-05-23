@@ -384,7 +384,11 @@ void FRenderer::RenderOpaque(const std::shared_ptr<FEditorViewportClient>& Viewp
         }
     }
     
-    // TODO: 이 시점에서 씬 뎁스 스텐실 버퍼를 복사해두면, 에디터 요소가 없는 순수한 뎁스 버퍼를 확보할 수 있음.
+    // 에디터 요소가 없는 순수한 뎁스 버퍼 확보
+    Graphics->DeviceContext->CopyResource(
+        Viewport->GetViewportResource()->GetDepthStencil(EResourceType::ERT_ScenePure)->Texture2D,
+        Viewport->GetViewportResource()->GetDepthStencil(EResourceType::ERT_Scene)->Texture2D
+    );
 }
 
 void FRenderer::RenderEditorDepthElement(const std::shared_ptr<FEditorViewportClient>& Viewport) const

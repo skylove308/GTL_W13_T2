@@ -11,7 +11,9 @@ FRenderPassBase::FRenderPassBase()
     : BufferManager(nullptr)
     , Graphics(nullptr)
     , ShaderManager(nullptr)
+    , GPUTimingManager(nullptr)
 {
+    GPUTimingManager = FEngineLoop::Renderer.GPUTimingManager;
 }
 
 FRenderPassBase::~FRenderPassBase()

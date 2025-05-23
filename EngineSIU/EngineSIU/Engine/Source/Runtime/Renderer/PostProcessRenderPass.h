@@ -11,7 +11,7 @@ class FPostProcessRenderPass : public FRenderPassBase
 public:
     FPostProcessRenderPass();
     virtual ~FPostProcessRenderPass() override = default;
-    
+
     virtual void Render(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
 
 protected:

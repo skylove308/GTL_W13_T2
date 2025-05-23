@@ -5,6 +5,7 @@
 #include "Math/Vector4.h"
 
 
+class FGPUTimingManager;
 class USkeletalMeshComponent;
 class UMaterial;
 struct FStaticMaterial;
@@ -41,6 +42,8 @@ protected:
     FDXDBufferManager* BufferManager;
     FGraphicsDevice* Graphics;
     FDXDShaderManager* ShaderManager;
+
+    FGPUTimingManager* GPUTimingManager;
 
     TArray<IRenderPass*> ChildRenderPasses;
 };
