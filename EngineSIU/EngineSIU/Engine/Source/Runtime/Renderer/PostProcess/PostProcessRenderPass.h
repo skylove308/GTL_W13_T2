@@ -2,6 +2,7 @@
 #include "RenderPassBase.h"
 
 
+class FDepthOfFieldRenderPass;
 class FFogRenderPass;
 class FCameraEffectRenderPass;
 class FPostProcessCompositingPass;
@@ -21,4 +22,5 @@ protected:
     FFogRenderPass* FogRenderPass = nullptr;
     FCameraEffectRenderPass* CameraEffectRenderPass = nullptr;
     FPostProcessCompositingPass* PostProcessCompositingPass = nullptr;
+    FDepthOfFieldRenderPass* DepthOfFieldRenderPass = nullptr;
 };

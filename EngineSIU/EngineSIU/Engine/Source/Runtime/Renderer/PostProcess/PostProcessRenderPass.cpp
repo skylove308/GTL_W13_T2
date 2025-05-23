@@ -7,12 +7,14 @@
 #include "UnrealEd/EditorViewportClient.h"
 #include "UObject/Object.h"
 #include "PropertyEditor/ShowFlags.h"
+#include "DepthOfFieldRenderPass.h"
 
 FPostProcessRenderPass::FPostProcessRenderPass()
 {
     FogRenderPass = AddRenderPass<FFogRenderPass>();
     CameraEffectRenderPass = AddRenderPass<FCameraEffectRenderPass>();
     PostProcessCompositingPass = AddRenderPass<FPostProcessCompositingPass>();
+    DepthOfFieldRenderPass = AddRenderPass<FDepthOfFieldRenderPass>();
 }
 
 void FPostProcessRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& Viewport)
@@ -27,6 +29,13 @@ void FPostProcessRenderPass::Render(const std::shared_ptr<FEditorViewportClient>
         QUICK_SCOPE_CYCLE_COUNTER(FogPass_CPU)
         QUICK_GPU_SCOPE_CYCLE_COUNTER(FogPass_GPU, *GPUTimingManager)
         FogRenderPass->Render(Viewport);
+    }
+
+    if (ShowFlag & EEngineShowFlags::SF_DOF)
+    {
+        QUICK_SCOPE_CYCLE_COUNTER(DepthOfFieldPass_CPU)
+        QUICK_GPU_SCOPE_CYCLE_COUNTER(DepthOfFieldPass_GPU, *GPUTimingManager)
+        DepthOfFieldRenderPass->Render(Viewport);
     }
 
     // TODO: 포스트 프로세스 별로 각자의 렌더 타겟 뷰에 렌더하기

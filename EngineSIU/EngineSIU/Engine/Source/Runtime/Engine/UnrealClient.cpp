@@ -80,20 +80,22 @@ void FViewportResource::Release()
     ReleaseAllResources();
 }
 
-HRESULT FViewportResource::CreateDepthStencil(EResourceType Type)
+HRESULT FViewportResource::CreateDepthStencil(EResourceType Type, uint32 ResolutionScaleDivisor)
 {
     if (HasDepthStencil(Type))
     {
         ReleaseDepthStencil(Type);
     }
 
+    ResolutionScaleDivisor = FMath::Max(ResolutionScaleDivisor, 1U);
+
     FDepthStencilRHI NewResource;
     
     HRESULT hr = S_OK;
     
     D3D11_TEXTURE2D_DESC DepthStencilTextureDesc = {};
-    DepthStencilTextureDesc.Width = static_cast<uint32>(D3DViewport.Width);
-    DepthStencilTextureDesc.Height = static_cast<uint32>(D3DViewport.Height);
+    DepthStencilTextureDesc.Width = static_cast<uint32>(D3DViewport.Width / static_cast<float>(ResolutionScaleDivisor));
+    DepthStencilTextureDesc.Height = static_cast<uint32>(D3DViewport.Height / static_cast<float>(ResolutionScaleDivisor));
     DepthStencilTextureDesc.MipLevels = 1;
     DepthStencilTextureDesc.ArraySize = 1;
     DepthStencilTextureDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
@@ -135,11 +137,11 @@ HRESULT FViewportResource::CreateDepthStencil(EResourceType Type)
     return hr;
 }
 
-FDepthStencilRHI* FViewportResource::GetDepthStencil(EResourceType Type)
+FDepthStencilRHI* FViewportResource::GetDepthStencil(EResourceType Type, uint32 ResolutionScaleDivisor)
 {
     if (!HasDepthStencil(Type))
     {
-        if (FAILED(CreateDepthStencil(Type)))
+        if (FAILED(CreateDepthStencil(Type, ResolutionScaleDivisor)))
         {
             return nullptr;
         }
@@ -168,20 +170,22 @@ void FViewportResource::ClearDepthStencil(ID3D11DeviceContext* DeviceContext, ER
     }
 }
 
-HRESULT FViewportResource::CreateRenderTarget(EResourceType Type)
+HRESULT FViewportResource::CreateRenderTarget(EResourceType Type, uint32 ResolutionScaleDivisor)
 {
     if (HasRenderTarget(Type))
     {
         ReleaseRenderTarget(Type);
     }
+
+    ResolutionScaleDivisor = FMath::Max(ResolutionScaleDivisor, 1U);
     
     FRenderTargetRHI NewResource;
     
     HRESULT hr = S_OK;
     
     D3D11_TEXTURE2D_DESC TextureDesc = {};
-    TextureDesc.Width = static_cast<uint32>(D3DViewport.Width);
-    TextureDesc.Height = static_cast<uint32>(D3DViewport.Height);
+    TextureDesc.Width = static_cast<uint32>(D3DViewport.Width / static_cast<float>(ResolutionScaleDivisor));
+    TextureDesc.Height = static_cast<uint32>(D3DViewport.Height / static_cast<float>(ResolutionScaleDivisor));
     TextureDesc.MipLevels = 1;
     TextureDesc.ArraySize = 1;
     TextureDesc.Format = DXGI_FORMAT_R16G16B16A16_UNORM;
@@ -218,11 +222,11 @@ HRESULT FViewportResource::CreateRenderTarget(EResourceType Type)
     return hr;
 }
 
-FRenderTargetRHI* FViewportResource::GetRenderTarget(EResourceType Type)
+FRenderTargetRHI* FViewportResource::GetRenderTarget(EResourceType Type, uint32 ResolutionScaleDivisor)
 {
     if (!HasRenderTarget(Type))
     {
-        if (FAILED(CreateRenderTarget(Type)))
+        if (FAILED(CreateRenderTarget(Type, ResolutionScaleDivisor)))
         {
             return nullptr;
         }

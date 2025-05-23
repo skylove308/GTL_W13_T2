@@ -98,10 +98,10 @@ public:
     ////////
     /// Depth Stencil
     ////////
-    HRESULT CreateDepthStencil(EResourceType Type);
+    HRESULT CreateDepthStencil(EResourceType Type, uint32 ResolutionScaleDivisor = 1);
     
     // 해당 타입의 리소스를 리턴. 없는 경우에는 생성해서 리턴.
-    FDepthStencilRHI* GetDepthStencil(EResourceType Type);
+    FDepthStencilRHI* GetDepthStencil(EResourceType Type, uint32 ResolutionScaleDivisor = 1);
 
     bool HasDepthStencil(EResourceType Type) const;
 
@@ -115,10 +115,10 @@ public:
     ////////
     /// Render Target
     ////////
-    HRESULT CreateRenderTarget(EResourceType Type);
+    HRESULT CreateRenderTarget(EResourceType Type, uint32 ResolutionScaleDivisor = 1);
     
     // 해당 타입의 리소스를 리턴. 없는 경우에는 생성해서 리턴.
-    FRenderTargetRHI* GetRenderTarget(EResourceType Type);
+    FRenderTargetRHI* GetRenderTarget(EResourceType Type, uint32 ResolutionScaleDivisor = 1);
 
     bool HasRenderTarget(EResourceType Type) const;
 
