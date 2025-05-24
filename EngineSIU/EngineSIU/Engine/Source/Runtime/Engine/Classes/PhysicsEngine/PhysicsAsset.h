@@ -16,11 +16,6 @@ struct PxAggregateGeom
     TArray<physx::PxCapsuleGeometry> CapsuleElems;
 };
 
-struct PhysicsConstraints
-{
-    
-};
-
 class UBodySetupCore : public UObject
 {
     DECLARE_CLASS(UBodySetupCore, UObject)
@@ -44,5 +39,5 @@ private:
 
 class UPhysicsAsset : public UObject
 {
-    TArray<UBodySetup*> BodySetup;
+    TArray<UBodySetup*> BodySetups;
 };

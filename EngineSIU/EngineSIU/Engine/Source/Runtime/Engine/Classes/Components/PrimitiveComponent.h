@@ -7,6 +7,8 @@ DECLARE_MULTICAST_DELEGATE_FiveParams(FComponentHitSignature, UPrimitiveComponen
 DECLARE_MULTICAST_DELEGATE_SixParams(FComponentBeginOverlapSignature, UPrimitiveComponent* /* OverlappedComponent */, AActor* /* OtherActor */, UPrimitiveComponent* /* OtherComp */, int32 /* OtherBodyIndex */, bool /* bFromSweep */, const FHitResult& /* Hit */);
 DECLARE_MULTICAST_DELEGATE_FourParams(FComponentEndOverlapSignature, UPrimitiveComponent* /* OverlappedComponent */, AActor* /* OtherActor */, UPrimitiveComponent* /* OtherComp */, int32 /* OtherBodyIndex */);
 
+struct GameObject;
+
 class UPrimitiveComponent : public USceneComponent
 {
     DECLARE_CLASS(UPrimitiveComponent, USceneComponent)
@@ -34,7 +36,7 @@ public:
     bool bGenerateOverlapEvents = true;
     bool bBlockComponent = true;
 
-    //FBodyInstance BodyInstance;
+    FBodyInstance* BodyInstance;
 
     FComponentHitSignature OnComponentHit;
 
@@ -98,6 +100,10 @@ public:
 
     /** Returns list of components this component is overlapping. */
     const TArray<FOverlapInfo>& GetOverlapInfos() const;
+
+    GameObject* CreatePhysXGameObject();
+
+    virtual void BeginPlay() override;
 
 protected:
     TArray<FOverlapInfo> OverlappingComponents;

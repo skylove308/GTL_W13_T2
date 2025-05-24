@@ -1,14 +1,16 @@
 ﻿#pragma once
 #include <PxRigidActor.h>
 
-#include "Container/Array.h"
-#include "Math/Vector.h"
+// #include "Container/Array.h"
+// #include "Math/Vector.h"
 #include "UObject/ObjectMacros.h"
+
+class UPrimitiveComponent;
 
 struct FBodyInstance
 {
     DECLARE_STRUCT(FBodyInstance)
-    FBodyInstance();
+    FBodyInstance(UPrimitiveComponent* InOwner); // TODO: 초기값 설정?
     
     // ==================== 질량과 관성 ====================
     
@@ -102,6 +104,8 @@ struct FBodyInstance
     // PhysX 객체 참조
     physx::PxRigidActor* RigidActorSync;   // 동기 액터
     physx::PxRigidActor* RigidActorAsync;  // 비동기 액터
+
+    UPrimitiveComponent* OwnerComponent;
     
     int32 BodyIndex; // 바디 인덱스 (PhysX 내부 식별자)
 };

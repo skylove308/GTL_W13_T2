@@ -1,5 +1,6 @@
 #include "PrimitiveComponent.h"
 
+#include "PhysicsManager.h"
 #include "UObject/Casts.h"
 #include "Engine/OverlapInfo.h"
 #include "Engine/OverlapResult.h"
@@ -458,6 +459,28 @@ void UPrimitiveComponent::GetOverlappingComponents(TSet<UPrimitiveComponent*>& O
 const TArray<FOverlapInfo>& UPrimitiveComponent::GetOverlapInfos() const
 {
     return OverlappingComponents;
+}
+
+GameObject* UPrimitiveComponent::CreatePhysXGameObject()
+{
+    BodyInstance = new FBodyInstance(this);
+    
+    FVector Location = GetComponentLocation();
+    PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
+    FVector HalfScale = GetComponentScale3D() / 2;
+    PxVec3 HalfExtent = PxVec3(HalfScale.X, HalfScale.Y, HalfScale.Z);
+    
+    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, HalfExtent);
+    obj->rigidBody->userData = (void*)BodyInstance;
+
+    return obj;
+}
+
+void UPrimitiveComponent::BeginPlay()
+{
+    USceneComponent::BeginPlay();
+
+    CreatePhysXGameObject();
 }
 
 void UPrimitiveComponent::UpdateOverlapsImpl(const TArray<FOverlapInfo>* NewPendingOverlaps, bool bDoNotifies, const TArray<const FOverlapInfo>* OverlapsAtEndLocation)

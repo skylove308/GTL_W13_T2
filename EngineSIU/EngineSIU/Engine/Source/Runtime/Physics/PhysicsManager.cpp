@@ -12,13 +12,17 @@ void FPhysicsManager::InitPhysX()
 
     PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
     sceneDesc.gravity = PxVec3(0, -9.81f, 0);
-    gDispatcher = PxDefaultCpuDispatcherCreate(2);
+    gDispatcher = PxDefaultCpuDispatcherCreate(4);
     sceneDesc.cpuDispatcher = gDispatcher;
     sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+    // sceneDesc.simulationEventCallback = gMyCallback; // TODO: 이벤트 핸들러 등록(옵저버 or component 별 override)
+    sceneDesc.flags |= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
+    sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
+    sceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
     gScene = gPhysics->createScene(sceneDesc);
 }
 
-GameObject FPhysicsManager::CreateBox(const PxVec3& pos, const PxVec3& halfExtents)
+GameObject FPhysicsManager::CreateBox(const PxVec3& pos, const PxVec3& halfExtents) const
 {
     GameObject obj;
     PxTransform pose(pos);
@@ -27,7 +31,20 @@ GameObject FPhysicsManager::CreateBox(const PxVec3& pos, const PxVec3& halfExten
     obj.rigidBody->attachShape(*shape);
     PxRigidBodyExt::updateMassAndInertia(*obj.rigidBody, 10.0f);
     gScene->addActor(*obj.rigidBody);
-    obj.UpdateFromPhysics();
+    obj.UpdateFromPhysics(gScene);
+    return obj;
+}
+
+GameObject* FPhysicsManager::CreateGameObject(const PxVec3& pos, const PxVec3& halfExtents) const
+{
+    GameObject* obj = new GameObject();
+    const PxTransform pose(pos);
+    obj->rigidBody = gPhysics->createRigidDynamic(pose);
+    PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtents), *gMaterial);
+    obj->rigidBody->attachShape(*shape);
+    PxRigidBodyExt::updateMassAndInertia(*obj->rigidBody, 10.0f);
+    gScene->addActor(*obj->rigidBody);
+    obj->UpdateFromPhysics(gScene);
     return obj;
 }
 
@@ -35,7 +52,7 @@ void FPhysicsManager::Simulate(float dt)
 {
     gScene->simulate(dt);
     gScene->fetchResults(true);
-    for (auto& obj : gObjects) obj.UpdateFromPhysics();
+    for (auto& obj : gObjects) obj.UpdateFromPhysics(gScene);
 }
 
 void FPhysicsManager::ShutdownPhysX()
