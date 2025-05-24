@@ -252,4 +252,9 @@ struct FDepthOfFieldConstant
     float SensorWidth = 24.576f; // mm
     float FocalDistance = 0.f; // cm
     float FocalLength = 0.f; // mm
+
+    float CoCScaleFactor = 2.f;
+    float InFocusThreshold = 0.05f;
+    float DOFPadding1 = 0.f;
+    float DOFPadding2 = 0.f;
 };

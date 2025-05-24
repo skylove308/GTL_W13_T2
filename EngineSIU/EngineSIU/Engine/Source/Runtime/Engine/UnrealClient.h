@@ -28,6 +28,10 @@ enum class EResourceType : uint8
     ERT_Gizmo,
     ERT_PostProcessCompositing,
     ERT_Blur,
+    ERT_DepthOfField_LayerInfo,
+    ERT_DepthOfField_LayerNear,
+    ERT_DepthOfField_LayerFar,
+    ERT_Temp,
     ERT_MAX,
 };
 

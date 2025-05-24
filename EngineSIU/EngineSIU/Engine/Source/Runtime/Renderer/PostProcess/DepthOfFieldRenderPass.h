@@ -21,11 +21,14 @@ protected:
 
     virtual void CreateResource() override;
 
-    void PrepareDownSample(const std::shared_ptr<FEditorViewportClient>& Viewport);
+    void PrepareDownSample(const std::shared_ptr<FEditorViewportClient>& Viewport, bool bNear);
     void CleanUpDownSample(const std::shared_ptr<FEditorViewportClient>& Viewport);
+
+    void PrepareLayerPass(const std::shared_ptr<FEditorViewportClient>& Viewport);
+    void CleanUpLayerPass(const std::shared_ptr<FEditorViewportClient>& Viewport);
     
-    void PrepareHorizontalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
-    void CleanUpHorizontalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
+    void PrepareBlur(const std::shared_ptr<FEditorViewportClient>& Viewport, bool bNear);
+    void CleanUpBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
     
     void PrepareVerticalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
     void CleanUpVerticalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
