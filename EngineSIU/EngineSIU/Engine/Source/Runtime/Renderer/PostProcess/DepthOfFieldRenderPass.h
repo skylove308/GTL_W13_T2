@@ -29,4 +29,7 @@ protected:
     
     void PrepareVerticalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
     void CleanUpVerticalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
+
+    void PrepareComposite(const std::shared_ptr<FEditorViewportClient>& Viewport);
+    void CleanUpComposite(const std::shared_ptr<FEditorViewportClient>& Viewport);
 };

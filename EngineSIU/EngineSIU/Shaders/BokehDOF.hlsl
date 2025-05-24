@@ -3,6 +3,7 @@
 
 Texture2D InputDepth : register(t99);
 Texture2D InputTexture : register(t100);
+Texture2D BlurTexture : register(t102);
 
 SamplerState Sampler : register(s10);
 
@@ -117,7 +118,8 @@ float CalculateCoC(float2 UV)
     if (SceneDistance_mm > 0.01f)
     {
         const float DistDiff = abs(SceneDistance_mm - FocalDistance_mm);
-        const float Denominator = FocalDistance_mm * max(0.001f, SceneDistance_mm - FocalLength_mm);
+        // const float Denominator = FocalDistance_mm * max(0.001f, SceneDistance_mm - FocalLength_mm);
+        const float Denominator = FocalDistance_mm * max(0.001f, SceneDistance_mm);
 
         if (F_Stop > 0.0f && Denominator > 0.0001f)
         {
@@ -136,7 +138,7 @@ float CalculateCoC(float2 UV)
             Coc /= Denominator;
 
             // 결과 CoC 값 스케일링
-            Coc *= 0.5f;
+            Coc *= 0.25f;
         }
         else if (F_Stop > 0.0f && DistDiff > 0.01f)
         {
@@ -150,4 +152,15 @@ float CalculateCoC(float2 UV)
 float4 main(PS_Input Input) : SV_TARGET
 {
     return CalculateBokeh(Input.UV, CalculateCoC(Input.UV));
+}
+
+float4 main_Composite(PS_Input Input) : SV_TARGET
+{
+    float4 SceneColor = InputTexture.Sample(Sampler, Input.UV);
+    float4 BlurColor = BlurTexture.Sample(Sampler, Input.UV);
+
+    float Coc = CalculateCoC(Input.UV);
+
+    float3 FinalColor = lerp(SceneColor.rgb, BlurColor.rgb, Coc);
+    return float4(FinalColor, SceneColor.a);
 }
