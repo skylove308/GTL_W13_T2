@@ -65,6 +65,7 @@ private:
     /* Static Mesh Settings */
     void RenderForStaticMesh(UStaticMeshComponent* StaticMeshComp) const;
     void RenderForSkeletalMesh(USkeletalMeshComponent* SkeletalMeshComp) const;
+    void RenderForPhysicsAsset(USkeletalMeshComponent* SkeletalMeshComp) const;
     void RenderForParticleSystem(UParticleSystemComponent* ParticleSystemComponent) const;
 
     void RenderForAmbientLightComponent(UAmbientLightComponent* AmbientLightComponent) const;
