@@ -330,6 +330,86 @@ void UEditorEngine::StartParticleViewer(FName ParticleName, UParticleSystem* Par
     ClearComponentSelection();
 }
 
+//void UEditorEngine::StartPhysicsAssetViewer(FName PhysicsAssetName, UPhysicsAssetViewerWorld* PhysicsAsset)
+//{
+//    if (PhysicsAssetName == "")
+//    {
+//        return;
+//    }
+//
+//    ClearActorSelection();
+//    ClearComponentSelection();
+//
+//    if (PhysicsAssetViewerWorld)
+//    {
+//        UE_LOG(ELogLevel::Warning, TEXT("PhysicsAssetViewerWorld already exists!"));
+//        const auto Actors = PhysicsAssetViewerWorld->GetActiveLevel()->Actors;
+//        for (const auto& Actor : Actors)
+//        {
+//            Actor->Destroy();
+//        }
+//    }
+//    else
+//    {
+//        FWorldContext& WorldContext = CreateNewWorldContext(EWorldType::PhysicsAssetViewer);
+//        PhysicsAssetViewerWorld = UPhysicsAssetViewerWorld::CreateWorld(this);
+//        WorldContext.SetCurrentWorld(PhysicsAssetViewerWorld);
+//    }
+//
+//    ActiveWorld = PhysicsAssetViewerWorld;
+//    PhysicsAssetViewerWorld->WorldType = EWorldType::PhysicsAssetViewer;
+//
+//    // 스켈레탈 액터 스폰
+//    ASkeletalMeshActor* SkeletalActor = SkeletalMeshViewerWorld->SpawnActor<ASkeletalMeshActor>();
+//    SkeletalActor->SetActorTickInEditor(true);
+//
+//    USkeletalMeshComponent* MeshComp = SkeletalActor->AddComponent<USkeletalMeshComponent>();
+//    SkeletalActor->SetRootComponent(MeshComp);
+//    SkeletalActor->SetActorLabel(TEXT("OBJ_SKELETALMESH"));
+//    MeshComp->SetSkeletalMeshAsset(UAssetManager::Get().GetSkeletalMesh(PhysicsAssetName.ToString()));
+//    SkeletalMeshViewerWorld->SetSkeletalMeshComponent(MeshComp);
+//
+//    MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+//    MeshComp->PlayAnimation(PhysicsAsset, true);
+//    MeshComp->DEBUG_SetAnimationEnabled(true);
+//    MeshComp->SetPlaying(true);
+//
+//    ADirectionalLight* DirectionalLight = SkeletalMeshViewerWorld->SpawnActor<ADirectionalLight>();
+//    DirectionalLight->SetActorRotation(FRotator(45.f, 45.f, 0.f));
+//    DirectionalLight->GetComponentByClass<UDirectionalLightComponent>()->SetIntensity(4.0f);
+//
+//    FViewportCamera& Camera = *GEngineLoop.GetLevelEditor()->GetActiveViewportClient()->GetPerspectiveCamera();
+//    CameraLocation = Camera.GetLocation();
+//    CameraRotation = Camera.GetRotation();
+//
+//    Camera.SetRotation(FVector(0.0f, 30, 180));
+//    if (UPrimitiveComponent* Primitive = Cast<UPrimitiveComponent>(MeshComp))
+//    {
+//        float FOV = GEngineLoop.GetLevelEditor()->GetActiveViewportClient()->GetCameraFOV();
+//
+//        // 로컬 바운딩 박스
+//        FBoundingBox Box = Primitive->GetBoundingBox();
+//        FVector LocalCenter = (Box.MinLocation + Box.MaxLocation) * 0.5f;
+//        FVector LocalExtents = (Box.MaxLocation - Box.MinLocation) * 0.5f;
+//        float Radius = LocalExtents.Length();
+//
+//        FMatrix ComponentToWorld = Primitive->GetWorldMatrix();
+//        FVector WorldCenter = ComponentToWorld.TransformPosition(LocalCenter);
+//
+//        // FOV 기반 거리 계산
+//        float VerticalFOV = FMath::DegreesToRadians(FOV);
+//        float Distance = Radius / FMath::Tan(VerticalFOV * 0.5f);
+//
+//        // 카메라 위치 설정
+//        Camera.SetLocation(WorldCenter - Camera.GetForwardVector() * Distance);
+//    }
+//
+//    if (AEditorPlayer* Player = GetEditorPlayer())
+//    {
+//        Player->SetCoordMode(ECoordMode::CDM_LOCAL);
+//    }
+//}
+
 void UEditorEngine::BindEssentialObjects()
 {
     for (const auto Iter: TObjectRange<APlayer>())
