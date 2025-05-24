@@ -110,12 +110,12 @@ void AActor::Tick(float DeltaTime)
 {
     // TODO: 임시로 Actor에서 Tick 돌리기
     // TODO: 나중에 삭제를 Pending으로 하던가 해서 복사비용 줄이기
-    const auto CopyComponents = OwnedComponents;
+    //const auto CopyComponents = OwnedComponents;
 
-    for (UActorComponent* Comp : CopyComponents)
-    {
-        Comp->TickComponent(DeltaTime);
-    }
+    //for (UActorComponent* Comp : CopyComponents)
+    //{
+    //    Comp->TickComponent(DeltaTime);
+    //}
 }
 
 void AActor::Destroyed()

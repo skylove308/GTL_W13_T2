@@ -8,6 +8,7 @@
 
 class UAssetManager;
 class UWorld;
+class FPhysicsManager;
 
 class UEngine : public UObject
 {
@@ -19,6 +20,7 @@ public:
 public:
     UWorld* ActiveWorld;
     UAssetManager* AssetManager = nullptr;
+    FPhysicsManager* PhysicsManager = nullptr;
 
 protected:
     TArray<FWorldContext*> WorldList;

@@ -34,7 +34,7 @@ public:
     bool bGenerateOverlapEvents = true;
     bool bBlockComponent = true;
 
-    FBodyInstance BodyInstance;
+    //FBodyInstance BodyInstance;
 
     FComponentHitSignature OnComponentHit;
 
