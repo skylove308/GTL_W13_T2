@@ -1,0 +1,107 @@
+﻿#pragma once
+#include <PxRigidActor.h>
+
+#include "Container/Array.h"
+#include "Math/Vector.h"
+#include "UObject/ObjectMacros.h"
+
+struct FBodyInstance
+{
+    DECLARE_STRUCT(FBodyInstance)
+    FBodyInstance();
+    
+    // ==================== 질량과 관성 ====================
+    
+    /** 바디의 질량 (킬로그램) */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, MassInKg)
+    
+    /** 질량 중심 오프셋 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, COMNudge)
+    
+    /** 관성 텐서 스케일 (회전 저항) */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, InertiaTensorScale)
+    
+    // ==================== 시뮬레이션 설정 ====================
+    
+    /** 물리 시뮬레이션을 할지 여부 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bSimulatePhysics)
+    
+    /** 중력을 적용할지 여부 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bEnableGravity)
+    
+    /** 자동으로 인접한 바디와 용접할지 여부 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bAutoWeld)
+    
+    /** 시작할 때 깨어있는 상태인지 (잠들어있으면 CPU 절약) */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bStartAwake)
+    
+    // ==================== 움직임 제한 ====================
+    
+    /** X축 이동 잠금 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bLockXTranslation)
+    
+    /** Y축 이동 잠금 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bLockYTranslation)
+    
+    /** Z축 이동 잠금 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bLockZTranslation)
+    
+    /** X축 회전 잠금 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bLockXRotation)
+    
+    /** Y축 회전 잠금 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bLockYRotation)
+    
+    /** Z축 회전 잠금 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bLockZRotation)
+    
+    // ==================== 댐핑 (저항) ====================
+    
+    /** 선형 댐핑 - 이동 속도 감소율 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, LinearDamping)
+    
+    /** 각속도 댐핑 - 회전 속도 감소율 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, AngularDamping)
+    
+    // ==================== 충돌 설정 (TODO: 충돌 시스템 구현 후 추가) ====================
+    
+    // /** 충돌 활성화 타입 */
+    // UPROPERTY_WITH_FLAGS(EditAnywhere, ECollisionEnabled::Type, CollisionEnabled)
+    // // - NoCollision: 충돌 없음
+    // // - QueryOnly: 쿼리만 (트레이스, 오버랩)
+    // // - PhysicsOnly: 물리만 (시뮬레이션)
+    // // - QueryAndPhysics: 둘 다
+    // 
+    // /** 충돌 오브젝트 타입 */
+    // UPROPERTY_WITH_FLAGS(EditAnywhere, ECollisionChannel, ObjectType)
+    // 
+    // /** 각 충돌 채널에 대한 응답 */
+    // UPROPERTY_WITH_FLAGS(EditAnywhere, FCollisionResponseContainer, CollisionResponses)
+    
+    // ==================== 고급 물리 설정 ====================
+    
+    /** 연속 충돌 검출 (CCD) 활성화 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bUseCCD)
+    
+    /** 복잡한 충돌을 단순 충돌로 사용할지 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bUseComplexAsSimpleCollision)
+    
+    /** 비동기 물리 시뮬레이션 사용 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bUseAsyncScene)
+    
+    /** 최대 각속도 제한 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, MaxAngularVelocity)
+    
+    /** 위치 솔버 반복 횟수 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, uint8, PositionSolverIterationCount)
+    
+    /** 속도 솔버 반복 횟수 */
+    UPROPERTY_WITH_FLAGS(EditAnywhere, uint8, VelocitySolverIterationCount)
+    
+    
+    // PhysX 객체 참조
+    physx::PxRigidActor* RigidActorSync;   // 동기 액터
+    physx::PxRigidActor* RigidActorAsync;  // 비동기 액터
+    
+    int32 BodyIndex; // 바디 인덱스 (PhysX 내부 식별자)
+};

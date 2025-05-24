@@ -6,6 +6,7 @@
 #include "Template/SubclassOf.h"
 #include "Animation/AnimNodeBase.h"
 
+struct FConstraintInstance;
 class UAnimSequence;
 class USkeletalMesh;
 class FAnimNotifyEvent;
@@ -132,6 +133,12 @@ private:
     std::unique_ptr<FSkeletalMeshRenderData> CPURenderData;
 
     static bool bIsCPUSkinning;
+
+    /** Array of FBodyInstance objects, storing per-instance state about about each body. */
+    TArray<FBodyInstance*> Bodies;
+
+    /** Array of FConstraintInstance structs, storing per-instance state about each constraint. */
+    TArray<FConstraintInstance*> Constraints;
 
     void CPUSkinning(bool bForceUpdate = false);
 
