@@ -117,22 +117,22 @@ float CalculateCoC(float2 UV)
 
     if (SceneDistance_mm > 0.01f)
     {
+        /**
+         * CoC 직경 (mm 단위, 센서 평면 기준)
+         * 
+         * 표준 CoC 공식: 
+         *   CoC = (FocalLength^2 / F_Stop) * |SceneDistance - FocalDistance| / (FocalDistance * (SceneDistance - FocalLength))
+         *   
+         * 근사:
+         *   CoC_approx = (FocalLength^2 / F_Stop) * |SceneDistance - FocalDistance| / (FocalDistance * SceneDistance)
+        */
+        
         const float DistDiff = abs(SceneDistance_mm - FocalDistance_mm);
         // const float Denominator = FocalDistance_mm * max(0.001f, SceneDistance_mm - FocalLength_mm);
         const float Denominator = FocalDistance_mm * max(0.001f, SceneDistance_mm);
 
         if (F_Stop > 0.0f && Denominator > 0.0001f)
         {
-            /**
-             * CoC 직경 (mm 단위, 센서 평면 기준)
-             * 
-             * 표준 CoC 공식: 
-             *   CoC = (FocalLength^2 / F_Stop) * |SceneDistance - FocalDistance| / (FocalDistance * (SceneDistance - FocalLength))
-             *   
-             * 근사:
-             *   CoC_approx = (FocalLength^2 / F_Stop) * |SceneDistance - FocalDistance| / (FocalDistance * SceneDistance)
-            */
-            
             Coc = (FocalLength_mm * FocalLength_mm) / F_Stop;
             Coc *= DistDiff;
             Coc /= Denominator;

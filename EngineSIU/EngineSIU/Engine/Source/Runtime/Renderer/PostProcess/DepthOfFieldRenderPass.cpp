@@ -96,7 +96,7 @@ void FDepthOfFieldRenderPass::PrepareDownSample(const std::shared_ptr<FEditorVie
     }
     
     FRenderTargetRHI* RenderTargetRHI_Scene = ViewportResource->GetRenderTarget(EResourceType::ERT_Scene);
-    FRenderTargetRHI* RenderTargetRHI_DownSample2x = ViewportResource->GetRenderTarget(EResourceType::ERT_DownSample2x, 2);
+    FRenderTargetRHI* RenderTargetRHI_SceneDownSample2x = ViewportResource->GetRenderTarget(EResourceType::ERT_Scene, EDownSampleScale::DSS_2x);
 
     const FRect ViewportRect = Viewport->GetViewport()->GetRect();
     const float DownSampledWidth = static_cast<float>(FMath::FloorToInt(ViewportRect.Width / 2));
@@ -111,7 +111,7 @@ void FDepthOfFieldRenderPass::PrepareDownSample(const std::shared_ptr<FEditorVie
     Viewport_DownSample2x.TopLeftY = 0.f;
     Graphics->DeviceContext->RSSetViewports(1, &Viewport_DownSample2x);
     
-    Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI_DownSample2x->RTV, nullptr);
+    Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI_SceneDownSample2x->RTV, nullptr);
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, &RenderTargetRHI_Scene->SRV);
 
     ID3D11VertexShader* VertexShader = ShaderManager->GetVertexShaderByKey(L"FullScreenQuadVertexShader");
@@ -140,14 +140,14 @@ void FDepthOfFieldRenderPass::PrepareHorizontalBlur(const std::shared_ptr<FEdito
         return;
     }
 
-    FRenderTargetRHI* RenderTargetRHI_DownSample2x = ViewportResource->GetRenderTarget(EResourceType::ERT_DownSample2x, 2);
-    FRenderTargetRHI* RenderTargetRHI_Blur = ViewportResource->GetRenderTarget(EResourceType::ERT_Blur, 2);
+    FRenderTargetRHI* RenderTargetRHI_SceneDownSample2x = ViewportResource->GetRenderTarget(EResourceType::ERT_Scene, EDownSampleScale::DSS_2x);
+    FRenderTargetRHI* RenderTargetRHI_Blur = ViewportResource->GetRenderTarget(EResourceType::ERT_Blur, EDownSampleScale::DSS_2x);
     
     FDepthStencilRHI* DepthStencilRHI_Scene = ViewportResource->GetDepthStencil(EResourceType::ERT_Scene);
     
     Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI_Blur->RTV, nullptr);
 
-    Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, &RenderTargetRHI_DownSample2x->SRV);
+    Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, &RenderTargetRHI_SceneDownSample2x->SRV);
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_SceneDepth), 1, &DepthStencilRHI_Scene->SRV);
     
     ID3D11VertexShader* VertexShader = ShaderManager->GetVertexShaderByKey(L"FullScreenQuadVertexShader");
@@ -230,7 +230,7 @@ void FDepthOfFieldRenderPass::PrepareComposite(const std::shared_ptr<FEditorView
     FRenderTargetRHI* RenderTargetRHI_PostProcess = ViewportResource->GetRenderTarget(EResourceType::ERT_PostProcessCompositing);
     Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI_PostProcess->RTV, nullptr);
     
-    FRenderTargetRHI* RenderTargetRHI_Blur = ViewportResource->GetRenderTarget(EResourceType::ERT_Blur, 2);
+    FRenderTargetRHI* RenderTargetRHI_Blur = ViewportResource->GetRenderTarget(EResourceType::ERT_Blur, EDownSampleScale::DSS_2x);
     FRenderTargetRHI* RenderTargetRHI_Scene = ViewportResource->GetRenderTarget(EResourceType::ERT_Scene);
     FDepthStencilRHI* DepthStencilRHI_Scene = ViewportResource->GetDepthStencil(EResourceType::ERT_Scene);
 

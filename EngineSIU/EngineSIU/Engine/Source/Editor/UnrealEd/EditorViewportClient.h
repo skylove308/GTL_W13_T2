@@ -123,7 +123,7 @@ public:
     int32 ViewportIndex;
     FViewport* GetViewport() const { return Viewport; }
     
-    D3D11_VIEWPORT& GetD3DViewport() const;
+    const D3D11_VIEWPORT& GetD3DViewport() const;
 
     FViewportResource* GetViewportResource();
 
