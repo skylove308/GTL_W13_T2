@@ -18,6 +18,7 @@
 #include "PropertyEditor/ParticleViewerPanel.h"
 #include "UnrealEd/UnrealEd.h"
 #include "World/ParticleViewerWorld.h"
+#include "Physics/PhysicsManager.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -65,6 +66,7 @@ void UEditorEngine::Release()
         WorldContext->World()->Release();
     }
     WorldList.Empty();
+    PhysicsManager->ShutdownPhysX();
 }
 
 void UEditorEngine::Tick(float DeltaTime)
@@ -87,6 +89,26 @@ void UEditorEngine::Tick(float DeltaTime)
                         if (Actor && Actor->IsActorTickInEditor())
                         {
                             Actor->Tick(DeltaTime);
+
+                            // 물리기반 시뮬레이션을 위한 TickGroup 처리
+                            for (auto* Comp : Actor->GetComponents())
+                            {
+                                if (Comp->TickGroup == ETickGroup::TG_PrePhysics)
+                                {
+                                    Comp->TickComponent(DeltaTime);
+                                }
+                            }
+
+                            PhysicsManager->Simulate(DeltaTime);
+
+                            for (auto* Comp : Actor->GetComponents())
+                            {
+                                if (Comp->TickGroup == ETickGroup::TG_PostPhysics)
+                                {
+                                    Comp->TickComponent(DeltaTime);
+                                }
+                            }
+
                         }
                     }
                 }
@@ -106,6 +128,25 @@ void UEditorEngine::Tick(float DeltaTime)
                         if (Actor)
                         {
                             Actor->Tick(DeltaTime);
+
+                            // 물리기반 시뮬레이션을 위한 TickGroup 처리
+                            for (auto* Comp : Actor->GetComponents())
+                            {
+                                if (Comp->TickGroup == ETickGroup::TG_PrePhysics)
+                                {
+                                    Comp->TickComponent(DeltaTime);
+                                }
+                            }
+
+                            PhysicsManager->Simulate(DeltaTime);
+
+                            for (auto* Comp : Actor->GetComponents())
+                            {
+                                if (Comp->TickGroup == ETickGroup::TG_PostPhysics)
+                                {
+                                    Comp->TickComponent(DeltaTime);
+                                }
+                            }
                         }
                     }
                 }
@@ -126,6 +167,25 @@ void UEditorEngine::Tick(float DeltaTime)
                         if (Actor && Actor->IsActorTickInEditor())
                         {
                             Actor->Tick(DeltaTime);
+
+                            // 물리기반 시뮬레이션을 위한 TickGroup 처리
+                            for (auto* Comp : Actor->GetComponents())
+                            {
+                                if (Comp->TickGroup == ETickGroup::TG_PrePhysics)
+                                {
+                                    Comp->TickComponent(DeltaTime);
+                                }
+                            }
+
+                            PhysicsManager->Simulate(DeltaTime);
+
+                            for (auto* Comp : Actor->GetComponents())
+                            {
+                                if (Comp->TickGroup == ETickGroup::TG_PostPhysics)
+                                {
+                                    Comp->TickComponent(DeltaTime);
+                                }
+                            }
                         }
                     }
                 }
@@ -146,6 +206,25 @@ void UEditorEngine::Tick(float DeltaTime)
                         if (Actor && Actor->IsActorTickInEditor())
                         {
                             Actor->Tick(DeltaTime);
+
+                            // 물리기반 시뮬레이션을 위한 TickGroup 처리
+                            for (auto* Comp : Actor->GetComponents())
+                            {
+                                if (Comp->TickGroup == ETickGroup::TG_PrePhysics)
+                                {
+                                    Comp->TickComponent(DeltaTime);
+                                }
+                            }
+
+                            PhysicsManager->Simulate(DeltaTime);
+
+                            for (auto* Comp : Actor->GetComponents())
+                            {
+                                if (Comp->TickGroup == ETickGroup::TG_PostPhysics)
+                                {
+                                    Comp->TickComponent(DeltaTime);
+                                }
+                            }
                         }
                     }
                 }
