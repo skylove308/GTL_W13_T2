@@ -1,9 +1,12 @@
 ﻿#include "DepthOfFieldRenderPass.h"
 
 #include "RendererHelpers.h"
+#include "ShaderConstants.h"
 #include "UnrealClient.h"
 #include "D3D11RHI/DXDShaderManager.h"
+#include "Engine/Engine.h"
 #include "UnrealEd/EditorViewportClient.h"
+#include "World/World.h"
 
 void FDepthOfFieldRenderPass::Initialize(FDXDBufferManager* InBufferManager, FGraphicsDevice* InGraphics, FDXDShaderManager* InShaderManage)
 {
@@ -60,7 +63,7 @@ void FDepthOfFieldRenderPass::PrepareDownSample(const std::shared_ptr<FEditorVie
         return;
     }
     
-    FRenderTargetRHI* RenderTargetRHI_ScenePure = ViewportResource->GetRenderTarget(EResourceType::ERT_Scene);
+    FRenderTargetRHI* RenderTargetRHI_Scene = ViewportResource->GetRenderTarget(EResourceType::ERT_Scene);
     FRenderTargetRHI* RenderTargetRHI_DownSample2x = ViewportResource->GetRenderTarget(EResourceType::ERT_DownSample2x, 2);
 
     const FRect ViewportRect = Viewport->GetViewport()->GetRect();
@@ -77,7 +80,7 @@ void FDepthOfFieldRenderPass::PrepareDownSample(const std::shared_ptr<FEditorVie
     Graphics->DeviceContext->RSSetViewports(1, &Viewport_DownSample2x);
     
     Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI_DownSample2x->RTV, nullptr);
-    Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, &RenderTargetRHI_ScenePure->SRV);
+    Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, &RenderTargetRHI_Scene->SRV);
 
     ID3D11VertexShader* VertexShader = ShaderManager->GetVertexShaderByKey(L"FullScreenQuadVertexShader");
     ID3D11PixelShader* PixelShader = ShaderManager->GetPixelShaderByKey(L"DownSamplePixelShader");
@@ -94,6 +97,7 @@ void FDepthOfFieldRenderPass::CleanUpDownSample(const std::shared_ptr<FEditorVie
 
     ID3D11ShaderResourceView* NullSRV[1] = { nullptr };
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, NullSRV);
+    Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_SceneDepth), 1, NullSRV);
 }
 
 void FDepthOfFieldRenderPass::PrepareHorizontalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport)
@@ -107,9 +111,12 @@ void FDepthOfFieldRenderPass::PrepareHorizontalBlur(const std::shared_ptr<FEdito
     FRenderTargetRHI* RenderTargetRHI_DownSample2x = ViewportResource->GetRenderTarget(EResourceType::ERT_DownSample2x, 2);
     FRenderTargetRHI* RenderTargetRHI_Blur = ViewportResource->GetRenderTarget(EResourceType::ERT_Blur, 2);
     
+    FDepthStencilRHI* DepthStencilRHI_Scene = ViewportResource->GetDepthStencil(EResourceType::ERT_Scene);
+    
     Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI_Blur->RTV, nullptr);
 
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, &RenderTargetRHI_DownSample2x->SRV);
+    Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_SceneDepth), 1, &DepthStencilRHI_Scene->SRV);
     
     ID3D11VertexShader* VertexShader = ShaderManager->GetVertexShaderByKey(L"FullScreenQuadVertexShader");
     ID3D11PixelShader* PixelShader = ShaderManager->GetPixelShaderByKey(L"HorizontalBlurPixelShader");
@@ -117,9 +124,10 @@ void FDepthOfFieldRenderPass::PrepareHorizontalBlur(const std::shared_ptr<FEdito
     Graphics->DeviceContext->PSSetShader(PixelShader, nullptr, 0);
     Graphics->DeviceContext->IASetInputLayout(nullptr);
 
-    Graphics->DeviceContext->PSSetSamplers(0, 1, &Graphics->SamplerState_LinearClamp);
+    Graphics->DeviceContext->PSSetSamplers(10, 1, &Graphics->SamplerState_LinearClamp);
 
     BufferManager->BindConstantBuffer("FViewportSize", 0, EShaderStage::Pixel);
+    BufferManager->BindConstantBuffer("FDepthOfFieldConstant", 1, EShaderStage::Pixel);
 
     const FRect ViewportRect = Viewport->GetViewport()->GetRect();
     FViewportSize TextureSize = {};
@@ -127,6 +135,30 @@ void FDepthOfFieldRenderPass::PrepareHorizontalBlur(const std::shared_ptr<FEdito
     TextureSize.ViewportSize.Y = static_cast<float>(FMath::FloorToInt(ViewportRect.Height / 2));
     
     BufferManager->UpdateConstantBuffer("FViewportSize", TextureSize);
+
+    FDepthOfFieldConstant DepthOfFieldConstant;
+    if (GEngine->ActiveWorld->WorldType == EWorldType::PIE)
+    {
+        if (const APlayerController* PC = GEngine->ActiveWorld->GetPlayerController())
+        {
+            if (const APlayerCameraManager* PCM = PC->PlayerCameraManager)
+            {
+                DepthOfFieldConstant.F_Stop = PCM->F_Stop;
+                DepthOfFieldConstant.SensorWidth = PCM->SensorWidth;
+                DepthOfFieldConstant.FocalDistance = PCM->FocalDistance;
+                DepthOfFieldConstant.FocalLength = PCM->GetFocalLength();
+            }
+        }
+    }
+    else
+    {
+        DepthOfFieldConstant.F_Stop = Viewport->F_Stop;
+        DepthOfFieldConstant.SensorWidth = Viewport->SensorWidth;
+        DepthOfFieldConstant.FocalDistance = Viewport->FocalDistance;
+        DepthOfFieldConstant.FocalLength = Viewport->GetFocalLength();
+    }
+
+    BufferManager->UpdateConstantBuffer("FDepthOfFieldConstant", DepthOfFieldConstant);
 }
 
 void FDepthOfFieldRenderPass::CleanUpHorizontalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport)
@@ -161,4 +193,7 @@ void FDepthOfFieldRenderPass::CreateResource()
         MessageBox(nullptr, L"Failed to Compile HorizontalBlurPixelShader", L"Error", MB_ICONERROR | MB_OK);
         return;
     }
+
+    uint32 DepthOfFieldConstantSize = sizeof(FDepthOfFieldConstant);
+    hr = BufferManager->CreateBufferGeneric<FDepthOfFieldConstant>("FDepthOfFieldConstant", nullptr, DepthOfFieldConstantSize, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
 }
