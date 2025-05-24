@@ -378,12 +378,6 @@ void FRenderer::RenderOpaque(const std::shared_ptr<FEditorViewportClient>& Viewp
             ParticleMeshRenderPass->Render(Viewport);
         }
     }
-    
-    // 에디터 요소가 없는 순수한 뎁스 버퍼 확보
-    Graphics->DeviceContext->CopyResource(
-        Viewport->GetViewportResource()->GetDepthStencil(EResourceType::ERT_ScenePure)->Texture2D,
-        Viewport->GetViewportResource()->GetDepthStencil(EResourceType::ERT_Scene)->Texture2D
-    );
 }
 
 void FRenderer::RenderEditorDepthElement(const std::shared_ptr<FEditorViewportClient>& Viewport) const

@@ -111,9 +111,9 @@ void FDepthOfFieldRenderPass::PrepareHorizontalBlur(const std::shared_ptr<FEdito
 
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, &RenderTargetRHI_DownSample2x->SRV);
     
-    //ID3D11VertexShader* VertexShader = ShaderManager->GetVertexShaderByKey(L"DownSampleVertexShader");
+    ID3D11VertexShader* VertexShader = ShaderManager->GetVertexShaderByKey(L"DownSampleVertexShader");
     ID3D11PixelShader* PixelShader = ShaderManager->GetPixelShaderByKey(L"HorizontalBlurPixelShader");
-    //Graphics->DeviceContext->VSSetShader(VertexShader, nullptr, 0);
+    Graphics->DeviceContext->VSSetShader(VertexShader, nullptr, 0);
     Graphics->DeviceContext->PSSetShader(PixelShader, nullptr, 0);
     Graphics->DeviceContext->IASetInputLayout(nullptr);
 
@@ -161,7 +161,8 @@ void FDepthOfFieldRenderPass::CreateResource()
         return;
     }
 
-    hr = ShaderManager->AddPixelShader(L"HorizontalBlurPixelShader", L"Shaders/GaussianBlurShader.hlsl", "mainPS");
+    //hr = ShaderManager->AddPixelShader(L"HorizontalBlurPixelShader", L"Shaders/GaussianBlurShader.hlsl", "mainPS");
+    hr = ShaderManager->AddPixelShader(L"HorizontalBlurPixelShader", L"Shaders/BokehDOF.hlsl", "mainPS");
     if (FAILED(hr))
     {
         MessageBox(nullptr, L"Failed to Compile HorizontalBlurPixelShader", L"Error", MB_ICONERROR | MB_OK);
