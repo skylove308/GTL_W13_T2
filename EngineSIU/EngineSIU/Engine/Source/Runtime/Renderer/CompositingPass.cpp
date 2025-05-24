@@ -9,12 +9,9 @@
 
 void FCompositingPass::Initialize(FDXDBufferManager* InBufferManager, FGraphicsDevice* InGraphics, FDXDShaderManager* InShaderManage)
 {
-    BufferManager = InBufferManager;
-    Graphics = InGraphics;
-    ShaderManager = InShaderManage;
-
-    ShaderManager->AddVertexShader(L"Compositing", L"Shaders/CompositingShader.hlsl", "mainVS");
-    ShaderManager->AddPixelShader(L"Compositing", L"Shaders/CompositingShader.hlsl", "mainPS");
+    FRenderPassBase::Initialize(InBufferManager, InGraphics, InShaderManage);
+    
+    ShaderManager->AddPixelShader(L"Compositing", L"Shaders/CompositingShader.hlsl", "main");
 
     ViewModeBuffer = BufferManager->GetConstantBuffer("FViewModeConstants");
 
@@ -53,7 +50,7 @@ void FCompositingPass::Render(const std::shared_ptr<FEditorViewportClient>& View
 
     Graphics->DeviceContext->RSSetState(Graphics->RasterizerSolidBack);
     Graphics->DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    Graphics->DeviceContext->PSSetSamplers(0, 1, &Graphics->SamplerState_PointWrap);
+    Graphics->DeviceContext->PSSetSamplers(0, 1, &Graphics->SamplerState_PointClamp);
 
     // 버퍼 바인딩
     Graphics->DeviceContext->PSSetConstantBuffers(0, 1, &ViewModeBuffer);
@@ -70,7 +67,7 @@ void FCompositingPass::Render(const std::shared_ptr<FEditorViewportClient>& View
     BufferManager->UpdateConstantBuffer<FGammaConstants>("FGammaConstants", GammaConstantData);
 
     // Render
-    ID3D11VertexShader* VertexShader = ShaderManager->GetVertexShaderByKey(L"Compositing");
+    ID3D11VertexShader* VertexShader = ShaderManager->GetVertexShaderByKey(L"FullScreenQuadVertexShader");
     ID3D11PixelShader* PixelShader = ShaderManager->GetPixelShaderByKey(L"Compositing");
     Graphics->DeviceContext->VSSetShader(VertexShader, nullptr, 0);
     Graphics->DeviceContext->PSSetShader(PixelShader, nullptr, 0);
@@ -91,7 +88,6 @@ void FCompositingPass::Render(const std::shared_ptr<FEditorViewportClient>& View
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_EditorOverlay), 1, NullSRV);
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_CameraEffect), 1, NullSRV);
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Debug), 1, NullSRV);
-
 }
 
 void FCompositingPass::ClearRenderArr()

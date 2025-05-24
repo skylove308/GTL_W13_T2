@@ -79,7 +79,7 @@ void FDepthOfFieldRenderPass::PrepareDownSample(const std::shared_ptr<FEditorVie
     Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI_DownSample2x->RTV, nullptr);
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, &RenderTargetRHI_ScenePure->SRV);
 
-    ID3D11VertexShader* VertexShader = ShaderManager->GetVertexShaderByKey(L"DownSampleVertexShader");
+    ID3D11VertexShader* VertexShader = ShaderManager->GetVertexShaderByKey(L"FullScreenQuadVertexShader");
     ID3D11PixelShader* PixelShader = ShaderManager->GetPixelShaderByKey(L"DownSamplePixelShader");
     Graphics->DeviceContext->VSSetShader(VertexShader, nullptr, 0);
     Graphics->DeviceContext->PSSetShader(PixelShader, nullptr, 0);
@@ -111,7 +111,7 @@ void FDepthOfFieldRenderPass::PrepareHorizontalBlur(const std::shared_ptr<FEdito
 
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, &RenderTargetRHI_DownSample2x->SRV);
     
-    ID3D11VertexShader* VertexShader = ShaderManager->GetVertexShaderByKey(L"DownSampleVertexShader");
+    ID3D11VertexShader* VertexShader = ShaderManager->GetVertexShaderByKey(L"FullScreenQuadVertexShader");
     ID3D11PixelShader* PixelShader = ShaderManager->GetPixelShaderByKey(L"HorizontalBlurPixelShader");
     Graphics->DeviceContext->VSSetShader(VertexShader, nullptr, 0);
     Graphics->DeviceContext->PSSetShader(PixelShader, nullptr, 0);
@@ -147,22 +147,15 @@ void FDepthOfFieldRenderPass::CleanUpVerticalBlur(const std::shared_ptr<FEditorV
 
 void FDepthOfFieldRenderPass::CreateResource()
 {
-    HRESULT hr = ShaderManager->AddVertexShader(L"DownSampleVertexShader", L"Shaders/DownSampleShader.hlsl", "mainVS");
+    HRESULT hr = hr = ShaderManager->AddPixelShader(L"DownSamplePixelShader", L"Shaders/DownSampleShader.hlsl", "main");
     if (FAILED(hr))
     {
-        MessageBox(nullptr, L"Failed to Compile DownSampleShader: mainVS", L"Error", MB_ICONERROR | MB_OK);
-        return;
-    }
-    
-    hr = ShaderManager->AddPixelShader(L"DownSamplePixelShader", L"Shaders/DownSampleShader.hlsl", "mainPS");
-    if (FAILED(hr))
-    {
-        MessageBox(nullptr, L"Failed to Compile DownSampleShader: mainPS", L"Error", MB_ICONERROR | MB_OK);
+        MessageBox(nullptr, L"Failed to Compile DownSamplePixelShader", L"Error", MB_ICONERROR | MB_OK);
         return;
     }
 
-    //hr = ShaderManager->AddPixelShader(L"HorizontalBlurPixelShader", L"Shaders/GaussianBlurShader.hlsl", "mainPS");
-    hr = ShaderManager->AddPixelShader(L"HorizontalBlurPixelShader", L"Shaders/BokehDOF.hlsl", "mainPS");
+    //hr = ShaderManager->AddPixelShader(L"HorizontalBlurPixelShader", L"Shaders/GaussianBlurShader.hlsl", "main");
+    hr = ShaderManager->AddPixelShader(L"HorizontalBlurPixelShader", L"Shaders/BokehDOF.hlsl", "main");
     if (FAILED(hr))
     {
         MessageBox(nullptr, L"Failed to Compile HorizontalBlurPixelShader", L"Error", MB_ICONERROR | MB_OK);

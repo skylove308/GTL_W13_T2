@@ -110,6 +110,10 @@ void FBillboardRenderPass::PrepareRender(const std::shared_ptr<FEditorViewportCl
 
     Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, DepthStencilRHI->DSV);
 
+    Graphics->DeviceContext->RSSetViewports(1, &Viewport->GetViewportResource()->GetD3DViewport());
+
+    Graphics->DeviceContext->RSSetState(Graphics->RasterizerSolidBack);
+    
     Graphics->DeviceContext->OMSetBlendState(Graphics->BlendState_AlphaBlend, nullptr, 0xffffffff);
     Graphics->DeviceContext->OMSetDepthStencilState(Graphics->DepthStencilState_DepthWriteDisabled, 1);
     
