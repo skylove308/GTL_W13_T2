@@ -37,10 +37,10 @@ void FCompositingPass::Render(const std::shared_ptr<FEditorViewportClient>& View
 
     Graphics->DeviceContext->RSSetViewports(1, &Viewport->GetD3DViewport());
 
-    // TODO: 테스트 끝난 후에 바인딩 할 리소스 타입 ERT_Scene으로 되돌리기
-    Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, &ViewportResource->GetRenderTarget(EResourceType::ERT_DepthOfField_Result)->SRV);
+    Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Scene), 1, &ViewportResource->GetRenderTarget(EResourceType::ERT_Scene)->SRV);
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Translucent), 1, &ViewportResource->GetRenderTarget(EResourceType::ERT_Translucent)->SRV);
-    Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_PostProcess), 1, &ViewportResource->GetRenderTarget(EResourceType::ERT_PP_Fog)->SRV);
+    // TODO: 포스트 프로세싱 결과에 Depth of Field 결과만 전달해주고 있음. Fog는 고려하지 않은 방식으로, 추후 개선 필요.
+    Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_PostProcess), 1, &ViewportResource->GetRenderTarget(EResourceType::ERT_DepthOfField_Result)->SRV);
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_Editor), 1, &ViewportResource->GetRenderTarget(EResourceType::ERT_Editor)->SRV);
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_EditorOverlay), 1, &ViewportResource->GetRenderTarget(EResourceType::ERT_EditorOverlay)->SRV);
     Graphics->DeviceContext->PSSetShaderResources(static_cast<UINT>(EShaderSRVSlot::SRV_CameraEffect), 1, &ViewportResource->GetRenderTarget(EResourceType::ERT_PP_CameraEffect)->SRV);

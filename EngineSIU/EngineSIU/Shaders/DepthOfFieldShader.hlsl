@@ -305,7 +305,7 @@ float4 PS_FilterNearCoC_Max(PS_Input Input) : SV_TARGET
 
     // 3x3 Max Filter 예시 (커널 크기는 필요에 따라 조절)
     // 좀 더 넓은 영역을 원하면 5x5 등으로 확장 가능
-    const int KernelRadius = 1; // 3x3 ( -1, 0, 1 )
+    const int KernelRadius = 2; // 3x3 ( -1, 0, 1 )
     for (int y = -KernelRadius; y <= KernelRadius; ++y)
     {
         for (int x = -KernelRadius; x <= KernelRadius; ++x)

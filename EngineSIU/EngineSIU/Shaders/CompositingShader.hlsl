@@ -58,9 +58,10 @@ float4 main(PS_Input Input) : SV_TARGET
     }
     else
     {
-        FinalColor = lerp(FinalColor, Editor, Editor.a);
-        FinalColor = lerp(FinalColor, Translucent, Translucent.a);
         FinalColor = lerp(FinalColor, PostProcess, PostProcess.a);
+        FinalColor = lerp(FinalColor, Editor, Editor.a);
+        // TODO: 반투명 물체는 포스트 프로세싱을 어떻게 처리해야하는지 고민해야 함.
+        FinalColor = lerp(FinalColor, Translucent, Translucent.a);
         FinalColor = lerp(FinalColor, EditorOverlay, EditorOverlay.a);
         FinalColor = lerp(FinalColor, CameraEffect, CameraEffect.a);
     }
