@@ -56,36 +56,59 @@ GameObject FPhysicsManager::CreateBox(const PxVec3& pos, const PxVec3& halfExten
     return obj;
 }
 
-GameObject* FPhysicsManager::CreateGameObject(const PxVec3& pos, const PxVec3& halfExtents, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const
+GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const
 {
-    GameObject* obj = new GameObject();
-    const PxTransform pose(pos);
-    obj->rigidBody = gPhysics->createRigidDynamic(pose);
+    GameObject* Obj = new GameObject();
+    const PxTransform Pose(Pos);
+    Obj->rigidBody = gPhysics->createRigidDynamic(Pose);
     for (const auto& BodySetup : BodySetups)
     {
         for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
         {
-            PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtents.x), *gMaterial);
-            obj->rigidBody->attachShape(*shape);
+            Obj->rigidBody->attachShape(*Sphere);
         }
 
         for (const auto& Box : BodySetup->AggGeom.BoxElems)
         {
-            PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtents), *gMaterial);
-            obj->rigidBody->attachShape(*shape);
+            Obj->rigidBody->attachShape(*Box);
         }
 
         for (const auto& Capsule : BodySetup->AggGeom.CapsuleElems)
         {
-            PxShape* shape = gPhysics->createShape(PxCapsuleGeometry(halfExtents.x, halfExtents.z), *gMaterial);
-            obj->rigidBody->attachShape(*shape);
+            Obj->rigidBody->attachShape(*Capsule);
         }
     }
-    PxRigidBodyExt::updateMassAndInertia(*obj->rigidBody, 10.0f);
-    gScene->addActor(*obj->rigidBody);
-    obj->UpdateFromPhysics(gScene);
-    obj->rigidBody->userData = (void*)BodyInstance;
-    return obj;
+    
+    PxRigidBodyExt::updateMassAndInertia(*Obj->rigidBody, 10.0f);
+    gScene->addActor(*Obj->rigidBody);
+    Obj->UpdateFromPhysics(gScene);
+    Obj->rigidBody->userData = (void*)BodyInstance;
+    
+    return Obj;
+}
+
+PxShape* FPhysicsManager::CreateBoxShape(const PxVec3& pos, const PxVec3& halfExtents) const
+{
+    PxShape* Result = gPhysics->createShape(PxSphereGeometry(halfExtents.x), *gMaterial);
+    PxTransform localPose(pos);
+    Result->setLocalPose(localPose);
+    return Result;
+}
+
+PxShape* FPhysicsManager::CreateSphereShape(const PxVec3& pos, const PxVec3& halfExtents) const
+{
+    PxShape* Result = gPhysics->createShape(PxBoxGeometry(halfExtents), *gMaterial);
+    PxTransform localPose(pos);
+    Result->setLocalPose(localPose);
+    return Result;
+}
+
+PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& pos, const PxVec3& halfExtents) const
+{
+    PxShape* Result = gPhysics->createShape(PxCapsuleGeometry(halfExtents.x, halfExtents.z), *gMaterial);
+    PxTransform localPose(pos);
+    Result->setLocalPose(localPose);
+    return Result;
 }
 
 void FPhysicsManager::Simulate(float dt)

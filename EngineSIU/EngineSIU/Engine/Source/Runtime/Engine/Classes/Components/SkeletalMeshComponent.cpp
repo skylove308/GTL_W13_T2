@@ -362,11 +362,9 @@ GameObject* USkeletalMeshComponent::CreatePhysXGameObject()
     BodyInstance = new FBodyInstance(this);
     
     FVector Location = GetComponentLocation();
-    physx::PxVec3 Pos = physx::PxVec3(Location.X, Location.Y, Location.Z);
-    FVector HalfScale = GetComponentScale3D() / 2;
-    physx::PxVec3 HalfExtent = physx::PxVec3(HalfScale.X, HalfScale.Y, HalfScale.Z);
+    PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
     
-    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, HalfExtent,  BodyInstance, SkeletalMeshAsset->GetPhysicsAsset()->BodySetups);
+    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance,  SkeletalMeshAsset->GetPhysicsAsset()->BodySetups);
 
     return obj;
 }

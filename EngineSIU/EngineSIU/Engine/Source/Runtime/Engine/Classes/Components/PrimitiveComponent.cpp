@@ -1,6 +1,10 @@
 #include "PrimitiveComponent.h"
 
+#include "BoxComponent.h"
+#include "CapsuleComponent.h"
 #include "PhysicsManager.h"
+#include "SphereComp.h"
+#include "SphereComponent.h"
 #include "UObject/Casts.h"
 #include "Engine/OverlapInfo.h"
 #include "Engine/OverlapResult.h"
@@ -150,6 +154,12 @@ static bool ShouldIgnoreOverlapResult(const UWorld* World, const AActor* ThisAct
     }
 
     return false;
+}
+
+UPrimitiveComponent::UPrimitiveComponent()
+{
+    ////////////////////////////////////// 테스트 코드
+    BodySetup = FObjectFactory::ConstructObject<UBodySetup>(this);
 }
 
 UObject* UPrimitiveComponent::Duplicate(UObject* InOuter)
@@ -468,13 +478,11 @@ GameObject* UPrimitiveComponent::CreatePhysXGameObject()
     
     FVector Location = GetComponentLocation();
     PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
-    FVector HalfScale = GetComponentScale3D() / 2;
-    PxVec3 HalfExtent = PxVec3(HalfScale.X, HalfScale.Y, HalfScale.Z);
 
     TArray<UBodySetup*> BodySetups;
     BodySetups.Add(BodySetup);
     
-    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, HalfExtent,  BodyInstance, BodySetups);
+    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance,  BodySetups);
 
     return obj;
 }
@@ -482,7 +490,31 @@ GameObject* UPrimitiveComponent::CreatePhysXGameObject()
 void UPrimitiveComponent::BeginPlay()
 {
     USceneComponent::BeginPlay();
+    
+    for (const auto& BoxShape : GetOwner()->GetComponentsByClass<UBoxComponent>())
+    {
+        PxVec3 Offset = PxVec3(BoxShape->RelativeLocation.X, BoxShape->RelativeLocation.Y, BoxShape->RelativeLocation.Z);
+        PxVec3 HalfScale = PxVec3(BoxShape->RelativeScale3D.X, BoxShape->RelativeScale3D.Y, BoxShape->RelativeScale3D.Z) / 2;
+        PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, HalfScale);
+        BodySetup->AggGeom.BoxElems.Add(PxBox);
+    }
 
+    for (const auto& SphereShape : GetOwner()->GetComponentsByClass<USphereComponent>())
+    {
+        PxVec3 Offset = PxVec3(SphereShape->RelativeLocation.X, SphereShape->RelativeLocation.Y, SphereShape->RelativeLocation.Z);
+        PxVec3 HalfScale = PxVec3(SphereShape->RelativeScale3D.X, SphereShape->RelativeScale3D.Y, SphereShape->RelativeScale3D.Z) / 2;
+        PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, HalfScale);
+        BodySetup->AggGeom.SphereElems.Add(PxSphere);
+    }
+
+    for (const auto& CapsuleShape : GetOwner()->GetComponentsByClass<UCapsuleComponent>())
+    {
+        PxVec3 Offset = PxVec3(CapsuleShape->RelativeLocation.X, CapsuleShape->RelativeLocation.Y, CapsuleShape->RelativeLocation.Z);
+        PxVec3 HalfScale = PxVec3(CapsuleShape->RelativeScale3D.X, CapsuleShape->RelativeScale3D.Y, CapsuleShape->RelativeScale3D.Z) / 2;
+        PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, HalfScale);
+        BodySetup->AggGeom.SphereElems.Add(PxCapsule);
+    }
+    
     CreatePhysXGameObject();
 }
 

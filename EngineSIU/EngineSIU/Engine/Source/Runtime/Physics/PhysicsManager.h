@@ -45,7 +45,10 @@ public:
     void SetCurrentScene(PxScene* Scene) { gScene = Scene; }
     
     GameObject CreateBox(const PxVec3& pos, const PxVec3& halfExtents) const;
-    GameObject* CreateGameObject(const PxVec3& pos, const PxVec3& halfExtents, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const;
+    GameObject* CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const;
+    PxShape* CreateBoxShape(const PxVec3& pos, const PxVec3& halfExtents) const;
+    PxShape* CreateSphereShape(const PxVec3& pos, const PxVec3& halfExtents) const;
+    PxShape* CreateCapsuleShape(const PxVec3& pos, const PxVec3& halfExtents) const;
     
     void Simulate(float dt);
     void ShutdownPhysX();

@@ -11,9 +11,9 @@
 
 struct PxAggregateGeom
 {
-    TArray<physx::PxSphereGeometry> SphereElems;
-    TArray<physx::PxBoxGeometry> BoxElems;
-    TArray<physx::PxCapsuleGeometry> CapsuleElems;
+    TArray<physx::PxShape*> SphereElems;
+    TArray<physx::PxShape*> BoxElems;
+    TArray<physx::PxShape*> CapsuleElems;
 };
 
 class UBodySetupCore : public UObject

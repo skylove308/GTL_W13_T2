@@ -3,11 +3,12 @@
 #include "SkeletalMesh.h"
 
 #include "PhysicsEngine/PhysicsAsset.h"
+#include "UObject/ObjectFactory.h"
 
 USkeletalMesh::USkeletalMesh()
 {
     /////////////// 테스트 코드
-    PhysicsAsset = new UPhysicsAsset();
+    PhysicsAsset = FObjectFactory::ConstructObject<UPhysicsAsset>(this);
     /////////////////////////
 }
 
