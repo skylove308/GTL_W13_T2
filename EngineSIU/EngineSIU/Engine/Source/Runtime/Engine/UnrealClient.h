@@ -27,10 +27,12 @@ enum class EResourceType : uint8
     ERT_EditorOverlay,
     ERT_Gizmo,
     ERT_PostProcessCompositing,
-    ERT_Blur,
+    // Begin Depth of Field
+    ERT_DepthOfField_FilteredCoC,
     ERT_DepthOfField_LayerInfo,
     ERT_DepthOfField_LayerNear,
     ERT_DepthOfField_LayerFar,
+    // End Depth of Field
     ERT_Temp1,
     ERT_Temp2,
     ERT_MAX,

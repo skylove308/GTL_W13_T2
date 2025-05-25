@@ -4,12 +4,14 @@
 Texture2D LayerInfoTexture : register(t90);
 Texture2D BlurredNearTexture : register(t91);
 Texture2D BlurredFarTexture : register(t92);
+Texture2D FilteredCoCTexture : register(t93);
 Texture2D InputDepth : register(t99);
 Texture2D SceneTexture : register(t100);
 
-SamplerState Sampler : register(s10);
+SamplerState LinearSampler : register(s10);
+SamplerState PointSampler : register(s11);
 
-static const float MAX_KERNEL_PIXEL_RADIUS = 6.0f;
+static const float MAX_KERNEL_PIXEL_RADIUS = 5.0f;
 
 // 포아송 디스크 샘플링 패턴 (19개 샘플)
 static const int NUM_SAMPLES = 19;
@@ -56,7 +58,7 @@ float LinearizeDepth(float NonLinearDepth, float Near, float Far)
 
 float4 CalculateBlur(float2 TexUV, float2 CurrentTextureSize)
 {
-    float4 CenterPixelData = SceneTexture.Sample(Sampler, TexUV);
+    float4 CenterPixelData = SceneTexture.Sample(LinearSampler, TexUV);
     float3 CenterColor = CenterPixelData.rgb;
     float CenterCoC = CenterPixelData.a;
 
@@ -77,7 +79,7 @@ float4 CalculateBlur(float2 TexUV, float2 CurrentTextureSize)
         float2 SampleUV = TexUV + UVOffset;
 
         // 샘플링할 픽셀의 데이터 (색상 및 해당 픽셀의 CoC)
-        float4 SampleData = SceneTexture.Sample(Sampler, SampleUV);
+        float4 SampleData = SceneTexture.Sample(LinearSampler, SampleUV);
         float3 SampleColor = SampleData.rgb;
         float SampleCoC = SampleData.a; // 샘플링된 픽셀의 CoC 값
 
@@ -127,51 +129,53 @@ float4 CalculateBlur(float2 TexUV, float2 CurrentTextureSize)
 
 float4 CalculateNearBlur(float2 TexUV, float2 CurrentTextureSize)
 {
-    float4 CenterPixelData = SceneTexture.Sample(Sampler, TexUV);
+    float4 CenterPixelData = SceneTexture.Sample(LinearSampler, TexUV);
     float3 CenterColor = CenterPixelData.rgb;
     float CenterCoC = CenterPixelData.a;
+
+    if (CenterCoC < 0.001f)
+    {
+        return CenterPixelData;
+    }
 
     float3 AccumulatedColor = float3(0.0f, 0.0f, 0.0f);
     float TotalWeight = 0.0f;
     float MaxCoC = CenterCoC; // 최대 CoC 추적
 
     // 확장된 블러 반경 - 주변 픽셀들의 CoC도 고려
-    float BasePixelRadius = CenterCoC * MAX_KERNEL_PIXEL_RADIUS * BokehIntensityScale;
-    
-    // Near 레이어의 경우 더 큰 반경으로 샘플링하여 확산 효과 구현
-    float ExpandedRadius = BasePixelRadius;
+    float ActualPixelRadius = CenterCoC * MAX_KERNEL_PIXEL_RADIUS * BokehIntensityScale;
 
     for (int i = 0; i < NUM_SAMPLES; ++i)
     {
         // 1차: 기본 반경으로 샘플링
-        float2 PixelOffset = PoissonSamples[i] * BasePixelRadius;
+        float2 PixelOffset = PoissonSamples[i] * ActualPixelRadius;
         float2 UVOffset = PixelOffset / CurrentTextureSize;
         float2 SampleUV = TexUV + UVOffset;
 
-        float4 SampleData = SceneTexture.Sample(Sampler, SampleUV);
+        float4 SampleData = SceneTexture.Sample(LinearSampler, SampleUV);
         float3 SampleColor = SampleData.rgb;
         float SampleCoC = SampleData.a;
-
-        // 샘플 픽셀의 CoC가 중심보다 클 경우, 그 영향 반경 계산
-        float SampleInfluenceRadius = SampleCoC * MAX_KERNEL_PIXEL_RADIUS * BokehIntensityScale;
-        
-        // 현재 샘플 위치에서 중심까지의 거리
-        float DistanceToCenter = length(PixelOffset);
         
         float Weight = 1.0f;
 
+        // 샘플 픽셀의 CoC가 중심보다 클 경우, 그 영향 반경 계산
+        float SampleInfluenceRadius = SampleCoC * MAX_KERNEL_PIXEL_RADIUS * BokehIntensityScale;
+        // 현재 샘플 위치에서 중심까지의 거리
+        float DistanceToCenter = length(PixelOffset);
+
         // Near 레이어 전용 가중치 계산
         // 1. 샘플 픽셀이 중심에 영향을 줄 수 있는지 확인
-        if (DistanceToCenter <= SampleInfluenceRadius)
+        if (DistanceToCenter <= SampleInfluenceRadius && SampleInfluenceRadius > 0.001f)
         {
             // 샘플 픽셀의 영향권 내에 있으면 높은 가중치
-            Weight *= saturate(1.0f - (DistanceToCenter / max(0.001f, SampleInfluenceRadius)));
+            Weight *= saturate(1.0f - (DistanceToCenter / SampleInfluenceRadius));
         }
         else
         {
             // 기본 가우시안 가중치
-            float NormalizedDistance = length(PoissonSamples[i]);
-            Weight *= exp(-NormalizedDistance * NormalizedDistance / (2.0f * 0.5f * 0.5f));
+            float Sigma = 0.5f; // 2.0f * 0.5f * 0.5f = 0.5f
+            float NormalizedKernelDistance = length(PoissonSamples[i]);
+            Weight *= exp(-NormalizedKernelDistance * NormalizedKernelDistance / Sigma);
         }
 
         // 하이라이트 부스트
@@ -190,40 +194,6 @@ float4 CalculateNearBlur(float2 TexUV, float2 CurrentTextureSize)
         }
     }
 
-    // 2차: 확산 샘플링 - 주변의 높은 CoC 픽셀들로부터 색상을 가져옴
-    // 더 넓은 범위에서 샘플링하여 Near 오브젝트의 색상이 배경으로 퍼지도록
-    float DilationRadius = MAX_KERNEL_PIXEL_RADIUS * BokehIntensityScale * 1.5f; // 확산용 더 큰 반경
-    
-    for (int j = 0; j < NUM_SAMPLES; ++j)
-    {
-        float2 DilationOffset = PoissonSamples[j] * DilationRadius;
-        float2 DilationUVOffset = DilationOffset / CurrentTextureSize;
-        float2 DilationSampleUV = TexUV + DilationUVOffset;
-
-        float4 DilationSampleData = SceneTexture.Sample(Sampler, DilationSampleUV);
-        float3 DilationSampleColor = DilationSampleData.rgb;
-        float DilationSampleCoC = DilationSampleData.a;
-
-        // 높은 CoC를 가진 픽셀만 확산에 기여
-        if (DilationSampleCoC > 0.1f)
-        {
-            float DilationDistance = length(DilationOffset);
-            float DilationInfluenceRadius = DilationSampleCoC * MAX_KERNEL_PIXEL_RADIUS * BokehIntensityScale;
-            
-            // 확산 픽셀이 현재 위치에 영향을 줄 수 있는지 확인
-            if (DilationDistance <= DilationInfluenceRadius)
-            {
-                float DilationWeight = saturate(1.0f - (DilationDistance / max(0.001f, DilationInfluenceRadius)));
-                DilationWeight *= DilationSampleCoC; // CoC 비례 가중치
-                DilationWeight *= 0.3f; // 확산 강도 조절
-                
-                AccumulatedColor += DilationSampleColor * DilationWeight;
-                TotalWeight += DilationWeight;
-                MaxCoC = max(MaxCoC, DilationSampleCoC);
-            }
-        }
-    }
-
     if (TotalWeight > 0.001f)
     {
         AccumulatedColor /= TotalWeight;
@@ -238,9 +208,14 @@ float4 CalculateNearBlur(float2 TexUV, float2 CurrentTextureSize)
 
 float4 CalculateFarBlur(float2 TexUV, float2 CurrentTextureSize)
 {
-    float4 CenterPixelData = SceneTexture.Sample(Sampler, TexUV);
+    float4 CenterPixelData = SceneTexture.Sample(LinearSampler, TexUV);
     float3 CenterColor = CenterPixelData.rgb;
     float CenterCoC = CenterPixelData.a;
+
+    if (CenterCoC < 0.001f)
+    {
+        return CenterPixelData;
+    }
 
     float3 AccumulatedColor = float3(0.0f, 0.0f, 0.0f);
     float TotalWeight = 0.0f;
@@ -253,15 +228,16 @@ float4 CalculateFarBlur(float2 TexUV, float2 CurrentTextureSize)
         float2 UVOffset = PixelOffset / CurrentTextureSize;
         float2 SampleUV = TexUV + UVOffset;
 
-        float4 SampleData = SceneTexture.Sample(Sampler, SampleUV);
+        float4 SampleData = SceneTexture.Sample(LinearSampler, SampleUV);
         float3 SampleColor = SampleData.rgb;
         float SampleCoC = SampleData.a;
 
         float Weight = 1.0f;
 
         // 거리 기반 가우시안 가중치
-        float DistanceSquared = dot(PoissonSamples[i], PoissonSamples[i]);
-        float GaussianWeight = exp(-DistanceSquared / (2.0f * 0.5f * 0.5f));
+        float Sigma = 0.5f; // 2.0f * 0.5f * 0.5f = 0.5f
+        float NormalizedKernelDistanceSq = dot(PoissonSamples[i], PoissonSamples[i]);
+        float GaussianWeight = exp(-NormalizedKernelDistanceSq / Sigma);
         Weight *= GaussianWeight;
 
         // 하이라이트 부스트
@@ -310,7 +286,7 @@ float4 CalculateLayerCoCAndMasks(float2 UV)
         return LayerInfo;
     }
     
-    const float NonLinearDepth = InputDepth.Sample(Sampler, UV).r;
+    const float NonLinearDepth = InputDepth.Sample(PointSampler, UV).r;
     // LinearizeDepth에 전달하는 NearClip, FarClip은 뎁스 버퍼가 생성될 때 사용된 카메라의 값과 일치해야 합니다.
     // 또한, FocalDistance_World와 단위가 같아야 합니다.
     const float SceneDistance_World = LinearizeDepth(NonLinearDepth, NearClip, FarClip);
@@ -390,6 +366,33 @@ float4 PS_GenerateLayer(PS_Input Input) : SV_TARGET
     return CalculateLayerCoCAndMasks(Input.UV);
 }
 
+float4 PS_FilterNearCoC_Max(PS_Input Input) : SV_TARGET
+{
+    float2 UV = Input.UV;
+    float2 TexelSize = TexturePixelSize; 
+
+    float MaxNearCoC = 0.0f;
+
+    // 3x3 Max Filter 예시 (커널 크기는 필요에 따라 조절)
+    // 좀 더 넓은 영역을 원하면 5x5 등으로 확장 가능
+    const int KernelRadius = 3; // 3x3 ( -1, 0, 1 )
+    for (int y = -KernelRadius; y <= KernelRadius; ++y)
+    {
+        for (int x = -KernelRadius; x <= KernelRadius; ++x)
+        {
+            float2 Offset = float2(x, y) * TexelSize;
+            // LayerInfoTexture 샘플링 시 PointSampler 사용 권장
+            float CurrentNearCoC = LayerInfoTexture.Sample(PointSampler, UV + Offset).g; 
+            MaxNearCoC = max(MaxNearCoC, CurrentNearCoC);
+        }
+    }
+    
+    // 필터링된 MaxNearCoC 값을 예를 들어 R 채널에 저장합니다.
+    // 다른 채널 값은 필요에 따라 LayerInfoTexture에서 가져오거나 0으로 설정할 수 있습니다.
+    // 여기서는 다른 채널은 사용하지 않는다고 가정하고 MaxNearCoC만 R 채널에 씁니다.
+    return float4(MaxNearCoC, MaxNearCoC, MaxNearCoC, MaxNearCoC);
+}
+
 float4 PS_BlurLayer(PS_Input Input) : SV_TARGET
 {
     float2 DownSampleTextureSize = 1.0 / TexturePixelSize;
@@ -412,12 +415,9 @@ float4 PS_BlurFarLayer(PS_Input Input) : SV_TARGET
 float4 PS_ExtractAndDownsampleLayer(PS_Input Input) : SV_TARGET
 {
     float2 UV = Input.UV;
-    float2 TexelSize = TexturePixelSize; // (1/width, 1/height) of full res texture
+    float2 TexelSize = TexturePixelSize;
 
     // 2x2 샘플링 오프셋 (풀 해상도 텍셀 기준)
-    // 다운샘플링된 픽셀의 중앙이 풀 해상도 픽셀 그리드의 교차점에 오도록 오프셋 조정 가능
-    // 예: 출력 픽셀이 입력 픽셀 (i,j), (i+1,j), (i,j+1), (i+1,j+1)을 커버
-    // 샘플링 위치는 각 입력 픽셀의 중앙이 됨
     float2 Offsets[4] =
     {
         float2(-0.5f * TexelSize.x, -0.5f * TexelSize.y),
@@ -428,30 +428,28 @@ float4 PS_ExtractAndDownsampleLayer(PS_Input Input) : SV_TARGET
 
     float3 AccumulatedColor = float3(0.0f, 0.0f, 0.0f);
     float TotalWeight = 0.0f;
-    float MaxCoC = 0.0f; // 합성 시 사용할 CoC 대표값 (예: 최대값)
+    float RepresentativeCoC = 0.0f; // 합성 시 사용할 CoC 대표값 (예: 최대값)
 
     for (int i = 0; i < 4; ++i)
     {
         float2 SampleUV = UV + Offsets[i];
-        float4 CurrentLayerInfo = LayerInfoTexture.Sample(Sampler, SampleUV);
+
+        float CurrentCoC = 
 #ifdef NEAR
-        float CurrentCoC = CurrentLayerInfo.g;
+            FilteredCoCTexture.Sample(LinearSampler, SampleUV).r;
 #else
-        float CurrentCoC = CurrentLayerInfo.r;
+            LayerInfoTexture.Sample(LinearSampler, SampleUV).r;
 #endif
 
-        if (CurrentCoC > 0.0f || true) // TODO: 전체 영역의 씬 컬러를 포함할지, 현재 레이어의 씬 컬러만 포함할지 결정하는 부분
-        {
-            float4 CurrentSceneColor = SceneTexture.Sample(Sampler, SampleUV);
-            AccumulatedColor += CurrentSceneColor.rgb; // CoC를 가중치로 사용
-            TotalWeight += 1.0;
-            MaxCoC = max(MaxCoC, CurrentCoC);
-        }
+        float4 CurrentSceneColor = SceneTexture.Sample(LinearSampler, SampleUV);
+        AccumulatedColor += CurrentSceneColor.rgb; // CoC를 가중치로 사용
+        TotalWeight += 1.0;
+        RepresentativeCoC = max(RepresentativeCoC, CurrentCoC);
     }
 
     if (TotalWeight > 0.001f)
     {
-        return float4(AccumulatedColor / TotalWeight, MaxCoC); // 또는 totalNearWeight / 4.0f 등
+        return float4(AccumulatedColor / TotalWeight, RepresentativeCoC); // 또는 totalNearWeight / 4.0f 등
     }
     
     return float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -459,7 +457,7 @@ float4 PS_ExtractAndDownsampleLayer(PS_Input Input) : SV_TARGET
 
 float4 DebugCoC(float2 UV)
 {
-    float4 layerInfo = LayerInfoTexture.Sample(Sampler, UV); // 또는 LinearClampSampler
+    float4 layerInfo = LayerInfoTexture.Sample(LinearSampler, UV); // 또는 LinearClampSampler
     
     float farCoC = layerInfo.r;        // 0.0 ~ 1.0 (원경 흐림 강도)
     float nearCoC = layerInfo.g;       // 0.0 ~ 1.0 (근경 흐림 강도)
@@ -518,22 +516,22 @@ float4 PS_Composite(PS_Input Input) : SV_TARGET
     // 약간의 부드러운 전환을 위해 LinearSampler를 사용해도 무방합니다.
     // 여기서는 생성 시 의도에 따라 PointSampler 또는 LinearSampler를 선택합니다.
     // 일반적으로 CoC 값은 부드럽게 변하므로 LinearSampler가 더 적합할 수 있습니다.
-    float4 LayerInfo = LayerInfoTexture.Sample(Sampler, Input.UV);
+    float4 LayerInfo = LayerInfoTexture.Sample(LinearSampler, Input.UV);
     float FarCoC = LayerInfo.r;
     float NearCoC = LayerInfo.g;
     float InFocusMask = LayerInfo.b; // 0.0 (아웃포커스) 또는 1.0 (인포커스)
 
     // 2. 원본 씬 컬러 가져오기
-    float4 OriginalSceneColor = SceneTexture.Sample(Sampler, Input.UV);
+    float4 OriginalSceneColor = SceneTexture.Sample(LinearSampler, Input.UV);
 
     // 3. 블러된 파 레이어 컬러 가져오기 (업샘플링 발생)
     // BlurredFarLayerTexture의 알파 채널은 FarCoC를 담고 있을 수 있음 (블러 쉐이더 설계에 따라).
     // 여기서는 해당 CoC 값을 블러 강도에 이미 반영했다고 가정하고, RGB만 사용.
     // 또는, 해당 알파값을 추가적인 가중치로 사용할 수도 있습니다.
-    float4 BlurredFarColor = BlurredFarTexture.Sample(Sampler, Input.UV);
+    float4 BlurredFarColor = BlurredFarTexture.Sample(LinearSampler, Input.UV);
 
     // 4. 블러된 니어 레이어 컬러 가져오기 (업샘플링 발생)
-    float4 BlurredNearColor = BlurredNearTexture.Sample(Sampler, Input.UV);
+    float4 BlurredNearColor = BlurredNearTexture.Sample(LinearSampler, Input.UV);
 
 
     // 5. 합성 로직
@@ -599,12 +597,12 @@ float4 CalculateDilate(float2 TexUV, float2 TextureSize, float DilateRadius)
         float2 UVOffset = PixelOffset / TextureSize;
         float2 SampleUV = TexUV + UVOffset;
 
-        float4 SampleData = SceneTexture.Sample(Sampler, SampleUV);
+        float4 SampleData = SceneTexture.Sample(LinearSampler, SampleUV);
         float SampleCoC = SampleData.a;
 
         // Near 레이어에서만 작동 (음수 CoC 또는 특정 조건)
         // 여기서는 LayerInfoTexture의 Near CoC를 체크
-        float4 LayerInfo = LayerInfoTexture.Sample(Sampler, SampleUV);
+        float4 LayerInfo = LayerInfoTexture.Sample(LinearSampler, SampleUV);
         float NearCoC = LayerInfo.g;
 
         if (NearCoC > MaxCoC)
@@ -617,88 +615,17 @@ float4 CalculateDilate(float2 TexUV, float2 TextureSize, float DilateRadius)
 
     if (HasValidSample)
     {
-        float3 originalColor = SceneTexture.Sample(Sampler, TexUV).rgb;
+        float3 originalColor = SceneTexture.Sample(LinearSampler, TexUV).rgb;
         //float3 dilatedColor = lerp(originalColor, MaxSample.rgb, saturate(MaxCoC * some_blend_factor));
         return float4(originalColor.rgb, MaxCoC);
     }
     // 유효한 샘플이 없으면 원본 반환
-    return SceneTexture.Sample(Sampler, TexUV);
-}
-
-float4 CalculateErode(float2 TexUV, float2 TextureSize, float ErodeRadius, Texture2D DilatedTexture)
-{
-    float4 CenterPixelData = DilatedTexture.Sample(Sampler, TexUV);
-    float CenterCoC = CenterPixelData.a;
-
-    float3 AccumulatedColor = float3(0.0f, 0.0f, 0.0f);
-    float TotalWeight = 0.0f;
-
-    // 원본 레이어 정보로 현재 픽셀이 Near 영역인지 확인
-    float4 OriginalLayerInfo = LayerInfoTexture.Sample(Sampler, TexUV);
-    float OriginalNearCoC = OriginalLayerInfo.g;
-    float InFocusMask = OriginalLayerInfo.b;
-
-    for (int i = 0; i < NUM_SAMPLES; ++i)
-    {
-        float2 PixelOffset = PoissonSamples[i] * ErodeRadius;
-        float2 UVOffset = PixelOffset / TextureSize;
-        float2 SampleUV = TexUV + UVOffset;
-
-        float4 DilatedSampleData = DilatedTexture.Sample(Sampler, SampleUV);
-        float3 DilatedSampleColor = DilatedSampleData.rgb;
-        float DilatedSampleCoC = DilatedSampleData.a;
-
-        // 원본 레이어 정보도 가져옴
-        float4 OriginalSampleLayerInfo = LayerInfoTexture.Sample(Sampler, SampleUV);
-        float OriginalSampleNearCoC = OriginalSampleLayerInfo.g;
-
-        float Weight = 1.0f;
-
-        // 거리 기반 가중치
-        float NormalizedDistance = length(PoissonSamples[i]);
-        Weight *= exp(-NormalizedDistance * NormalizedDistance / (2.0f * 0.5f * 0.5f));
-
-        // Erode 로직: 높은 CoC 영역에서만 기여하도록
-        // 현재 픽셀이 배경이고 샘플이 Near 오브젝트인 경우 높은 가중치
-        if (OriginalNearCoC < 0.1f && DilatedSampleCoC > 0.1f)
-        {
-            // 배경 픽셀이 Near 오브젝트의 색상을 받는 경우
-            Weight *= DilatedSampleCoC * 2.0f; // CoC 비례 강화
-        }
-        // 현재 픽셀이 Near 오브젝트인 경우
-        else if (OriginalNearCoC > 0.1f)
-        {
-            // Near 오브젝트 내부에서는 일반적인 블러
-            Weight *= saturate(DilatedSampleCoC + 0.2f);
-        }
-        // 둘 다 배경인 경우
-        else
-        {
-            Weight *= 0.1f; // 매우 낮은 가중치
-        }
-
-        // 하이라이트 보정
-        float HighlightBoost = 1.0f + saturate(dot(DilatedSampleColor, DilatedSampleColor) - 0.8f) * 3.0f;
-        Weight *= HighlightBoost;
-
-        if (Weight > 0.001f)
-        {
-            AccumulatedColor += DilatedSampleColor * Weight;
-            TotalWeight += Weight;
-        }
-    }
-
-    if (TotalWeight > 0.001f)
-    {
-        AccumulatedColor /= TotalWeight;
-        return float4(AccumulatedColor, max(CenterCoC, OriginalNearCoC));
-    }
-    return CenterPixelData;
+    return SceneTexture.Sample(LinearSampler, TexUV);
 }
 
 float4 CalculateStandardBlur(float2 TexUV, float2 TextureSize, float CoC)
 {
-    float4 CenterPixelData = SceneTexture.Sample(Sampler, TexUV);
+    float4 CenterPixelData = SceneTexture.Sample(LinearSampler, TexUV);
     float3 AccumulatedColor = float3(0.0f, 0.0f, 0.0f);
     float TotalWeight = 0.0f;
 
@@ -710,7 +637,7 @@ float4 CalculateStandardBlur(float2 TexUV, float2 TextureSize, float CoC)
         float2 UVOffset = PixelOffset / TextureSize;
         float2 SampleUV = TexUV + UVOffset;
 
-        float4 SampleData = SceneTexture.Sample(Sampler, SampleUV);
+        float4 SampleData = SceneTexture.Sample(LinearSampler, SampleUV);
         
         float Weight = 1.0f;
         
@@ -741,7 +668,7 @@ float4 CalculateStandardBlur(float2 TexUV, float2 TextureSize, float CoC)
 float4 CalculateNearBlurDilateErode(float2 TexUV, float2 TextureSize)
 {
     // 1단계: 현재 픽셀의 레이어 정보 확인
-    float4 LayerInfo = LayerInfoTexture.Sample(Sampler, TexUV);
+    float4 LayerInfo = LayerInfoTexture.Sample(LinearSampler, TexUV);
     float NearCoC = LayerInfo.g;
     float InFocusMask = LayerInfo.b;
 
@@ -750,7 +677,7 @@ float4 CalculateNearBlurDilateErode(float2 TexUV, float2 TextureSize)
     {
         float3 AccumulatedColor = float3(0.0f, 0.0f, 0.0f);
         float TotalWeight = 0.0f;
-        float4 OriginalColor = SceneTexture.Sample(Sampler, TexUV);
+        float4 OriginalColor = SceneTexture.Sample(LinearSampler, TexUV);
 
         // 확장된 반경에서 Near 픽셀들을 찾음
         float SearchRadius = MAX_KERNEL_PIXEL_RADIUS * BokehIntensityScale * 2.0f;
@@ -761,12 +688,12 @@ float4 CalculateNearBlurDilateErode(float2 TexUV, float2 TextureSize)
             float2 UVOffset = PixelOffset / TextureSize;
             float2 SampleUV = TexUV + UVOffset;
 
-            float4 SampleLayerInfo = LayerInfoTexture.Sample(Sampler, SampleUV);
+            float4 SampleLayerInfo = LayerInfoTexture.Sample(LinearSampler, SampleUV);
             float SampleNearCoC = SampleLayerInfo.g;
 
             if (SampleNearCoC > 0.1f) // 유의미한 Near CoC
             {
-                float4 SampleColor = SceneTexture.Sample(Sampler, SampleUV);
+                float4 SampleColor = SceneTexture.Sample(LinearSampler, SampleUV);
                 
                 // 샘플 픽셀의 영향 반경 계산
                 float SampleInfluenceRadius = SampleNearCoC * MAX_KERNEL_PIXEL_RADIUS * BokehIntensityScale;
@@ -813,13 +740,6 @@ float4 PS_DilateNear(PS_Input Input) : SV_TARGET
     float2 TextureSize = 1.0f / TexturePixelSize;
     float DilateRadius = MAX_KERNEL_PIXEL_RADIUS * BokehIntensityScale * 1.5f;
     return CalculateDilate(Input.UV, TextureSize, DilateRadius);
-}
-
-float4 PS_ErodeNear(PS_Input Input) : SV_TARGET
-{
-    float2 TextureSize = 1.0f / TexturePixelSize;
-    float ErodeRadius = MAX_KERNEL_PIXEL_RADIUS * BokehIntensityScale;
-    return CalculateErode(Input.UV, TextureSize, ErodeRadius, SceneTexture);
 }
 
 float4 PS_BlurNearLayerImproved(PS_Input Input) : SV_TARGET

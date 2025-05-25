@@ -9,6 +9,7 @@ enum class EShaderSRVSlot : int8
     SRV_DepthOfField_LayerInfo = 90,
     SRV_DepthOfField_LayerNear = 91,
     SRV_DepthOfField_LayerFar = 92,
+    SRV_DepthOfField_FilteredCoC = 93,
     SRV_SceneDepth = 99,
     SRV_Scene = 100,
     SRV_Translucent = 101,
