@@ -13,10 +13,10 @@ FViewportResource::FViewportResource()
     ClearColors.Add(EResourceType::ERT_Editor, { 0.f, 0.f, 0.f, 0.f });
     ClearColors.Add(EResourceType::ERT_Gizmo, { 0.f, 0.f, 0.f, 0.f });
     ClearColors.Add(EResourceType::ERT_EditorOverlay, { 0.f, 0.f, 0.f, 0.f });
-    ClearColors.Add(EResourceType::ERT_DepthOfField_FilteredCoC, { 0.f, 0.f, 0.f, 0.f });
     ClearColors.Add(EResourceType::ERT_DepthOfField_LayerInfo, { 0.f, 0.f, 0.f, 0.f });
     ClearColors.Add(EResourceType::ERT_DepthOfField_LayerNear, { 0.f, 0.f, 0.f, 0.f });
     ClearColors.Add(EResourceType::ERT_DepthOfField_LayerFar, { 0.f, 0.f, 0.f, 0.f });
+    ClearColors.Add(EResourceType::ERT_DepthOfField_Result, { 0.f, 0.f, 0.f, 0.f });
     ClearColors.Add(EResourceType::ERT_Temp1, { 0.f, 0.f, 0.f, 0.f });
     ClearColors.Add(EResourceType::ERT_Temp2, { 0.f, 0.f, 0.f, 0.f });
     ClearColors.Add(EResourceType::ERT_PostProcessCompositing, { 0.f, 0.f, 0.f, 0.f });
