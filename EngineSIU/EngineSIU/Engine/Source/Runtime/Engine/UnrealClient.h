@@ -29,6 +29,7 @@ enum class EResourceType : uint8
     ERT_PostProcessCompositing,
     // Begin Depth of Field
     ERT_DepthOfField_FilteredCoC,
+    ERT_DepthOfField_BlurredCoC,
     ERT_DepthOfField_LayerInfo,
     ERT_DepthOfField_LayerNear,
     ERT_DepthOfField_LayerFar,
