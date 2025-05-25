@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <PxRigidActor.h>
 
 // #include "Container/Array.h"
@@ -6,12 +6,14 @@
 #include "UObject/ObjectMacros.h"
 
 class UPrimitiveComponent;
+struct GameObject;
 
 struct FBodyInstance
 {
     DECLARE_STRUCT(FBodyInstance)
     FBodyInstance(UPrimitiveComponent* InOwner); // TODO: 초기값 설정?
-    
+
+    void SetGameObject(GameObject* InGameObject);
     // ==================== 질량과 관성 ====================
     
     /** 바디의 질량 (킬로그램) */
@@ -104,6 +106,8 @@ struct FBodyInstance
     // PhysX 객체 참조
     physx::PxRigidActor* RigidActorSync;   // 동기 액터
     physx::PxRigidActor* RigidActorAsync;  // 비동기 액터
+
+    GameObject* BIGameObject;
 
     UPrimitiveComponent* OwnerComponent;
     

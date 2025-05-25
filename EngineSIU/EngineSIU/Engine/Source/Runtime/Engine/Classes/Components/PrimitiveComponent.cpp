@@ -195,6 +195,16 @@ void UPrimitiveComponent::TickComponent(float DeltaTime)
     Super::TickComponent(DeltaTime);
 
     // Physics simulation
+    if (TickGroup == ETickGroup::TG_PrePhysics)
+    {
+    }
+    else if (TickGroup == ETickGroup::TG_PostPhysics)
+    {
+        if(BodyInstance)
+        {
+            BodyInstance->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
+        }
+    }
 }
 
 bool UPrimitiveComponent::IntersectRayTriangle(const FVector& RayOrigin, const FVector& RayDirection, const FVector& v0, const FVector& v1, const FVector& v2, float& OutHitDistance) const

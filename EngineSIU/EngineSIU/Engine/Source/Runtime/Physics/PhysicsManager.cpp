@@ -117,19 +117,34 @@ void FPhysicsManager::Simulate(float dt)
     {
         gScene->simulate(dt);
         gScene->fetchResults(true);
-        for (auto& obj : gObjects)
-        {
-            obj.UpdateFromPhysics(gScene);
-        }
     }
 }
 
 void FPhysicsManager::ShutdownPhysX()
 {
-    gScene->release();
-    gDispatcher->release();
-    gMaterial->release();
-    gPhysics->release();
-    gFoundation->release();
-    gObjects.clear();
+    if(gScene)
+    {
+        gScene->release();
+        gScene = nullptr;
+    }
+    if(gDispatcher)
+    {
+        gDispatcher->release();
+        gDispatcher = nullptr;
+    }
+    if(gMaterial)
+    {
+        gMaterial->release();
+        gMaterial = nullptr;
+    }
+    if(gPhysics)
+    {
+        gPhysics->release();
+        gPhysics = nullptr;
+    }
+    if(gFoundation)
+    {
+        gFoundation->release();
+        gFoundation = nullptr;
+    }
 }

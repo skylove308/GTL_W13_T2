@@ -15,6 +15,7 @@
 #include "PhysicsEngine/PhysicsAsset.h"
 #include "UObject/Casts.h"
 #include "UObject/ObjectFactory.h"
+#include "Engine/Engine.h"
 
 bool USkeletalMeshComponent::bIsCPUSkinning = false;
 
@@ -62,7 +63,17 @@ void USkeletalMeshComponent::TickComponent(float DeltaTime)
 {
     Super::TickComponent(DeltaTime);
 
-    TickPose(DeltaTime);
+    if(TickGroup == ETickGroup::TG_PrePhysics)
+    {
+        TickPose(DeltaTime);
+    }
+    else if (TickGroup == ETickGroup::TG_PostPhysics)
+    {
+        for(FBodyInstance* BI : Bodies)
+        {
+            BI->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
+        }
+    }
 }
 
 void USkeletalMeshComponent::TickPose(float DeltaTime)
@@ -364,7 +375,7 @@ GameObject* USkeletalMeshComponent::CreatePhysXGameObject()
     FVector Location = GetComponentLocation();
     PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
     
-    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance,  SkeletalMeshAsset->GetPhysicsAsset()->BodySetups);
+    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance, SkeletalMeshAsset->GetPhysicsAsset()->BodySetups);
 
     return obj;
 }

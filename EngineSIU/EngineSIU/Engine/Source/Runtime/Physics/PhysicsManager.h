@@ -62,6 +62,5 @@ private:
     PxScene* gScene = nullptr;
     PxMaterial* gMaterial = nullptr;
     PxDefaultCpuDispatcher* gDispatcher = nullptr;
-    std::vector<GameObject> gObjects;
 };
 
