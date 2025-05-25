@@ -2,6 +2,15 @@
 #include "Asset/SkeletalMeshAsset.h"
 #include "SkeletalMesh.h"
 
+#include "PhysicsEngine/PhysicsAsset.h"
+
+USkeletalMesh::USkeletalMesh()
+{
+    /////////////// 테스트 코드
+    PhysicsAsset = new UPhysicsAsset();
+    /////////////////////////
+}
+
 void USkeletalMesh::SetRenderData(std::unique_ptr<FSkeletalMeshRenderData> InRenderData)
 {
     RenderData = std::move(InRenderData);

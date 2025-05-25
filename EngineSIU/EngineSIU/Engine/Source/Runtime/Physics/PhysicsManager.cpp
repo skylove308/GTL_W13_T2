@@ -1,6 +1,7 @@
 #include "PhysicsManager.h"
 
 #include "PhysicsEngine/BodyInstance.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 
 
 FPhysicsManager::FPhysicsManager()
@@ -55,13 +56,31 @@ GameObject FPhysicsManager::CreateBox(const PxVec3& pos, const PxVec3& halfExten
     return obj;
 }
 
-GameObject* FPhysicsManager::CreateGameObject(const PxVec3& pos, const PxVec3& halfExtents, FBodyInstance* BodyInstance) const
+GameObject* FPhysicsManager::CreateGameObject(const PxVec3& pos, const PxVec3& halfExtents, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const
 {
     GameObject* obj = new GameObject();
     const PxTransform pose(pos);
     obj->rigidBody = gPhysics->createRigidDynamic(pose);
-    PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtents), *gMaterial);
-    obj->rigidBody->attachShape(*shape);
+    for (const auto& BodySetup : BodySetups)
+    {
+        for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
+        {
+            PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtents.x), *gMaterial);
+            obj->rigidBody->attachShape(*shape);
+        }
+
+        for (const auto& Box : BodySetup->AggGeom.BoxElems)
+        {
+            PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtents), *gMaterial);
+            obj->rigidBody->attachShape(*shape);
+        }
+
+        for (const auto& Capsule : BodySetup->AggGeom.CapsuleElems)
+        {
+            PxShape* shape = gPhysics->createShape(PxCapsuleGeometry(halfExtents.x, halfExtents.z), *gMaterial);
+            obj->rigidBody->attachShape(*shape);
+        }
+    }
     PxRigidBodyExt::updateMassAndInertia(*obj->rigidBody, 10.0f);
     gScene->addActor(*obj->rigidBody);
     obj->UpdateFromPhysics(gScene);
@@ -71,9 +90,15 @@ GameObject* FPhysicsManager::CreateGameObject(const PxVec3& pos, const PxVec3& h
 
 void FPhysicsManager::Simulate(float dt)
 {
-    gScene->simulate(dt);
-    gScene->fetchResults(true);
-    for (auto& obj : gObjects) obj.UpdateFromPhysics(gScene);
+    if (gScene)
+    {
+        gScene->simulate(dt);
+        gScene->fetchResults(true);
+        for (auto& obj : gObjects)
+        {
+            obj.UpdateFromPhysics(gScene);
+        }
+    }
 }
 
 void FPhysicsManager::ShutdownPhysX()

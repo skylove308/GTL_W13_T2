@@ -32,12 +32,12 @@ class UBodySetup : public UBodySetupCore
 public:
     UBodySetup() = default;
 
-private:
     // DisplayName = Primitives
     PxAggregateGeom AggGeom;
 };
 
 class UPhysicsAsset : public UObject
 {
+public:
     TArray<UBodySetup*> BodySetups;
 };

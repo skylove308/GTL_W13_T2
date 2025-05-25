@@ -3,7 +3,11 @@
 #include "Engine/OverlapInfo.h"
 #include "PhysicsEngine/BodyInstance.h"
 
-DECLARE_MULTICAST_DELEGATE_FiveParams(FComponentHitSignature, UPrimitiveComponent* /* HitComponent */, AActor* /* OtherActor */, UPrimitiveComponent* /* OtherComp */, FVector /* NormalImpulse */, const FHitResult& /* Hit */);
+class UBodySetup;
+DECLARE_MULTICAST_DELEGATE_FiveParams(
+    FComponentHitSignature, UPrimitiveComponent* /* HitComponent */, AActor* /* OtherActor */, UPrimitiveComponent* /* OtherComp */,
+    FVector /* NormalImpulse */, const FHitResult& /* Hit */
+);
 DECLARE_MULTICAST_DELEGATE_SixParams(FComponentBeginOverlapSignature, UPrimitiveComponent* /* OverlappedComponent */, AActor* /* OtherActor */, UPrimitiveComponent* /* OtherComp */, int32 /* OtherBodyIndex */, bool /* bFromSweep */, const FHitResult& /* Hit */);
 DECLARE_MULTICAST_DELEGATE_FourParams(FComponentEndOverlapSignature, UPrimitiveComponent* /* OverlappedComponent */, AActor* /* OtherActor */, UPrimitiveComponent* /* OtherComp */, int32 /* OtherBodyIndex */);
 
@@ -101,16 +105,19 @@ public:
     /** Returns list of components this component is overlapping. */
     const TArray<FOverlapInfo>& GetOverlapInfos() const;
 
-    GameObject* CreatePhysXGameObject();
+    virtual GameObject* CreatePhysXGameObject();
 
     virtual void BeginPlay() override;
 
 protected:
     TArray<FOverlapInfo> OverlappingComponents;
 
+    UBodySetup* BodySetup;
+
     virtual void UpdateOverlapsImpl(const TArray<FOverlapInfo>* PendingOverlaps = nullptr, bool bDoNotifies = true, const TArray<const FOverlapInfo>* OverlapsAtEndLocation = nullptr) override;
 
     void ClearComponentOverlaps(bool bDoNotifies, bool bSkipNotifySelf);
+
     
 private:
     FString m_Type;

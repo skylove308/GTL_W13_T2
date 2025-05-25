@@ -45,7 +45,7 @@ public:
     void SetCurrentScene(PxScene* Scene) { gScene = Scene; }
     
     GameObject CreateBox(const PxVec3& pos, const PxVec3& halfExtents) const;
-    GameObject* CreateGameObject(const PxVec3& pos, const PxVec3& halfExtents, FBodyInstance* BodyInstance) const;
+    GameObject* CreateGameObject(const PxVec3& pos, const PxVec3& halfExtents, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const;
     
     void Simulate(float dt);
     void ShutdownPhysX();

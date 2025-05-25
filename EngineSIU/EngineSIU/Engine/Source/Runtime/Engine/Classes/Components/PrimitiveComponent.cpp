@@ -6,6 +6,7 @@
 #include "Engine/OverlapResult.h"
 #include "GameFramework/Actor.h"
 #include "World/World.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 
 // 언리얼 엔진에서도 여기에서 FOverlapInfo의 생성자를 정의하고 있음.
 FOverlapInfo::FOverlapInfo(UPrimitiveComponent* InComponent, int32 InBodyIndex)
@@ -469,8 +470,11 @@ GameObject* UPrimitiveComponent::CreatePhysXGameObject()
     PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
     FVector HalfScale = GetComponentScale3D() / 2;
     PxVec3 HalfExtent = PxVec3(HalfScale.X, HalfScale.Y, HalfScale.Z);
+
+    TArray<UBodySetup*> BodySetups;
+    BodySetups.Add(BodySetup);
     
-    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, HalfExtent, BodyInstance);
+    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, HalfExtent,  BodyInstance, BodySetups);
 
     return obj;
 }

@@ -31,6 +31,4 @@ public:
 private:
     FStaticMeshRenderData* RenderData = nullptr;
     TArray<FStaticMaterial*> Materials;
-
-    UBodySetup* BodySetup;
 };

@@ -10,7 +10,7 @@ class USkeletalMesh : public USkinnedAsset
     DECLARE_CLASS(USkeletalMesh, USkinnedAsset)
 
 public:
-    USkeletalMesh() = default;
+    USkeletalMesh();
     virtual ~USkeletalMesh() override = default;
 
     void SetRenderData(std::unique_ptr<FSkeletalMeshRenderData> InRenderData);
@@ -22,6 +22,8 @@ public:
     void SetSkeleton(USkeleton* InSkeleton) { Skeleton = InSkeleton; }
 
     virtual void SerializeAsset(FArchive& Ar) override;
+
+    UPhysicsAsset* GetPhysicsAsset() const { return PhysicsAsset; }
 
 protected:
     std::unique_ptr<FSkeletalMeshRenderData> RenderData;

@@ -1,5 +1,6 @@
 #include "SkeletalMeshComponent.h"
 
+#include "PhysicsManager.h"
 #include "ReferenceSkeleton.h"
 #include "Animation/AnimSequence.h"
 #include "Animation/AnimInstance.h"
@@ -11,6 +12,7 @@
 #include "Animation/AnimTypes.h"
 #include "Contents/AnimInstance/MyAnimInstance.h"
 #include "Engine/Engine.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 #include "UObject/Casts.h"
 #include "UObject/ObjectFactory.h"
 
@@ -353,6 +355,20 @@ void USkeletalMeshComponent::InitAnim()
     {
         // TODO: 애니메이션 포즈 바로 반영하려면 여기에서 진행.
     }
+}
+
+GameObject* USkeletalMeshComponent::CreatePhysXGameObject()
+{
+    BodyInstance = new FBodyInstance(this);
+    
+    FVector Location = GetComponentLocation();
+    physx::PxVec3 Pos = physx::PxVec3(Location.X, Location.Y, Location.Z);
+    FVector HalfScale = GetComponentScale3D() / 2;
+    physx::PxVec3 HalfExtent = physx::PxVec3(HalfScale.X, HalfScale.Y, HalfScale.Z);
+    
+    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, HalfExtent,  BodyInstance, SkeletalMeshAsset->GetPhysicsAsset()->BodySetups);
+
+    return obj;
 }
 
 bool USkeletalMeshComponent::NeedToSpawnAnimScriptInstance() const

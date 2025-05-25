@@ -117,6 +117,8 @@ public:
     EAnimationMode GetAnimationMode() const { return AnimationMode; }
 
     virtual void InitAnim();
+
+    virtual GameObject* CreatePhysXGameObject() override;
     
 protected:
     bool NeedToSpawnAnimScriptInstance() const;
