@@ -1302,30 +1302,29 @@ FProperty* MakeProperty(
         static_assert(TAlwaysFalse<T>, "EditInline cannot be set for non-UObject types.");
     }
 
-    if constexpr      (TypeEnum == EPropertyType::Int8)        { return new FInt8Property        { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Int16)       { return new FInt16Property       { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Int32)       { return new FInt32Property       { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Int64)       { return new FInt64Property       { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::UInt8)       { return new FUInt8Property       { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::UInt16)      { return new FUInt16Property      { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::UInt32)      { return new FUInt32Property      { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::UInt64)      { return new FUInt64Property      { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Float)       { return new FFloatProperty       { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Double)      { return new FDoubleProperty      { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Bool)        { return new FBoolProperty        { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-
-    else if constexpr (TypeEnum == EPropertyType::String)      { return new FStrProperty         { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Name)        { return new FNameProperty        { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Vector2D)    { return new FVector2DProperty    { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Vector)      { return new FVectorProperty      { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Vector4)     { return new FVector4Property     { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Rotator)     { return new FRotatorProperty     { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Quat)        { return new FQuatProperty        { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Transform)   { return new FTransformProperty   { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Matrix)      { return new FMatrixProperty      { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::Color)       { return new FColorProperty       { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-    else if constexpr (TypeEnum == EPropertyType::LinearColor) { return new FLinearColorProperty { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
-
+    if constexpr      (TypeEnum == EPropertyType::Int8)               { return new FInt8Property               { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Int16)              { return new FInt16Property              { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Int32)              { return new FInt32Property              { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Int64)              { return new FInt64Property              { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::UInt8)              { return new FUInt8Property              { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::UInt16)             { return new FUInt16Property             { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::UInt32)             { return new FUInt32Property             { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::UInt64)             { return new FUInt64Property             { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Float)              { return new FFloatProperty              { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Double)             { return new FDoubleProperty             { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Bool)               { return new FBoolProperty               { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+              
+    else if constexpr (TypeEnum == EPropertyType::String)             { return new FStrProperty                { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Name)               { return new FNameProperty               { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Vector2D)           { return new FVector2DProperty           { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Vector)             { return new FVectorProperty             { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Vector4)            { return new FVector4Property            { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Rotator)            { return new FRotatorProperty            { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Quat)               { return new FQuatProperty               { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Transform)          { return new FTransformProperty          { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Matrix)             { return new FMatrixProperty             { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::Color)              { return new FColorProperty              { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
+    else if constexpr (TypeEnum == EPropertyType::LinearColor)        { return new FLinearColorProperty        { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
     else if constexpr (TypeEnum == EPropertyType::DistributionFloat)  { return new FDistributionFloatProperty  { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
     else if constexpr (TypeEnum == EPropertyType::DistributionVector) { return new FDistributionVectorProperty { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }
     else if constexpr (TypeEnum == EPropertyType::Material)           { return new UMaterialProperty           { InOwnerStruct, InPropertyName, sizeof(T), InOffset, InFlags, std::move(InMetadata) }; }

@@ -3,6 +3,12 @@
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
 
+enum class ETickGroup : uint8
+{
+    TG_PrePhysics,
+    TG_PostPhysics,
+};
+
 class AActor;
 
 class UActorComponent : public UObject
@@ -85,4 +91,6 @@ private:
 public:
     /** Component가 초기화 되었을 때, 자동으로 활성화할지 여부 */
     uint8 bAutoActive : 1 = true;
+
+    ETickGroup TickGroup = ETickGroup::TG_PrePhysics;
 };
