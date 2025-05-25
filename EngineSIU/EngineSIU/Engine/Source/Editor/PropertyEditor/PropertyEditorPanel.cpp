@@ -157,6 +157,7 @@ void PropertyEditorPanel::Render()
     if (USkeletalMeshComponent* SkeletalMeshComponent = GetTargetComponent<USkeletalMeshComponent>(SelectedActor, SelectedComponent))
     {
         RenderForSkeletalMesh(SkeletalMeshComponent);
+        RenderForPhysicsAsset(SkeletalMeshComponent);
     }
     if (UHeightFogComponent* FogComponent = GetTargetComponent<UHeightFogComponent>(SelectedActor, SelectedComponent))
     {
@@ -715,6 +716,65 @@ void PropertyEditorPanel::RenderForSkeletalMesh(USkeletalMeshComponent* Skeletal
             if (SkeletalMeshComp->GetSkeletalMeshAsset())
             {
                 Engine->StartSkeletalMeshViewer(FName(SkeletalMeshComp->GetSkeletalMeshAsset()->GetRenderData()->ObjectName), SkeletalMeshComp->GetAnimation());
+            }
+        }
+        ImGui::TreePop();
+    }
+    ImGui::PopStyleColor();
+}
+
+void PropertyEditorPanel::RenderForPhysicsAsset(USkeletalMeshComponent* SkeletalMeshComp) const
+{
+    ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
+    if (ImGui::TreeNodeEx("Physics Asset", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
+    {
+        ImGui::Text("SkeletalMesh");
+        ImGui::SameLine();
+
+        FString SelectedSkeletalMeshName = FString("None");
+        if (USkeletalMesh* SkeletalMesh = SkeletalMeshComp->GetSkeletalMeshAsset())
+        {
+            if (const FSkeletalMeshRenderData* RenderData = SkeletalMesh->GetRenderData())
+            {
+                SelectedSkeletalMeshName = RenderData->DisplayName;
+            }
+        }
+
+        const TMap<FName, FAssetInfo> SkeletalMeshAssets = UAssetManager::Get().GetAssetRegistry();
+
+        if (ImGui::BeginCombo("##SkeletalMesh", GetData(SelectedSkeletalMeshName), ImGuiComboFlags_None))
+        {
+            for (const auto& Asset : SkeletalMeshAssets)
+            {
+                if (Asset.Value.AssetType != EAssetType::SkeletalMesh)
+                {
+                    continue;
+                }
+
+                if (ImGui::Selectable(GetData(Asset.Value.AssetName.ToString()), false))
+                {
+                    FString AssetName = Asset.Value.PackagePath.ToString() + "/" + Asset.Value.AssetName.ToString();
+                    USkeletalMesh* SkeletalMesh = UAssetManager::Get().GetSkeletalMesh(FName(AssetName));
+                    if (SkeletalMesh)
+                    {
+                        SkeletalMeshComp->SetSkeletalMeshAsset(SkeletalMesh);
+                    }
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        if (ImGui::Button("Open Viewer"))
+        {
+            UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
+            if (!Engine)
+            {
+                return;
+            }
+            if (SkeletalMeshComp->GetSkeletalMeshAsset())
+            {
+                Engine->StartPhysicsAssetViewer(FName(SkeletalMeshComp->GetSkeletalMeshAsset()->GetRenderData()->ObjectName));
+                // Engine->StartPhysicsAssetViewer(FName(SkeletalMeshComp->GetSkeletalMeshAsset()->GetRenderData()->ObjectName), SkeletalMeshComp->GetAnimation());
             }
         }
         ImGui::TreePop();

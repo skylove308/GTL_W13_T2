@@ -2,6 +2,7 @@
 #include "Engine.h"
 #include "Actors/Player.h"
 #include "World/SkeletalViewerWorld.h"
+#include "World/PhysicsViewerWorld.h"
 
 /*
     Editor 모드에서 사용될 엔진.
@@ -28,6 +29,7 @@ public:
     UWorld* PIEWorld = nullptr;
     USkeletalViewerWorld* SkeletalMeshViewerWorld = nullptr;
     UParticleViewerWorld* ParticleViewerWorld = nullptr;
+    UPhysicsAssetViewerWorld* PhysicsAssetViewerWorld = nullptr;
     UWorld* EditorWorld = nullptr;
     
 
@@ -35,11 +37,14 @@ public:
     void StartSkeletalMeshViewer(FName SkeletalMeshName, UAnimationAsset* AnimAsset);
     void StartParticleViewer(FName ParticleName, UParticleSystem* ParticleSystem);
 
+    void StartPhysicsAssetViewer(FName PhysicsAssetName);
+    void StartPhysicsAssetViewer(FName PhysicsAssetName, UPhysicsAssetViewerWorld* PhysicsAsset);
+
+    void BindEssentialObjects();
+
     void EndPIE();
     void EndSkeletalMeshViewer();
     void EndParticleViewer();
-    
-    void BindEssentialObjects();
 
     void SetPhysXScene(UWorld* World);
 
