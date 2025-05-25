@@ -31,7 +31,8 @@ enum class EResourceType : uint8
     ERT_DepthOfField_LayerInfo,
     ERT_DepthOfField_LayerNear,
     ERT_DepthOfField_LayerFar,
-    ERT_Temp,
+    ERT_Temp1,
+    ERT_Temp2,
     ERT_MAX,
 };
 

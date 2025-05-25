@@ -30,8 +30,11 @@ protected:
     void PrepareBlur(const std::shared_ptr<FEditorViewportClient>& Viewport, bool bNear);
     void CleanUpBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
     
-    void PrepareVerticalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
-    void CleanUpVerticalBlur(const std::shared_ptr<FEditorViewportClient>& Viewport);
+    void PrepareDilate(const std::shared_ptr<FEditorViewportClient>& Viewport);
+    void CleanUpDilate(const std::shared_ptr<FEditorViewportClient>& Viewport);
+
+    void PrepareErode(const std::shared_ptr<FEditorViewportClient>& Viewport);
+    void CleanUpErode(const std::shared_ptr<FEditorViewportClient>& Viewport);
 
     void PrepareComposite(const std::shared_ptr<FEditorViewportClient>& Viewport);
     void CleanUpComposite(const std::shared_ptr<FEditorViewportClient>& Viewport);
