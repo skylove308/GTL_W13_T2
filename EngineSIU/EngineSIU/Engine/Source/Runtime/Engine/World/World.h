@@ -30,6 +30,7 @@ class UWorld : public UObject
 
 public:
     UWorld() = default;
+    ~UWorld();
 
     static UWorld* CreateWorld(UObject* InOuter, const EWorldType InWorldType, const FString& InWorldName = "DefaultWorld");
 

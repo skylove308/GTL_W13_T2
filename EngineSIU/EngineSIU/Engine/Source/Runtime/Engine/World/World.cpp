@@ -1,6 +1,7 @@
 #include "World.h"
 
 #include "CollisionManager.h"
+#include "PhysicsManager.h"
 #include "Actors/Cube.h"
 #include "Actors/Player.h"
 #include "BaseGizmos/TransformGizmo.h"
@@ -18,6 +19,14 @@
 #include "Contents/Actors/Fish.h"
 
 class UEditorEngine;
+
+UWorld::~UWorld()
+{
+    if (GEngine->PhysicsManager->GetScene(this))
+    {
+        GEngine->PhysicsManager->RemoveScene(this);
+    }
+}
 
 UWorld* UWorld::CreateWorld(UObject* InOuter, const EWorldType InWorldType, const FString& InWorldName)
 {

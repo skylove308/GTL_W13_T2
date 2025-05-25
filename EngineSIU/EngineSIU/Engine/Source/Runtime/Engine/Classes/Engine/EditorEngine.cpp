@@ -254,6 +254,8 @@ void UEditorEngine::StartPIE()
 
     PIEWorldContext.SetCurrentWorld(PIEWorld);
     ActiveWorld = PIEWorld;
+
+    SetPhysXScene(PIEWorld);
     
     BindEssentialObjects();
     
@@ -436,6 +438,18 @@ void UEditorEngine::BindEssentialObjects()
     ActiveWorld->SetPlayerController(PlayerController);
     
     ActiveWorld->GetPlayerController()->Possess(ActiveWorld->GetMainPlayer());
+}
+
+void UEditorEngine::SetPhysXScene(UWorld* World)
+{
+    PhysicsManager->CreateScene(PIEWorld);
+    PhysicsManager->SetCurrentScene(PIEWorld);
+
+    for (const auto& Actor : World->GetActiveLevel()->Actors)
+    {
+        UPrimitiveComponent* Prim = Actor->GetComponentByClass<UPrimitiveComponent>();
+        Prim->CreatePhysXGameObject();
+    }
 }
 
 void UEditorEngine::EndPIE()

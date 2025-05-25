@@ -1,11 +1,13 @@
 #pragma once
+
+#include "Core/HAL/PlatformType.h" // TCHAR 재정의 문제때문에 다른 헤더들보다 앞에 있어야 함
+#include "World/World.h"
+
 #include <PxPhysicsAPI.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <vector>
 
-// #include "Container/Array.h"
-// #include "Math/Vector.h"
 
 class UBodySetup;
 
@@ -36,8 +38,14 @@ public:
     ~FPhysicsManager() = default;
 
     void InitPhysX();
+    PxScene* CreateScene(UWorld* World);
+    PxScene* GetScene(UWorld* World) { return SceneMap[World]; }
+    void RemoveScene(UWorld* World) { SceneMap.Remove(World); }
+    void SetCurrentScene(UWorld* World) { gScene = SceneMap[World]; }
+    void SetCurrentScene(PxScene* Scene) { gScene = Scene; }
+    
     GameObject CreateBox(const PxVec3& pos, const PxVec3& halfExtents) const;
-    GameObject* CreateGameObject(const PxVec3& pos, const PxVec3& halfExtents) const;
+    GameObject* CreateGameObject(const PxVec3& pos, const PxVec3& halfExtents, FBodyInstance* BodyInstance) const;
     
     void Simulate(float dt);
     void ShutdownPhysX();
@@ -47,6 +55,7 @@ private:
     PxDefaultErrorCallback  gErrorCallback;
     PxFoundation* gFoundation = nullptr;
     PxPhysics* gPhysics = nullptr;
+    TMap<UWorld*, PxScene*> SceneMap;
     PxScene* gScene = nullptr;
     PxMaterial* gMaterial = nullptr;
     PxDefaultCpuDispatcher* gDispatcher = nullptr;

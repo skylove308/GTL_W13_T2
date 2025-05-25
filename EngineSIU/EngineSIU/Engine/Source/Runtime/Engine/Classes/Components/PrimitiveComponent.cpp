@@ -470,8 +470,7 @@ GameObject* UPrimitiveComponent::CreatePhysXGameObject()
     FVector HalfScale = GetComponentScale3D() / 2;
     PxVec3 HalfExtent = PxVec3(HalfScale.X, HalfScale.Y, HalfScale.Z);
     
-    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, HalfExtent);
-    obj->rigidBody->userData = (void*)BodyInstance;
+    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, HalfExtent, BodyInstance);
 
     return obj;
 }
