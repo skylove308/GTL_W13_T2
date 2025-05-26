@@ -144,6 +144,7 @@ void FRenderer::CreateConstantBuffers()
 
     BufferManager->CreateStructuredBufferGeneric<FMeshParticleInstanceVertex>("ParticleMeshInstanceBuffer", nullptr, MaxParticleInstanceNum, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
 
+    BufferManager->CreateBufferGeneric<FViewportSize>("FViewportSize", nullptr, sizeof(FViewportSize), D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
     
     // TODO: 함수로 분리
     ID3D11Buffer* ObjectBuffer = BufferManager->GetConstantBuffer(TEXT("FObjectConstantBuffer"));
@@ -210,6 +211,12 @@ void FRenderer::CreateCommonShader() const
         return;
     }
 #pragma endregion UberShader
+
+    hr = ShaderManager->AddVertexShader(L"FullScreenQuadVertexShader", L"Shaders/FullScreenQuadVertexShader.hlsl", "main");
+    if (FAILED(hr))
+    {
+        return;
+    }
 }
 
 void FRenderer::PrepareRender(FViewportResource* ViewportResource) const
@@ -377,12 +384,6 @@ void FRenderer::RenderOpaque(const std::shared_ptr<FEditorViewportClient>& Viewp
             ParticleMeshRenderPass->Render(Viewport);
         }
     }
-    
-    // 에디터 요소가 없는 순수한 뎁스 버퍼 확보
-    Graphics->DeviceContext->CopyResource(
-        Viewport->GetViewportResource()->GetDepthStencil(EResourceType::ERT_ScenePure)->Texture2D,
-        Viewport->GetViewportResource()->GetDepthStencil(EResourceType::ERT_Scene)->Texture2D
-    );
 }
 
 void FRenderer::RenderEditorDepthElement(const std::shared_ptr<FEditorViewportClient>& Viewport) const

@@ -123,7 +123,7 @@ public:
     int32 ViewportIndex;
     FViewport* GetViewport() const { return Viewport; }
     
-    D3D11_VIEWPORT& GetD3DViewport() const;
+    const D3D11_VIEWPORT& GetD3DViewport() const;
 
     FViewportResource* GetViewportResource();
 
@@ -137,11 +137,24 @@ public:
     /** Viewport camera transform data for perspective viewports */
     FViewportCamera PerspectiveCamera;
     FViewportCamera OrthogonalCamera;
+    
     // 카메라 정보 
     float ViewFOV = 90.0f;
     float AspectRatio;
     float NearClip = 0.1f;
     float FarClip = 1000.0f;
+    
+    float F_Stop = 2.8f;
+    float SensorWidth = 24.576f; // mm
+    float FocalDistance = 0.f; // cm
+
+    float GetFocalLength() const
+    {
+        const float FovRad = FMath::DegreesToRadians(ViewFOV);
+        const float FocalLength = SensorWidth / (2.f * FMath::Tan(FovRad / 2.0f));
+        return FocalLength;
+    }
+    
     static FVector Pivot;
     static float OrthoSize;
     ELevelViewportType ViewportType;

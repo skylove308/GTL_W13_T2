@@ -49,7 +49,7 @@ public:
 
     FComponentEndOverlapSignature OnComponentEndOverlap;
 
-    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bSimulate)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bSimulate, = false)
 
     /** 
      * Begin tracking an overlap interaction with the component specified.

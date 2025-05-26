@@ -502,7 +502,8 @@ struct FLinePrimitiveBatchArgs
 struct FViewportSize
 {
     FVector2D ViewportSize;
-    FVector2D Padding;
+    float Padding1;
+    float Padding2;
 };
 
 struct FVertexInfo
