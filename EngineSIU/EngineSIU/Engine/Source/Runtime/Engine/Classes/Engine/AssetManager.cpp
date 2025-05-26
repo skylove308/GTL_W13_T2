@@ -16,6 +16,7 @@
 #include "Particles/ParticleSystem.h"
 #include "Serialization/MemoryArchive.h"
 #include "UObject/ObjectFactory.h"
+#include "Classes/PhysicsEngine/PhysicsAsset.h"
 
 bool UAssetManager::IsInitialized()
 {
@@ -122,34 +123,50 @@ void UAssetManager::AddAssetInfo(const FAssetInfo& Info)
     AssetRegistry->PathNameToAssetInfo.Add(Info.AssetName, Info);
 }
 
-void UAssetManager::AddSkeleton(const FName& Key, USkeleton* Skeleton)
+void UAssetManager::AddAsset(const FName& Key, UObject* AssetObject)
 {
-    AssetMap[EAssetType::Skeleton].Add(Key, Skeleton);
+    EAssetType AssetType = GetAssetType(AssetObject);
+
+    if (AssetType != EAssetType::MAX)
+    {
+        AssetMap[AssetType].Add(Key, AssetObject);
+    }
 }
 
-void UAssetManager::AddSkeletalMesh(const FName& Key, USkeletalMesh* SkeletalMesh)
+EAssetType UAssetManager::GetAssetType(const UObject* AssetObject) const
 {
-    AssetMap[EAssetType::SkeletalMesh].Add(Key, SkeletalMesh);
-}
+    EAssetType AssetType = EAssetType::MAX;
+    
+    if (AssetObject->IsA<USkeleton>())
+    {
+        AssetType = EAssetType::Skeleton;
+    }
+    else if (AssetObject->IsA<USkeletalMesh>())
+    {
+        AssetType = EAssetType::SkeletalMesh;
+    }
+    else if (AssetObject->IsA<UStaticMesh>())
+    {
+        AssetType = EAssetType::StaticMesh;
+    }
+    else if (AssetObject->IsA<UMaterial>())
+    {
+        AssetType = EAssetType::Material;
+    }
+    else if (AssetObject->IsA<UAnimationAsset>())
+    {
+        AssetType = EAssetType::Animation;
+    }
+    else if (AssetObject->IsA<UParticleSystem>())
+    {
+        AssetType = EAssetType::ParticleSystem;
+    }
+    else if (AssetObject->IsA<UPhysicsAsset>())
+    {
+        AssetType = EAssetType::PhysicsAsset;
+    }
 
-void UAssetManager::AddMaterial(const FName& Key, UMaterial* Material)
-{
-    AssetMap[EAssetType::Material].Add(Key, Material);
-}
-
-void UAssetManager::AddStaticMesh(const FName& Key, UStaticMesh* StaticMesh)
-{
-    AssetMap[EAssetType::StaticMesh].Add(Key, StaticMesh);
-}
-
-void UAssetManager::AddAnimation(const FName& Key, UAnimationAsset* Animation)
-{
-    AssetMap[EAssetType::Animation].Add(Key, Animation);
-}
-
-void UAssetManager::AddParticleSystem(const FName& Key, UParticleSystem* ParticleSystem)
-{
-    AssetMap[EAssetType::ParticleSystem].Add(Key, ParticleSystem);
+    return AssetType;
 }
 
 void UAssetManager::LoadContentFiles()

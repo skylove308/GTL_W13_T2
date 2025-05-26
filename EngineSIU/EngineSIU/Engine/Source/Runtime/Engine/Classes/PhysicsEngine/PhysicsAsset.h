@@ -63,4 +63,6 @@ public:
 
     virtual bool SetPreviewMesh(USkeletalMesh* PreviewMesh);
     virtual USkeletalMesh* GetPreviewMesh() const;
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };

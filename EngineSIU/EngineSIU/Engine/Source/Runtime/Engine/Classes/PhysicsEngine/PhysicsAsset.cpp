@@ -27,3 +27,8 @@ USkeletalMesh* UPhysicsAsset::GetPreviewMesh() const
 {
     return PreviewSkeletalMesh;
 }
+
+void UPhysicsAsset::SerializeAsset(FArchive& Ar)
+{
+    
+}
