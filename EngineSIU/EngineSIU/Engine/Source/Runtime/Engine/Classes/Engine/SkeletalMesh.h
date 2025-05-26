@@ -1,4 +1,5 @@
 #pragma once
+#include "ReferenceSkeleton.h"
 #include "SkinnedAsset.h"
 #include "Asset/SkeletalMeshAsset.h"
 
@@ -19,11 +20,13 @@ public:
 
     USkeleton* GetSkeleton() const { return Skeleton; }
 
-    void SetSkeleton(USkeleton* InSkeleton) { Skeleton = InSkeleton; }
+    void SetSkeleton(USkeleton* InSkeleton);
 
     virtual void SerializeAsset(FArchive& Ar) override;
 
     UPhysicsAsset* GetPhysicsAsset() const { return PhysicsAsset; }
+
+    virtual FReferenceSkeleton& GetRefSkeleton();
 
 protected:
     std::unique_ptr<FSkeletalMeshRenderData> RenderData;
@@ -31,4 +34,6 @@ protected:
     USkeleton* Skeleton;
 
     UPhysicsAsset* PhysicsAsset;
+
+    FReferenceSkeleton RefSkeleton;
 };
