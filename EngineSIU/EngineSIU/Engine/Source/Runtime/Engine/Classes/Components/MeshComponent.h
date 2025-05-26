@@ -26,6 +26,6 @@ public:
 protected:
     TArray<UMaterial*> OverrideMaterials;
 public:
-    TArray<UMaterial*>& GetOverrideMaterials() { return OverrideMaterials; }
+    const TArray<UMaterial*>& GetOverrideMaterials() const { return OverrideMaterials; }
 };
 

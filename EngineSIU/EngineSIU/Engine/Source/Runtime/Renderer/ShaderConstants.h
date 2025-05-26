@@ -245,3 +245,16 @@ struct alignas(16) FConstantBufferLetterBox
     float LetterBoxAspectRatio = 16.f / 9.f;
     FVector2D Padding;
 };
+
+struct FDepthOfFieldConstant
+{
+    float F_Stop = 2.8f;
+    float SensorWidth = 24.576f; // mm
+    float FocalDistance = 0.f; // cm
+    float FocalLength = 0.f; // mm
+
+    float CoCScaleFactor = 2.f;
+    float InFocusThreshold = 0.0f;
+    float DOFPadding1 = 0.f;
+    float DOFPadding2 = 0.f;
+};

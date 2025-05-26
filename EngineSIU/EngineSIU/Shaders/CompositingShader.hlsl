@@ -1,9 +1,11 @@
 
 Texture2D SceneTexture : register(t100);
-Texture2D PP_PostProcessTexture : register(t101);
-Texture2D EditorTexture : register(t102);
-Texture2D DebugTexture : register(t104);
-Texture2D CameraEffectTexture : register(t105);
+Texture2D TranslucentTexture : register(t101);
+Texture2D PP_PostProcessTexture : register(t102);
+Texture2D EditorTexture : register(t103);
+Texture2D EditorOverlayTexture : register(t104);
+Texture2D DebugTexture : register(t106);
+Texture2D CameraEffectTexture : register(t107);
 
 SamplerState CompositingSampler : register(s0);
 
@@ -36,51 +38,32 @@ struct PS_Input
     float2 UV : TEXCOORD;
 };
 
-PS_Input mainVS(uint VertexID : SV_VertexID)
-{
-    PS_Input Output;
-
-    float2 QuadPositions[6] = {
-        float2(-1,  1),  // Top Left
-        float2(1,  1),  // Top Right
-        float2(-1, -1),  // Bottom Left
-        float2(1,  1),  // Top Right
-        float2(1, -1),  // Bottom Right
-        float2(-1, -1)   // Bottom Left
-    };
-
-    float2 UVs[6] = {
-        float2(0, 0), float2(1, 0), float2(0, 1),
-        float2(1, 0), float2(1, 1), float2(0, 1)
-    };
-
-    Output.Position = float4(QuadPositions[VertexID], 0, 1);
-    Output.UV = UVs[VertexID];
-
-    return Output;
-}
-
-float4 mainPS(PS_Input Input) : SV_TARGET
+float4 main(PS_Input Input) : SV_TARGET
 {
     float4 Scene = SceneTexture.Sample(CompositingSampler, Input.UV);
     Scene = pow(Scene, GammaValue);
+    float4 Translucent = TranslucentTexture.Sample(CompositingSampler, Input.UV);
     float4 PostProcess = PP_PostProcessTexture.Sample(CompositingSampler, Input.UV);
     float4 Editor = EditorTexture.Sample(CompositingSampler, Input.UV);
+    float4 EditorOverlay = EditorOverlayTexture.Sample(CompositingSampler, Input.UV);
     float4 Debug = DebugTexture.Sample(CompositingSampler, Input.UV);
     float4 CameraEffect = CameraEffectTexture.Sample(CompositingSampler, Input.UV);
     
-    float4 FinalColor = float4(0, 0, 0, 0);
+    float4 FinalColor = Scene;
     if (ViewMode == VMI_LightHeatMap)
     {
-        FinalColor = lerp(Scene, Debug, 0.5);
+        FinalColor = lerp(FinalColor, Debug, 0.5);
         FinalColor = lerp(FinalColor, Editor, Editor.a);
+        FinalColor = lerp(FinalColor, Translucent, Translucent.a);
     }
     else
     {
-        FinalColor = lerp(Scene, PostProcess, PostProcess.a);
+        FinalColor = lerp(FinalColor, PostProcess, PostProcess.a);
         FinalColor = lerp(FinalColor, Editor, Editor.a);
+        // TODO: 반투명 물체는 포스트 프로세싱을 어떻게 처리해야하는지 고민해야 함.
+        FinalColor = lerp(FinalColor, Translucent, Translucent.a);
+        FinalColor = lerp(FinalColor, EditorOverlay, EditorOverlay.a);
         FinalColor = lerp(FinalColor, CameraEffect, CameraEffect.a);
-        // FinalColor = CameraEffect;
     }
 
     return FinalColor;

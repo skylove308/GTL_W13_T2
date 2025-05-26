@@ -422,7 +422,7 @@ void FEditorViewportClient::GetViewInfo(FMinimalViewInfo& OutViewInfo) const
 }
 
 
-D3D11_VIEWPORT& FEditorViewportClient::GetD3DViewport() const
+const D3D11_VIEWPORT& FEditorViewportClient::GetD3DViewport() const
 {
     return Viewport->GetD3DViewport();
 }

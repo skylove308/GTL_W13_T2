@@ -65,7 +65,7 @@ void FPostProcessCompositingPass::Render(const std::shared_ptr<FEditorViewportCl
     Graphics->DeviceContext->IASetInputLayout(nullptr);
     Graphics->DeviceContext->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
     
-    Graphics->DeviceContext->Draw(6, 0);
+    //Graphics->DeviceContext->Draw(6, 0);
 
     // Finish
     Graphics->DeviceContext->OMSetRenderTargets(0, nullptr, nullptr);

@@ -216,5 +216,12 @@ public:
     uint32 bEnableFading : 1;
     uint32 bAnimateVignette : 1;
     uint32 bHoldFadeWhenFinished : 1; /* true일 경우 페이드 종료 상태 유지 */
+
+    // Depth of Field
+    float F_Stop = 2.8f;
+    float SensorWidth = 24.576f; // mm
+    float FocalDistance = 0.f; // cm
+
+    float GetFocalLength() const;
 };
 

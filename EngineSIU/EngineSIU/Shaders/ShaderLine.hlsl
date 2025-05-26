@@ -260,7 +260,7 @@ PS_INPUT mainVS(VS_INPUT input)
     {
         // 0 ~ (GridCount-1): 그리드
         pos = ComputeGridPosition(input.instanceID, input.vertexID);
-        color = float4(0.1, 0.1, 0.1, 1.0);
+        color = float4(0.1, 0.1, 0.1, 0.75);
     }
     else if (input.instanceID < gridLineCount + axisCount)
     {
@@ -270,11 +270,17 @@ PS_INPUT mainVS(VS_INPUT input)
 
         // 축마다 색상
         if (axisInstanceID == 0)
+        {
             color = float4(1.0, 0.0, 0.0, 1.0); // X: 빨강
+        }
         else if (axisInstanceID == 1)
+        {
             color = float4(0.0, 1.0, 0.0, 1.0); // Y: 초록
+        }
         else
+        {
             color = float4(0.0, 0.0, 1.0, 1.0); // Z: 파랑
+        }
     }
     else if (input.instanceID < gridLineCount + axisCount + aabbInstanceCount)
     {

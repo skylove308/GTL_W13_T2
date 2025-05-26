@@ -64,6 +64,10 @@ APlayerCameraManager::APlayerCameraManager()
     ViewYawMax = 359.999f;
     ViewRollMin = -89.9f;
     ViewRollMax = 89.9f;
+
+    F_Stop = 2.8f;
+    SensorWidth = 24.576f; // mm
+    FocalDistance = 0.f; // cm
 }
 
 void APlayerCameraManager::PostSpawnInitialize()
@@ -365,6 +369,13 @@ FMinimalViewInfo APlayerCameraManager::BlendViewTargets(const FTViewTarget& A, c
     POV.Rotation = A.POV.Rotation + DeltaAng * Alpha;
 
     return POV;
+}
+
+float APlayerCameraManager::GetFocalLength() const
+{
+    const float FovRad = FMath::DegreesToRadians(DefaultFOV);
+    const float FocalLength = SensorWidth / (2.f * FMath::Tan(FovRad / 2.0f));
+    return FocalLength;
 }
 
 void APlayerCameraManager::AssignViewTarget(AActor* NewTarget, FTViewTarget& VT, struct FViewTargetTransitionParams TransitionParams)
