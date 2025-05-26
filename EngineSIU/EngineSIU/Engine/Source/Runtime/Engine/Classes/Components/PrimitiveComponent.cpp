@@ -202,7 +202,7 @@ void UPrimitiveComponent::EndPhysicsTickComponent(float DeltaTime)
     if (bSimulate && BodyInstance)
     {
         BodyInstance->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
-        XMMATRIX Matrix = BodyInstance->BIGameObject->worldMatrix;
+        XMMATRIX Matrix = BodyInstance->BIGameObject->WorldMatrix;
         float x = XMVectorGetX(Matrix.r[3]);
         float y = XMVectorGetY(Matrix.r[3]);
         float z = XMVectorGetZ(Matrix.r[3]);
@@ -508,6 +508,7 @@ void UPrimitiveComponent::BeginPlay()
     bSimulate = true; // (임시) 기본적으로 시뮬레이션을 활성화합니다.
     if (bSimulate)
     {
+        /*
         for (const auto& BoxShape : GetOwner()->GetComponentsByClass<UBoxComponent>())
         {
             PxVec3 Offset = PxVec3(BoxShape->RelativeLocation.X, BoxShape->RelativeLocation.Y, BoxShape->RelativeLocation.Z);
@@ -531,7 +532,7 @@ void UPrimitiveComponent::BeginPlay()
             PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, HalfScale);
             BodySetup->AggGeom.SphereElems.Add(PxCapsule);
         }
-    
+        */
         CreatePhysXGameObject();
     }
 }
