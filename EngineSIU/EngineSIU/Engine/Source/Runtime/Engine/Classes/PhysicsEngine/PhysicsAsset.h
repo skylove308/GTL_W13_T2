@@ -23,6 +23,12 @@ enum class EGeomType
     ECapsule,
 };
 
+enum class ERigidBodyType {
+    STATIC,
+    DYNAMIC, 
+    KINEMATIC
+};
+
 struct AggregateGeomAttributes
 {
     DECLARE_STRUCT(AggregateGeomAttributes)

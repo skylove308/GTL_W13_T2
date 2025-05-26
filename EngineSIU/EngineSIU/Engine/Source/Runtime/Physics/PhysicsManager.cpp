@@ -3,6 +3,31 @@
 #include "PhysicsEngine/BodyInstance.h"
 #include "PhysicsEngine/PhysicsAsset.h"
 
+#include "World/World.h"
+
+void GameObject::SetRigidBodyType(ERigidBodyType RigidBodyType) const
+{
+    switch (RigidBodyType)
+    {
+    case ERigidBodyType::STATIC:
+    {
+        // 재생성해야 함
+        break;
+    }
+        case ERigidBodyType::DYNAMIC:
+    {
+        DynamicRigidBody->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, false);
+        break;
+    }
+        case ERigidBodyType::KINEMATIC:
+    {
+        DynamicRigidBody->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+        DynamicRigidBody->setLinearVelocity(PxVec3(0));
+        DynamicRigidBody->setAngularVelocity(PxVec3(0));
+        break;
+    }
+    }
+}
 
 FPhysicsManager::FPhysicsManager()
 {
@@ -11,7 +36,19 @@ FPhysicsManager::FPhysicsManager()
 void FPhysicsManager::InitPhysX()
 {
     Foundation = PxCreateFoundation(PX_PHYSICS_VERSION, Allocator, ErrorCallback);
-    Physics = PxCreatePhysics(PX_PHYSICS_VERSION, *Foundation, PxTolerancesScale());
+
+    // PVD 생성 및 연결
+    Pvd = PxCreatePvd(*Foundation);
+    if (Pvd) {
+        // TCP 연결 (기본 포트 5425)
+        Transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
+        if (Transport) {
+            Pvd->connect(*Transport, PxPvdInstrumentationFlag::eALL);
+        }
+    }
+    
+    Physics = PxCreatePhysics(PX_PHYSICS_VERSION, *Foundation, PxTolerancesScale(), true, Pvd);
+    
     Material = Physics->createMaterial(0.5f, 0.5f, 0.6f);
 }
 
@@ -40,51 +77,150 @@ PxScene* FPhysicsManager::CreateScene(UWorld* World)
     PxScene* NewScene = Physics->createScene(sceneDesc);
     SceneMap.Add(World, NewScene);
 
+    // PVD 클라이언트 생성 및 씬 연결
+    if (Pvd && Pvd->isConnected()) {
+        PxPvdSceneClient* pvdClient = NewScene->getScenePvdClient();
+        if (pvdClient) {
+            pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
+            pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
+            pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
+        }
+    }
+
     return NewScene;
+}
+
+bool FPhysicsManager::ConnectPVD()
+{
+    // PVD 생성
+    Pvd = PxCreatePvd(*Foundation);
+    if (!Pvd) {
+        printf("PVD 생성 실패\n");
+        return false;
+    }
+
+    // 네트워크 전송 생성 (TCP)
+    Transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
+    if (!Transport) {
+        printf("PVD Transport 생성 실패\n");
+        return false;
+    }
+
+    // PVD 연결 및 계측 플래그 설정
+    bool connected = Pvd->connect(*Transport, 
+        PxPvdInstrumentationFlag::eALL);  // 모든 데이터 전송
+    // 또는 특정 플래그만:
+    // PxPvdInstrumentationFlag::eDEBUG | 
+    // PxPvdInstrumentationFlag::ePROFILE |
+    // PxPvdInstrumentationFlag::eMEMORY
+
+    if (connected) {
+        printf("PVD 연결 성공\n");
+    } else {
+        printf("PVD 연결 실패\n");
+    }
+
+    return connected;
 }
 
 GameObject FPhysicsManager::CreateBox(const PxVec3& Pos, const PxVec3& HalfExtents) const
 {
     GameObject obj;
     PxTransform pose(Pos);
-    obj.rigidBody = Physics->createRigidDynamic(pose);
+    obj.DynamicRigidBody = Physics->createRigidDynamic(pose);
     PxShape* shape = Physics->createShape(PxBoxGeometry(HalfExtents), *Material);
-    obj.rigidBody->attachShape(*shape);
-    PxRigidBodyExt::updateMassAndInertia(*obj.rigidBody, 10.0f);
-    CurrentScene->addActor(*obj.rigidBody);
+    obj.DynamicRigidBody->attachShape(*shape);
+    PxRigidBodyExt::updateMassAndInertia(*obj.DynamicRigidBody, 10.0f);
+    CurrentScene->addActor(*obj.DynamicRigidBody);
     obj.UpdateFromPhysics(CurrentScene);
     return obj;
 }
 
-GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const
+GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, const TArray<UBodySetup*>& BodySetups,ERigidBodyType RigidBodyType) const
 {
     GameObject* Obj = new GameObject();
+    
+    // RigidBodyType에 따라 다른 타입의 Actor 생성
+    switch (RigidBodyType)
+    {
+    case ERigidBodyType::STATIC:
+    {
+        Obj->StaticRigidBody = CreateStaticRigidBody(Pos, BodyInstance, BodySetups);
+        break;
+    }
+    case ERigidBodyType::DYNAMIC:
+    {
+        Obj->DynamicRigidBody = CreateDynamicRigidBody(Pos, BodyInstance, BodySetups);
+        break;
+    }
+    case ERigidBodyType::KINEMATIC:
+    {
+        Obj->DynamicRigidBody = CreateDynamicRigidBody(Pos, BodyInstance, BodySetups);
+        Obj->DynamicRigidBody->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+        break;
+    }
+    }
+    
+    return Obj;
+}
+
+PxRigidDynamic* FPhysicsManager::CreateDynamicRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const
+{
     const PxTransform Pose(Pos);
-    Obj->rigidBody = Physics->createRigidDynamic(Pose);
+    PxRigidDynamic* DynamicRigidBody = Physics->createRigidDynamic(Pose);
+
     for (const auto& BodySetup : BodySetups)
     {
         for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
         {
-            Obj->rigidBody->attachShape(*Sphere);
+            DynamicRigidBody->attachShape(*Sphere);
         }
 
         for (const auto& Box : BodySetup->AggGeom.BoxElems)
         {
-            Obj->rigidBody->attachShape(*Box);
+            DynamicRigidBody->attachShape(*Box);
         }
 
         for (const auto& Capsule : BodySetup->AggGeom.CapsuleElems)
         {
-            Obj->rigidBody->attachShape(*Capsule);
+            DynamicRigidBody->attachShape(*Capsule);
         }
     }
+
+    PxRigidBodyExt::updateMassAndInertia(*DynamicRigidBody, 10.0f);
+    CurrentScene->addActor(*DynamicRigidBody); // 여기에 넣을지 CreateGameObject에 넣을지 고민해보기
+    DynamicRigidBody->userData = (void*)BodyInstance;
+
+    return DynamicRigidBody;
+}
+
+PxRigidStatic* FPhysicsManager::CreateStaticRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const
+{
+    const PxTransform Pose(Pos);
+    PxRigidStatic* StaticRigidBody = Physics->createRigidStatic(Pose);
     
-    PxRigidBodyExt::updateMassAndInertia(*Obj->rigidBody, 10.0f);
-    CurrentScene->addActor(*Obj->rigidBody);
-    Obj->UpdateFromPhysics(CurrentScene);
-    Obj->rigidBody->userData = (void*)BodyInstance;
-    
-    return Obj;
+    for (const auto& BodySetup : BodySetups)
+    {
+        for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
+        {
+            StaticRigidBody->attachShape(*Sphere);
+        }
+
+        for (const auto& Box : BodySetup->AggGeom.BoxElems)
+        {
+            StaticRigidBody->attachShape(*Box);
+        }
+
+        for (const auto& Capsule : BodySetup->AggGeom.CapsuleElems)
+        {
+            StaticRigidBody->attachShape(*Capsule);
+        }
+    }
+
+    CurrentScene->addActor(*StaticRigidBody); // 여기에 넣을지 CreateGameObject에 넣을지 고민해보기
+    StaticRigidBody->userData = (void*)BodyInstance;
+
+    return StaticRigidBody;
 }
 
 PxShape* FPhysicsManager::CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
@@ -146,5 +282,19 @@ void FPhysicsManager::ShutdownPhysX()
     {
         Foundation->release();
         Foundation = nullptr;
+    }
+}
+
+void FPhysicsManager::CleanupPVD() {
+    if (Pvd) {
+        if (Pvd->isConnected()) {
+            Pvd->disconnect();
+        }
+        if (Transport) {
+            Transport->release();
+            Transport = nullptr;
+        }
+        Pvd->release();
+        Pvd = nullptr;
     }
 }

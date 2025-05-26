@@ -169,6 +169,8 @@ UObject* UPrimitiveComponent::Duplicate(UObject* InOuter)
     NewComponent->AABB = AABB;
     NewComponent->bSimulate = bSimulate;
     NewComponent->bApplyGravity = bApplyGravity;
+    NewComponent->GeomAttributes = GeomAttributes;
+    NewComponent->RigidBodyType = RigidBodyType;
 
     return NewComponent;
 }
@@ -201,10 +203,10 @@ void UPrimitiveComponent::EndPhysicsTickComponent(float DeltaTime)
 {
     Super::EndPhysicsTickComponent(DeltaTime);
     // Physics simulation
-    if (bSimulate && BodyInstance)
+    if (bSimulate && BodyInstance && RigidBodyType != ERigidBodyType::STATIC)
     {
         BodyInstance->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
-        XMMATRIX Matrix = BodyInstance->BIGameObject->worldMatrix;
+        XMMATRIX Matrix = BodyInstance->BIGameObject->WorldMatrix;
         float x = XMVectorGetX(Matrix.r[3]);
         float y = XMVectorGetY(Matrix.r[3]);
         float z = XMVectorGetZ(Matrix.r[3]);
@@ -501,7 +503,7 @@ GameObject* UPrimitiveComponent::CreatePhysXGameObject()
     {
         PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
         PxVec3 Rotation = PxVec3(GeomAttribute.Rotation.Roll, GeomAttribute.Rotation.Pitch, GeomAttribute.Rotation.Yaw);
-        PxVec3 HalfScale = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z) / 2;
+        PxVec3 HalfScale = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
 
         switch (GeomAttribute.GeomType)
         {
@@ -526,8 +528,11 @@ GameObject* UPrimitiveComponent::CreatePhysXGameObject()
         }
     }
     
-    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance,  BodySetups);
-    obj->rigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bApplyGravity);
+    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance,  BodySetups, RigidBodyType);
+    if (RigidBodyType != ERigidBodyType::STATIC)
+    {
+        obj->DynamicRigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bApplyGravity);
+    }
     BodyInstance->BIGameObject = obj;
 
     return obj;
@@ -536,11 +541,6 @@ GameObject* UPrimitiveComponent::CreatePhysXGameObject()
 void UPrimitiveComponent::BeginPlay()
 {
     USceneComponent::BeginPlay();
-
-    if (bSimulate)
-    {
-        CreatePhysXGameObject();
-    }
 }
 
 void UPrimitiveComponent::UpdateOverlapsImpl(const TArray<FOverlapInfo>* NewPendingOverlaps, bool bDoNotifies, const TArray<const FOverlapInfo>* OverlapsAtEndLocation)

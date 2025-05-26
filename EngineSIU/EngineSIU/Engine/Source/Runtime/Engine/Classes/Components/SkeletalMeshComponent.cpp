@@ -76,7 +76,10 @@ void USkeletalMeshComponent::EndPhysicsTickComponent(float DeltaTime)
     {
         for (FBodyInstance* BI : Bodies)
         {
-            BI->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
+            if (RigidBodyType != ERigidBodyType::STATIC)
+            {
+                BI->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
+            }
         }
     }
 }
@@ -380,7 +383,7 @@ GameObject* USkeletalMeshComponent::CreatePhysXGameObject()
     FVector Location = GetComponentLocation();
     PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
     
-    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance, SkeletalMeshAsset->GetPhysicsAsset()->BodySetups);
+    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance, SkeletalMeshAsset->GetPhysicsAsset()->BodySetups, RigidBodyType);
 
     return obj;
 }

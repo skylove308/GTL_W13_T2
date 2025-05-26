@@ -52,6 +52,7 @@ public:
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bSimulate, = false)
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bApplyGravity, = false)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, ERigidBodyType, RigidBodyType)
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, TArray<AggregateGeomAttributes>, GeomAttributes)
 
