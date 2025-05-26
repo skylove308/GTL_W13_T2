@@ -12,66 +12,40 @@
 class USkeletalMesh;
 struct FConstraintInstance;
 
+enum class EGeomType : uint8
+{
+    ESphere,
+    EBox,
+    ECapsule,
+    MAX,
+};
+
+struct AggregateGeomAttributes
+{
+    DECLARE_STRUCT(AggregateGeomAttributes)
+
+    UPROPERTY_WITH_FLAGS(EditAnywhere, EGeomType, GeomType)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Offset)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Rotation)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Extent)
+};
+
 struct FKAggregateGeom
 {
     TArray<physx::PxShape*> SphereElems;
     TArray<physx::PxShape*> BoxElems;
     TArray<physx::PxShape*> CapsuleElems;
 
-    friend FArchive& operator<<(FArchive& Ar, FKAggregateGeom& AggGeom)
-    {
-        AggGeom.SerializeShapeArray(Ar, AggGeom.SphereElems);
-        AggGeom.SerializeShapeArray(Ar, AggGeom.BoxElems);
-        AggGeom.SerializeShapeArray(Ar, AggGeom.CapsuleElems);
-        return Ar;
-    }
+    friend FArchive& operator<<(FArchive& Ar, FKAggregateGeom& AggGeom);
 
 private:
-    void SerializeShapeArray(FArchive& Ar, TArray<physx::PxShape*>& ShapeArray)
-    {
-        int32 Num = ShapeArray.Num();
-        Ar << Num;
+    void SerializeShapeArray(EGeomType Type, FArchive& Ar, TArray<physx::PxShape*>& ShapeArray);
 
-        if (Ar.IsLoading())
-        {
-            ShapeArray.SetNum(Num);
-        }
-        
-        for (int32 i = 0; i < Num; ++i)
-        {
-            SerializeShape(Ar, ShapeArray[i]);
-        }
-    }
+    void SerializeShape(EGeomType Type, FArchive& Ar, physx::PxShape* Shape);
 
-    void SerializeShape(FArchive& Ar, physx::PxShape* Shape)
-    {
-        physx::PxTransform LocalPose = Shape->getLocalPose();
-        physx::PxBoxGeometry Geometry;
-        Shape->getBoxGeometry(Geometry);
-        
-        FVector Location = FVector(LocalPose.p.x, LocalPose.p.y, LocalPose.p.z);
-        FQuat Rotation = FQuat(LocalPose.q.x, LocalPose.q.y, LocalPose.q.z, LocalPose.q.w);
-        FVector HalfExtent = FVector(Geometry.halfExtents.x, Geometry.halfExtents.y, Geometry.halfExtents.z);
-
-        Ar << Location << Rotation << HalfExtent;
-
-        if (Ar.IsLoading())
-        {
-            LocalPose.p.x = Location.X;
-            LocalPose.p.y = Location.Y;
-            LocalPose.p.z = Location.Z;
-            LocalPose.q.x = Rotation.X;
-            LocalPose.q.y = Rotation.Y;
-            LocalPose.q.z = Rotation.Z;
-            LocalPose.q.w = Rotation.W;
-            Shape->setLocalPose(LocalPose);
-
-            Geometry.halfExtents.x = HalfExtent.X;
-            Geometry.halfExtents.y = HalfExtent.Y;
-            Geometry.halfExtents.z = HalfExtent.Z;
-            Shape->setGeometry(Geometry);
-        }
-    }
+    void SerializeSphere(FArchive& Ar, physx::PxShape* Shape);
+    void SerializeBox(FArchive& Ar, physx::PxShape* Shape);
+    void SerializeCapsule(FArchive& Ar, physx::PxShape* Shape);
 };
 
 class UBodySetupCore : public UObject
