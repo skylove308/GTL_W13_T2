@@ -26,10 +26,11 @@ enum class EGeomType
 struct AggregateGeomAttributes
 {
     DECLARE_STRUCT(AggregateGeomAttributes)
+    AggregateGeomAttributes() = default;
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, EGeomType, GeomType)
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Offset)
-    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Rotation)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FRotator, Rotation)
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Extent)
 };
 

@@ -696,8 +696,9 @@ void FEditorRenderPass::RenderBoxInstanced(uint64 ShowFlag)
                 if (GeomAttribute.GeomType == EGeomType::EBox)
                 {
                     FConstantBufferDebugBox b;
-                    FMatrix WorldMatrix = StaticComp->GetWorldMatrix() *
-                        JungleMath::CreateModelMatrix(GeomAttribute.Offset, GeomAttribute.Rotation, GeomAttribute.Extent);
+                    FMatrix WorldMatrix =
+                        FTransform(GeomAttribute.Rotation, GeomAttribute.Offset, GeomAttribute.Extent).ToMatrixWithScale()
+                        * StaticComp->GetWorldMatrix();
                     b.WorldMatrix = WorldMatrix;
                     b.Extent = GeomAttribute.Extent;
                     BufferAll.Add(b);
@@ -770,8 +771,9 @@ void FEditorRenderPass::RenderSphereInstanced(uint64 ShowFlag)
                 if (GeomAttribute.GeomType == EGeomType::ESphere)
                 {
                     FConstantBufferDebugSphere b;
-                    FMatrix WorldMatrix = StaticComp->GetWorldMatrix() *
-                        JungleMath::CreateModelMatrix(GeomAttribute.Offset, GeomAttribute.Rotation, GeomAttribute.Extent);
+                    FMatrix WorldMatrix =
+                        FTransform(GeomAttribute.Rotation, GeomAttribute.Offset, GeomAttribute.Extent).ToMatrixWithScale()
+                        * StaticComp->GetWorldMatrix();
                     b.Position = WorldMatrix.GetTranslationVector();
                     b.Radius = GeomAttribute.Extent.X;
                     BufferAll.Add(b);
@@ -848,8 +850,9 @@ void FEditorRenderPass::RenderCapsuleInstanced(uint64 ShowFlag)
                 if (GeomAttribute.GeomType == EGeomType::ECapsule)
                 {
                     FConstantBufferDebugCapsule b;
-                    FMatrix WorldMatrix = StaticComp->GetWorldMatrix() *
-                        JungleMath::CreateModelMatrix(GeomAttribute.Offset, GeomAttribute.Rotation, GeomAttribute.Extent);
+                    FMatrix WorldMatrix =
+                        FTransform(GeomAttribute.Rotation, GeomAttribute.Offset, GeomAttribute.Extent).ToMatrixWithScale()
+                        * StaticComp->GetWorldMatrix();
                     b.WorldMatrix = WorldMatrix;
                     b.Radius = GeomAttribute.Extent.X;
                     b.Height = GeomAttribute.Extent.Z;

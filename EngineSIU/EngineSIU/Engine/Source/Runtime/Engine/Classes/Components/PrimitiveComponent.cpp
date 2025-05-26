@@ -500,7 +500,7 @@ GameObject* UPrimitiveComponent::CreatePhysXGameObject()
     for (const auto& GeomAttribute : GeomAttributes)
     {
         PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
-        PxVec3 Rotation = PxVec3(GeomAttribute.Rotation.X, GeomAttribute.Rotation.Y, GeomAttribute.Rotation.Z);
+        PxVec3 Rotation = PxVec3(GeomAttribute.Rotation.Roll, GeomAttribute.Rotation.Pitch, GeomAttribute.Rotation.Yaw);
         PxVec3 HalfScale = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z) / 2;
 
         switch (GeomAttribute.GeomType)
