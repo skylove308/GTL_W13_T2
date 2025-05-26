@@ -21,6 +21,7 @@ public:
 
     virtual void InitializeComponent() override;
     virtual void TickComponent(float DeltaTime) override;
+    virtual void EndPhysicsTickComponent(float DeltaTime) override;
     virtual int CheckRayIntersection(const FVector& InRayOrigin, const FVector& InRayDirection, float& OutHitDistance) const;
     virtual void DestroyComponent(bool bPromoteChildren = false) override;
 

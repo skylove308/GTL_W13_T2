@@ -193,23 +193,20 @@ void UPrimitiveComponent::InitializeComponent()
 void UPrimitiveComponent::TickComponent(float DeltaTime)
 {
     Super::TickComponent(DeltaTime);
+}
 
+void UPrimitiveComponent::EndPhysicsTickComponent(float DeltaTime)
+{
+    Super::EndPhysicsTickComponent(DeltaTime);
     // Physics simulation
-    if (TickGroup == ETickGroup::TG_PrePhysics)
+    if (bSimulate && BodyInstance)
     {
-    }
-    else if (TickGroup == ETickGroup::TG_PostPhysics)
-    {
-        if(BodyInstance)
-        {
-            BodyInstance->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
-            XMMATRIX Matrix = BodyInstance->BIGameObject->worldMatrix;
-            float x = XMVectorGetX(Matrix.r[3]);
-            float y = XMVectorGetY(Matrix.r[3]);
-            float z = XMVectorGetZ(Matrix.r[3]);
-            SetWorldLocation(FVector(x, y, z)); 
-        }
-        
+        BodyInstance->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
+        XMMATRIX Matrix = BodyInstance->BIGameObject->worldMatrix;
+        float x = XMVectorGetX(Matrix.r[3]);
+        float y = XMVectorGetY(Matrix.r[3]);
+        float z = XMVectorGetZ(Matrix.r[3]);
+        SetWorldLocation(FVector(x, y, z)); 
     }
 }
 
@@ -508,10 +505,9 @@ void UPrimitiveComponent::BeginPlay()
 {
     USceneComponent::BeginPlay();
 
+    bSimulate = true; // (임시) 기본적으로 시뮬레이션을 활성화합니다.
     if (bSimulate)
     {
-        TickGroup = ETickGroup::TG_PostPhysics;
-        
         for (const auto& BoxShape : GetOwner()->GetComponentsByClass<UBoxComponent>())
         {
             PxVec3 Offset = PxVec3(BoxShape->RelativeLocation.X, BoxShape->RelativeLocation.Y, BoxShape->RelativeLocation.Z);

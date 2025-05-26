@@ -93,22 +93,16 @@ void UEditorEngine::Tick(float DeltaTime)
                             // 물리기반 시뮬레이션을 위한 TickGroup 처리
                             for (auto* Comp : Actor->GetComponents())
                             {
-                                if (Comp->TickGroup == ETickGroup::TG_PrePhysics)
-                                {
-                                    Comp->TickComponent(DeltaTime);
-                                }
+                                Comp->TickComponent(DeltaTime);
                             }
 
                             PhysicsManager->Simulate(DeltaTime);
 
                             for (auto* Comp : Actor->GetComponents())
                             {
-                                if (Comp->TickGroup == ETickGroup::TG_PostPhysics)
-                                {
-                                    Comp->TickComponent(DeltaTime);
-                                }
-                            }
+                                Comp->EndPhysicsTickComponent(DeltaTime);
 
+                            }
                         }
                     }
                 }
@@ -132,20 +126,15 @@ void UEditorEngine::Tick(float DeltaTime)
                             // 물리기반 시뮬레이션을 위한 TickGroup 처리
                             for (auto* Comp : Actor->GetComponents())
                             {
-                                if (Comp->TickGroup == ETickGroup::TG_PrePhysics)
-                                {
-                                    Comp->TickComponent(DeltaTime);
-                                }
+                                Comp->TickComponent(DeltaTime);
                             }
 
                             PhysicsManager->Simulate(DeltaTime);
 
                             for (auto* Comp : Actor->GetComponents())
                             {
-                                if (Comp->TickGroup == ETickGroup::TG_PostPhysics)
-                                {
-                                    Comp->TickComponent(DeltaTime);
-                                }
+                                Comp->EndPhysicsTickComponent(DeltaTime);
+
                             }
                         }
                     }
@@ -171,20 +160,15 @@ void UEditorEngine::Tick(float DeltaTime)
                             // 물리기반 시뮬레이션을 위한 TickGroup 처리
                             for (auto* Comp : Actor->GetComponents())
                             {
-                                if (Comp->TickGroup == ETickGroup::TG_PrePhysics)
-                                {
-                                    Comp->TickComponent(DeltaTime);
-                                }
+                                Comp->TickComponent(DeltaTime);
                             }
 
                             PhysicsManager->Simulate(DeltaTime);
 
                             for (auto* Comp : Actor->GetComponents())
                             {
-                                if (Comp->TickGroup == ETickGroup::TG_PostPhysics)
-                                {
-                                    Comp->TickComponent(DeltaTime);
-                                }
+                                Comp->EndPhysicsTickComponent(DeltaTime);
+
                             }
                         }
                     }
@@ -210,20 +194,15 @@ void UEditorEngine::Tick(float DeltaTime)
                             // 물리기반 시뮬레이션을 위한 TickGroup 처리
                             for (auto* Comp : Actor->GetComponents())
                             {
-                                if (Comp->TickGroup == ETickGroup::TG_PrePhysics)
-                                {
-                                    Comp->TickComponent(DeltaTime);
-                                }
+                                Comp->TickComponent(DeltaTime);
                             }
 
                             PhysicsManager->Simulate(DeltaTime);
 
                             for (auto* Comp : Actor->GetComponents())
                             {
-                                if (Comp->TickGroup == ETickGroup::TG_PostPhysics)
-                                {
-                                    Comp->TickComponent(DeltaTime);
-                                }
+                                Comp->EndPhysicsTickComponent(DeltaTime);
+
                             }
                         }
                     }
