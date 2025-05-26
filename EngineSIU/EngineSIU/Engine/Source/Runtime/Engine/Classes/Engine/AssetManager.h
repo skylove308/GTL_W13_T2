@@ -1,5 +1,7 @@
 #pragma once
 #include "StaticMesh.h"
+#include "DirectXTK/Keyboard.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
 
@@ -92,8 +94,8 @@ public:
     UAnimationAsset* GetAnimation(const FName& Name) const;
     UParticleSystem* GetParticleSystem(const FName& Name) const;
 
-    void GetMaterialKeys(TSet<FName>& OutKeys) const;
-    void GetMaterialKeys(TArray<FName>& OutKeys) const;
+    void GetAssetKeys(EAssetType AssetType, TSet<FName>& OutKeys) const;
+    void GetAssetKeys(EAssetType AssetType, TArray<FName>& OutKeys) const;
 
     void AddAssetInfo(const FAssetInfo& Info);
     

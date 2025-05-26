@@ -944,7 +944,7 @@ void UMaterialProperty::DisplayRawDataInImGui_Implement(const char* PropertyLabe
 
     // Material Keys #1
     TArray<FName> MaterialKeys;
-    UAssetManager::Get().GetMaterialKeys(MaterialKeys);
+    UAssetManager::Get().GetAssetKeys(EAssetType::Material, MaterialKeys);
     for (const FName& Key : MaterialKeys)
     {
         if (UAssetManager::Get().GetMaterial(Key) == CurrentMaterial)

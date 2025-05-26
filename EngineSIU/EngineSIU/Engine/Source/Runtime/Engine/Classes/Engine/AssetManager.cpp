@@ -98,21 +98,21 @@ UParticleSystem* UAssetManager::GetParticleSystem(const FName& Name) const
     return Cast<UParticleSystem>(GetAsset(EAssetType::ParticleSystem, Name));
 }
 
-void UAssetManager::GetMaterialKeys(TSet<FName>& OutKeys) const
+void UAssetManager::GetAssetKeys(EAssetType AssetType, TSet<FName>& OutKeys) const
 {
     OutKeys.Empty();
 
-    for (const auto& Material : AssetMap[EAssetType::Material])
+    for (const auto& Material : AssetMap[AssetType])
     {
         OutKeys.Add(Material.Key);
     }
 }
 
-void UAssetManager::GetMaterialKeys(TArray<FName>& OutKeys) const
+void UAssetManager::GetAssetKeys(EAssetType AssetType, TArray<FName>& OutKeys) const
 {
     OutKeys.Empty();
 
-    for (const auto& Material : AssetMap[EAssetType::Material])
+    for (const auto& Material : AssetMap[AssetType])
     {
         OutKeys.Add(Material.Key);
     }
