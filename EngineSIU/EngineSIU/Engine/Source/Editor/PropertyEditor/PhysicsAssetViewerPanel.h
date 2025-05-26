@@ -2,6 +2,7 @@
 #include "Engine/EditorEngine.h"
 #include "GameFramework/Actor.h"
 #include "UnrealEd/EditorPanel.h"
+#include "PhysicsEngine/ConstraintInstance.h"
 
 class USkeletalMesh;
 class FReferenceSkeleton;
@@ -22,6 +23,10 @@ public:
     FString GetSelectedBoneName() const;
 
     void ClearRefSkeletalMeshComponent();
+
+    void AddConstraint(const FString& BoneName1, const FString& BoneName2);
+    void RemoveConstraint(int32 ConstraintIndex);
+
 private:
     float Width = 0, Height = 0;
     USkeletalMesh* SkeletalMesh;
@@ -51,7 +56,8 @@ private:
     //TCHAR RenameTrackBuffer[256];
     //TCHAR RenameNotifyBuffer[256];
 
-//private:
+private:
+    TArray<FConstraintInstance> Constraints; // 물리 제약 조건 인스턴스 배열
 //    char NewNotifyNameBuffer[128] = "NewNotify";
 //    float NewNotifyTime = 0.0f;
 //    float RenameNotifyDuration = 1.0f;

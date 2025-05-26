@@ -126,6 +126,18 @@ void PhysicsAssetViewerPanel::Render()
         ImGui::End();
         ImGui::PopStyleVar();
     }
+
+    ImGui::Separator();
+    ImGui::Text("Current Constraints:");
+    for (int32 i = 0; i < Constraints.Num(); ++i)
+    {
+        auto& C = Constraints[i];
+        ImGui::Text("%d: %s - %s", i, *C.ConstraintBone1, *C.ConstraintBone2);
+        if (ImGui::SmallButton(("Remove##" + FString::FromInt(i)).operator*()))
+        {
+            RemoveConstraint(i);
+        }
+    }
 }
 
 void PhysicsAssetViewerPanel::OnResize(HWND hWnd)
@@ -170,6 +182,23 @@ void PhysicsAssetViewerPanel::ClearRefSkeletalMeshComponent()
     //}
 }
 
+void PhysicsAssetViewerPanel::AddConstraint(const FString& BoneName1, const FString& BoneName2)
+{
+    // 1) 빈 FConstraintInstance 상자 하나를 배열에 추가
+    int32 NewIndex = Constraints.AddDefaulted();
+
+    Constraints[NewIndex].ConstraintBone1 = BoneName1;
+    Constraints[NewIndex].ConstraintBone2 = BoneName2;
+}
+
+void PhysicsAssetViewerPanel::RemoveConstraint(int32 ConstraintIndex)
+{
+    if (Constraints.IsValidIndex(ConstraintIndex))
+    {
+        Constraints.RemoveAt(ConstraintIndex);
+    }
+}
+
 void PhysicsAssetViewerPanel::LoadBoneIcon()
 {
     BoneIconSRV = FEngineLoop::ResourceManager.GetTexture(L"Assets/Viewer/Bone_16x.PNG")->TextureSRV;
@@ -195,9 +224,18 @@ void PhysicsAssetViewerPanel::CopyRefSkeleton()
 
 void PhysicsAssetViewerPanel::RenderBoneTree(const FReferenceSkeleton& RefSkeleton, int32 BoneIndex, UEditorEngine* Engine /*, const FString& SearchFilter */)
 {
-    const FMeshBoneInfo& BoneInfo = CopiedRefSkeleton->RawRefBoneInfo[BoneIndex];
+    // 0) 본 이름, 부모 본 이름 구하기
+    const FMeshBoneInfo& BoneInfo = RefSkeleton.RawRefBoneInfo[BoneIndex];
     const FString& ShortBoneName = GetCleanBoneName(BoneInfo.Name.ToString());
 
+    int32 ParentIndex = RefSkeleton.RawRefBoneInfo[BoneIndex].ParentIndex;
+    FString ParentBoneName;
+    if (ParentIndex != INDEX_NONE)
+    {
+        ParentBoneName = GetCleanBoneName(
+            RefSkeleton.RawRefBoneInfo[ParentIndex].Name.ToString()
+        );
+    }
     // 검색 필터 적용 (선택 사항)
     // if (!SearchFilter.IsEmpty() && !ShortBoneName.Contains(SearchFilter))
     // {
@@ -215,17 +253,15 @@ void PhysicsAssetViewerPanel::RenderBoneTree(const FReferenceSkeleton& RefSkelet
     //    // if (!ShortBoneName.Contains(SearchFilter)) return;
     // }
 
+    // ================================
+
+    // ImGui TreeNodeEx 로 본 이름 그리기…
     // 1) ImGui ID 충돌 방지
     ImGui::PushID(BoneIndex);
 
-    ImGui::Image((ImTextureID)BoneIconSRV, ImVec2(16, 16));  // 16×16 픽셀 크기
-    ImGui::SameLine();
-
-    ImGuiTreeNodeFlags NodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen;
-    // if (Engine->SkeletalMeshViewerWorld->SelectBoneIndex == BoneIndex) // 가상의 함수 호출
-    // {
-    //     NodeFlags |= ImGuiTreeNodeFlags_Selected; // 선택된 경우 Selected 플래그 추가
-    // }
+    // 2) 자식 유무 판별 후 TreeNode 플래그 설정
+    ImGuiTreeNodeFlags NodeFlags =
+        ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen;
 
     // 자식이 없는 본은 리프 노드로 처리 (화살표 없음)
     bool bHasChildren = false;
@@ -243,17 +279,22 @@ void PhysicsAssetViewerPanel::RenderBoneTree(const FReferenceSkeleton& RefSkelet
         NodeFlags &= ~ImGuiTreeNodeFlags_OpenOnArrow; // 리프 노드는 화살표로 열 필요 없음
     }
 
+    ImGui::Image((ImTextureID)BoneIconSRV, ImVec2(16, 16));  // 16×16 픽셀 크기
+    ImGui::SameLine();
     // ImGui::TreeNodeEx (본 이름, 플래그)
     // 이름 부분만 클릭 가능하도록 하려면 ImGui::Selectable을 함께 사용하거나 커스텀 로직 필요
     // 여기서는 TreeNodeEx 자체의 클릭 이벤트를 사용
     bool bNodeOpen = ImGui::TreeNodeEx(*ShortBoneName, NodeFlags);
 
-    // --- 클릭 이벤트 처리 ---
-    //if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) // 왼쪽 마우스 버튼 클릭 시
-    //{
-    //    // 엔진에 선택된 본 인덱스 설정 (가상의 함수 호출)
-    //    Engine->SkeletalMeshViewerWorld->SelectBoneIndex = (BoneIndex);
-    //}
+    if (ImGui::BeginPopupContextItem("BonePopup"))
+    {
+        if (ImGui::MenuItem("Add Constraint"))
+        {
+            // 예: 이 본을 Bone1으로, 부모 본을 Bone2로 지정
+            AddConstraint(ShortBoneName, ParentBoneName);
+        }
+        ImGui::EndPopup();
+    }
 
     if (bNodeOpen) // 노드가 열려있다면
     {
@@ -268,6 +309,17 @@ void PhysicsAssetViewerPanel::RenderBoneTree(const FReferenceSkeleton& RefSkelet
         ImGui::TreePop(); // 트리 노드 닫기
     }
     ImGui::PopID(); // ID 스택 복원
+    // if (Engine->SkeletalMeshViewerWorld->SelectBoneIndex == BoneIndex) // 가상의 함수 호출
+    // {
+    //     NodeFlags |= ImGuiTreeNodeFlags_Selected; // 선택된 경우 Selected 플래그 추가
+    // }
+
+    // --- 클릭 이벤트 처리 ---
+    //if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) // 왼쪽 마우스 버튼 클릭 시
+    //{
+    //    // 엔진에 선택된 본 인덱스 설정 (가상의 함수 호출)
+    //    Engine->SkeletalMeshViewerWorld->SelectBoneIndex = (BoneIndex);
+    //}
 }
 
 // void PhysicsAssetViewerPanel::RenderAnimationSequence(const FReferenceSkeleton& RefSkeleton, UEditorEngine* Engine)
