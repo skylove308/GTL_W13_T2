@@ -505,7 +505,6 @@ void UPrimitiveComponent::BeginPlay()
 {
     USceneComponent::BeginPlay();
 
-    //bSimulate = true; // (임시) 기본적으로 시뮬레이션을 활성화합니다.
     if (bSimulate)
     {
         for (const auto& BoxShape : GetOwner()->GetComponentsByClass<UBoxComponent>())
