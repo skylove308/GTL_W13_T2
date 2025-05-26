@@ -48,6 +48,8 @@ public:
 
     FComponentEndOverlapSignature OnComponentEndOverlap;
 
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bSimulate)
+
     /** 
      * Begin tracking an overlap interaction with the component specified.
      * @param OtherComp - The component of the other actor that this component is now overlapping
@@ -108,7 +110,6 @@ public:
     virtual GameObject* CreatePhysXGameObject();
 
     virtual void BeginPlay() override;
-
 protected:
     TArray<FOverlapInfo> OverlappingComponents;
 

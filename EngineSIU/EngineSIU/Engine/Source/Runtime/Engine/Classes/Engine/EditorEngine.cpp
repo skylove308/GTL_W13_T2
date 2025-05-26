@@ -277,7 +277,6 @@ void UEditorEngine::StartSkeletalMeshViewer(FName SkeletalMeshName, UAnimationAs
     }
     
     FWorldContext& WorldContext = CreateNewWorldContext(EWorldType::SkeletalViewer);
-
     
     SkeletalMeshViewerWorld = USkeletalViewerWorld::CreateWorld(this, EWorldType::SkeletalViewer, FString("SkeletalMeshViewerWorld"));
 
@@ -626,7 +625,10 @@ void UEditorEngine::SetPhysXScene(UWorld* World)
     for (const auto& Actor : World->GetActiveLevel()->Actors)
     {
         UPrimitiveComponent* Prim = Actor->GetComponentByClass<UPrimitiveComponent>();
-        Prim->CreatePhysXGameObject();
+        if (Prim && Prim->bSimulate)
+        {
+            Prim->CreatePhysXGameObject();
+        }
     }
 }
 
