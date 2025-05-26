@@ -167,6 +167,8 @@ UObject* UPrimitiveComponent::Duplicate(UObject* InOuter)
     ThisClass* NewComponent = Cast<ThisClass>(Super::Duplicate(InOuter));
 
     NewComponent->AABB = AABB;
+    NewComponent->bSimulate = bSimulate;
+    NewComponent->bApplyGravity = bApplyGravity;
 
     return NewComponent;
 }
@@ -494,6 +496,35 @@ GameObject* UPrimitiveComponent::CreatePhysXGameObject()
 
     TArray<UBodySetup*> BodySetups;
     BodySetups.Add(BodySetup);
+
+    for (const auto& GeomAttribute : GeomAttributes)
+    {
+        PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
+        PxVec3 Rotation = PxVec3(GeomAttribute.Rotation.X, GeomAttribute.Rotation.Y, GeomAttribute.Rotation.Z);
+        PxVec3 HalfScale = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z) / 2;
+
+        switch (GeomAttribute.GeomType)
+        {
+        case EGeomType::ESphere:
+        {
+            PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, HalfScale);
+            BodySetup->AggGeom.SphereElems.Add(PxSphere);
+            break;
+        }
+        case EGeomType::EBox:
+        {
+            PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, Rotation, HalfScale);
+            BodySetup->AggGeom.BoxElems.Add(PxBox);
+            break;
+        }
+        case EGeomType::ECapsule:
+        {
+            PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, HalfScale);
+            BodySetup->AggGeom.SphereElems.Add(PxCapsule);
+            break;
+        }
+        }
+    }
     
     GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance,  BodySetups);
     BodyInstance->BIGameObject = obj;
@@ -507,33 +538,6 @@ void UPrimitiveComponent::BeginPlay()
 
     if (bSimulate)
     {
-        for (const auto& BoxShape : GetOwner()->GetComponentsByClass<UBoxComponent>())
-        {
-            PxVec3 Offset = PxVec3(BoxShape->RelativeLocation.X, BoxShape->RelativeLocation.Y, BoxShape->RelativeLocation.Z);
-            PxVec3 Rotation = PxVec3(BoxShape->RelativeRotation.Roll, BoxShape->RelativeRotation.Pitch, BoxShape->RelativeRotation.Yaw);
-            PxVec3 HalfScale = PxVec3(BoxShape->RelativeScale3D.X, BoxShape->RelativeScale3D.Y, BoxShape->RelativeScale3D.Z) / 2;
-            PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, Rotation, HalfScale);
-            BodySetup->AggGeom.BoxElems.Add(PxBox);
-        }
-
-        for (const auto& SphereShape : GetOwner()->GetComponentsByClass<USphereComponent>())
-        {
-            PxVec3 Offset = PxVec3(SphereShape->RelativeLocation.X, SphereShape->RelativeLocation.Y, SphereShape->RelativeLocation.Z);
-            PxVec3 Rotation = PxVec3(SphereShape->RelativeRotation.Roll, SphereShape->RelativeRotation.Pitch, SphereShape->RelativeRotation.Yaw);
-            PxVec3 HalfScale = PxVec3(SphereShape->RelativeScale3D.X, SphereShape->RelativeScale3D.Y, SphereShape->RelativeScale3D.Z) / 2;
-            PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, HalfScale);
-            BodySetup->AggGeom.SphereElems.Add(PxSphere);
-        }
-
-        for (const auto& CapsuleShape : GetOwner()->GetComponentsByClass<UCapsuleComponent>())
-        {
-            PxVec3 Offset = PxVec3(CapsuleShape->RelativeLocation.X, CapsuleShape->RelativeLocation.Y, CapsuleShape->RelativeLocation.Z);
-            PxVec3 Rotation = PxVec3(CapsuleShape->RelativeRotation.Roll, CapsuleShape->RelativeRotation.Pitch, CapsuleShape->RelativeRotation.Yaw);
-            PxVec3 HalfScale = PxVec3(CapsuleShape->RelativeScale3D.X, CapsuleShape->RelativeScale3D.Y, CapsuleShape->RelativeScale3D.Z) / 2;
-            PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, HalfScale);
-            BodySetup->AggGeom.SphereElems.Add(PxCapsule);
-        }
-    
         CreatePhysXGameObject();
     }
 }

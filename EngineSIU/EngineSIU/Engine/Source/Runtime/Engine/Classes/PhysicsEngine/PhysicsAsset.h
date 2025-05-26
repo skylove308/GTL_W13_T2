@@ -16,6 +16,23 @@ struct PxAggregateGeom
     TArray<physx::PxShape*> CapsuleElems;
 };
 
+enum class EGeomType
+{
+    ESphere,
+    EBox,
+    ECapsule,
+};
+
+struct AggregateGeomAttributes
+{
+    DECLARE_STRUCT(AggregateGeomAttributes)
+
+    UPROPERTY_WITH_FLAGS(EditAnywhere, EGeomType, GeomType)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Offset)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Rotation)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Extent)
+};
+
 class UBodySetupCore : public UObject
 {
     DECLARE_CLASS(UBodySetupCore, UObject)
