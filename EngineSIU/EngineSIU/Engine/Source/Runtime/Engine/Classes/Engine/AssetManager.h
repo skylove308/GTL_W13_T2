@@ -17,6 +17,7 @@ enum class EAssetType : uint8
     Texture2D,
     Material,
     ParticleSystem,
+    PhysicsAsset,
 };
 
 struct FAssetInfo
@@ -26,6 +27,7 @@ struct FAssetInfo
     FString SourceFilePath; // 원본 파일 경로
     EAssetType AssetType;   // Asset의 타입
     uint32 Size;            // Asset의 크기 (바이트 단위)
+    UObject* AssetObject;
 
     [[nodiscard]] FString GetFullPath() const { return PackagePath.ToString() / AssetName.ToString(); }
 

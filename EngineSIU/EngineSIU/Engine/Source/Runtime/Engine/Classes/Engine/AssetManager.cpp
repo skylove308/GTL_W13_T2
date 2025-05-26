@@ -156,6 +156,10 @@ void UAssetManager::LoadContentFiles()
 {
     const std::string BasePathName = "Contents/";
 
+    TArray<std::filesystem::directory_entry> ObjEntries;
+    TArray<std::filesystem::directory_entry> FbxEntries;
+    TArray<std::filesystem::directory_entry> PhysicsAssetEntries;
+
     for (const auto& Entry : std::filesystem::recursive_directory_iterator(BasePathName))
     {
         if (!Entry.is_regular_file() || Entry.path().extension() == ".bin")
@@ -165,36 +169,61 @@ void UAssetManager::LoadContentFiles()
 
         if (Entry.path().extension() == ".obj")
         {
-            // Obj 파일 로드
-            FAssetInfo NewAssetInfo;
-            NewAssetInfo.AssetName = FName(Entry.path().filename().generic_string());
-            NewAssetInfo.PackagePath = FName(Entry.path().parent_path().generic_string());
-            NewAssetInfo.SourceFilePath = Entry.path().generic_string();
-            NewAssetInfo.AssetType = EAssetType::StaticMesh; // obj 파일은 무조건 StaticMesh
-            NewAssetInfo.Size = static_cast<uint32>(std::filesystem::file_size(Entry.path()));
-            
-            AssetRegistry->PathNameToAssetInfo.Add(NewAssetInfo.AssetName, NewAssetInfo);
-            
-            FString MeshName = NewAssetInfo.GetFullPath();
-            FObjManager::CreateStaticMesh(MeshName);
+            ObjEntries.Add(Entry);
         }
         else if (Entry.path().extension() == ".fbx")
         {
-            FAssetInfo AssetInfo = {};
-            AssetInfo.SourceFilePath = Entry.path().generic_string();
-            AssetInfo.PackagePath = FName(Entry.path().parent_path().generic_string());
-            AssetInfo.Size = static_cast<uint32>(std::filesystem::file_size(Entry.path()));
-
-            HandleFBX(AssetInfo);
+            FbxEntries.Add(Entry);
+        }
+        else if (Entry.path().extension() == ".physicsasset")
+        {
+            PhysicsAssetEntries.Add(Entry);
         }
     }
 
+    for (const auto& Entry : ObjEntries)
+    {
+        // Obj 파일 로드
+        FAssetInfo NewAssetInfo;
+        NewAssetInfo.AssetName = FName(Entry.path().filename().generic_string());
+        NewAssetInfo.PackagePath = FName(Entry.path().parent_path().generic_string());
+        NewAssetInfo.SourceFilePath = Entry.path().generic_string();
+        NewAssetInfo.AssetType = EAssetType::StaticMesh; // obj 파일은 무조건 StaticMesh
+        NewAssetInfo.Size = static_cast<uint32>(std::filesystem::file_size(Entry.path()));
+            
+        FString MeshName = NewAssetInfo.GetFullPath();
+        NewAssetInfo.AssetObject = FObjManager::CreateStaticMesh(MeshName);
+            
+        AssetRegistry->PathNameToAssetInfo.Add(NewAssetInfo.AssetName, NewAssetInfo);
+    }
+
+    for (const auto& Entry : FbxEntries)
+    {
+        FAssetInfo AssetInfo = {};
+        AssetInfo.PackagePath = FName(Entry.path().parent_path().generic_string());
+        AssetInfo.SourceFilePath = Entry.path().generic_string();
+        AssetInfo.Size = static_cast<uint32>(std::filesystem::file_size(Entry.path()));
+
+        HandleFBX(AssetInfo);
+    }
     OutputDebugStringA(std::format("FBX Load Time: {:.2f} s\nBinary Load Time: {:.2f} s", FbxLoadTime / 1000.0, BinaryLoadTime / 1000.0).c_str());
+
+    for (const auto& Entry : PhysicsAssetEntries)
+    {
+        FAssetInfo AssetInfo = {};
+        AssetInfo.AssetName = FName(Entry.path().filename().generic_string());
+        AssetInfo.PackagePath = FName(Entry.path().parent_path().generic_string());
+        AssetInfo.SourceFilePath = Entry.path().generic_string();
+        AssetInfo.AssetType = EAssetType::PhysicsAsset;
+        AssetInfo.Size = static_cast<uint32>(std::filesystem::file_size(Entry.path()));
+
+        // TODO: 피직스 에셋 로드
+    }
 }
 
 void UAssetManager::HandleFBX(const FAssetInfo& AssetInfo)
 {
-    // TODO : ControlEditorPanel Viwer Open과 코드 중복 다수
+    // TODO : ControlEditorPanel Viewer Open과 코드 중복 다수
     // 경로, 이름 준비
     FString BaseName;
 
@@ -284,6 +313,7 @@ void UAssetManager::AddToAssetMap(const FAssetLoadResult& Result, const FString&
         FAssetInfo Info = BaseAssetInfo;
         Info.AssetName = i > 0 ? FName(BaseAssetName + FString::FromInt(i)) : FName(BaseAssetName);
         Info.AssetType = EAssetType::Skeleton;
+        Info.AssetObject = Skeleton;
         
         FString Key = Info.GetFullPath();
         AssetRegistry->PathNameToAssetInfo.Add(Key, Info);
@@ -299,6 +329,7 @@ void UAssetManager::AddToAssetMap(const FAssetLoadResult& Result, const FString&
         FAssetInfo Info = BaseAssetInfo;
         Info.AssetName = i > 0 ? FName(BaseAssetName + FString::FromInt(i)) : FName(BaseAssetName);
         Info.AssetType = EAssetType::SkeletalMesh;
+        Info.AssetObject = SkeletalMesh;
         
         FString Key = Info.GetFullPath();
         AssetRegistry->PathNameToAssetInfo.Add(Key, Info);
@@ -314,6 +345,7 @@ void UAssetManager::AddToAssetMap(const FAssetLoadResult& Result, const FString&
         FAssetInfo Info = BaseAssetInfo;
         Info.AssetName = i > 0 ? FName(BaseAssetName + FString::FromInt(i)) : FName(BaseAssetName);
         Info.AssetType = EAssetType::StaticMesh;
+        Info.AssetObject = StaticMesh;
         
         FString Key = Info.GetFullPath();
         AssetRegistry->PathNameToAssetInfo.Add(Key, Info);
@@ -329,6 +361,7 @@ void UAssetManager::AddToAssetMap(const FAssetLoadResult& Result, const FString&
         FAssetInfo Info = BaseAssetInfo;
         Info.AssetName = FName(BaseAssetName);
         Info.AssetType = EAssetType::Material;
+        Info.AssetObject = Material;
         
         FString Key = Info.GetFullPath();
         AssetRegistry->PathNameToAssetInfo.Add(Key, Info);
@@ -344,6 +377,7 @@ void UAssetManager::AddToAssetMap(const FAssetLoadResult& Result, const FString&
         FAssetInfo Info = BaseAssetInfo;
         Info.AssetName = FName(BaseAssetName);
         Info.AssetType = EAssetType::Animation;
+        Info.AssetObject = Animation;
         
         FString Key = Info.GetFullPath();
         AssetRegistry->PathNameToAssetInfo.Add(Key, Info);
