@@ -19,6 +19,7 @@
 #include "UnrealEd/UnrealEd.h"
 #include "World/ParticleViewerWorld.h"
 #include "Physics/PhysicsManager.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -389,105 +390,7 @@ void UEditorEngine::StartParticleViewer(FName ParticleName, UParticleSystem* Par
     ClearComponentSelection();
 }
 
-void UEditorEngine::StartPhysicsAssetViewer(FName PhysicsAssetName)
-{
-    if (PhysicsAssetName == "")
-    {
-        return;
-    }
-
-    ClearActorSelection();
-    ClearComponentSelection();
-
-    if (PhysicsAssetViewerWorld)
-    {
-        UE_LOG(ELogLevel::Warning, TEXT("PhysicsAssetViewerWorld already exists!"));
-        const auto Actors = PhysicsAssetViewerWorld->GetActiveLevel()->Actors;
-        for (const auto& Actor : Actors)
-        {
-            Actor->Destroy();
-        }
-    }
-    else
-    {
-        FWorldContext& WorldContext = CreateNewWorldContext(EWorldType::PhysicsAssetViewer);
-        PhysicsAssetViewerWorld = UPhysicsAssetViewerWorld::CreateWorld(this); // PhysicsAssetViewerWorld가 생성됩니다.
-        WorldContext.SetCurrentWorld(PhysicsAssetViewerWorld);
-    }
-
-    ActiveWorld = PhysicsAssetViewerWorld;
-    PhysicsAssetViewerWorld->WorldType = EWorldType::PhysicsAssetViewer;
-
-    // 스켈레탈 액터 스폰
-    ASkeletalMeshActor* SkeletalActor = PhysicsAssetViewerWorld->SpawnActor<ASkeletalMeshActor>();
-    SkeletalActor->SetActorTickInEditor(true);
-
-    USkeletalMeshComponent* MeshComp = SkeletalActor->AddComponent<USkeletalMeshComponent>();
-    SkeletalActor->SetRootComponent(MeshComp);
-    SkeletalActor->SetActorLabel(TEXT("OBJ_SKELETALMESH"));
-    MeshComp->SetSkeletalMeshAsset(UAssetManager::Get().GetSkeletalMesh(PhysicsAssetName.ToString()));
-    
-    if (PhysicsAssetViewerWorld) // PhysicsAssetViewerWorld가 유효한지 다시 확인하는 것이 좋습니다.
-    {
-        // 만약 UPhysicsAssetViewerWorld가 USkeletalViewerWorld를 상속받지 않는다면, 
-        // 직접 캐스팅하거나 PhysicsAssetViewerWorld 클래스에 MeshComp를 저장할 별도의 변수를 추가해야 합니다.
-        // 예를 들어, UPhysicsAssetViewerWorld에 USkeletalMeshComponent* CurrentPhysicsMeshComp; 와 같은 변수를 만들고
-        // PhysicsAssetViewerWorld->SetCurrentPhysicsMeshComp(MeshComp); 와 같이 호출합니다.
-
-        // 현재 상황에서 가장 직접적인 수정: PhysicsAssetViewerWorld가 USkeletalViewerWorld라고 가정하고 호출
-        // 만약 UPhysicsAssetViewerWorld 클래스가 SetSkeletalMeshComponent를 가지고 있다면 이렇게 호출
-        PhysicsAssetViewerWorld->SetSkeletalMeshComponent(MeshComp);
-    }
-    else
-    {
-        // 에러 로그: PhysicsAssetViewerWorld가 유효하지 않습니다.
-        UE_LOG(ELogLevel::Error, TEXT("PhysicsAssetViewerWorld is null after creation attempt in StartPhysicsAssetViewer."));
-    }
-
-
-    //MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-    //MeshComp->PlayAnimation(PhysicsAsset, true);
-    //MeshComp->DEBUG_SetAnimationEnabled(true);
-    //MeshComp->SetPlaying(true);
-
-    ADirectionalLight* DirectionalLight = PhysicsAssetViewerWorld->SpawnActor<ADirectionalLight>();
-    DirectionalLight->SetActorRotation(FRotator(45.f, 45.f, 0.f));
-    DirectionalLight->GetComponentByClass<UDirectionalLightComponent>()->SetIntensity(4.0f);
-
-    FViewportCamera& Camera = *GEngineLoop.GetLevelEditor()->GetActiveViewportClient()->GetPerspectiveCamera();
-    CameraLocation = Camera.GetLocation();
-    CameraRotation = Camera.GetRotation();
-
-    Camera.SetRotation(FVector(0.0f, 30, 180));
-    if (UPrimitiveComponent* Primitive = Cast<UPrimitiveComponent>(MeshComp))
-    {
-        float FOV = GEngineLoop.GetLevelEditor()->GetActiveViewportClient()->GetCameraFOV();
-
-        // 로컬 바운딩 박스
-        FBoundingBox Box = Primitive->GetBoundingBox();
-        FVector LocalCenter = (Box.MinLocation + Box.MaxLocation) * 0.5f;
-        FVector LocalExtents = (Box.MaxLocation - Box.MinLocation) * 0.5f;
-        float Radius = LocalExtents.Length();
-
-        FMatrix ComponentToWorld = Primitive->GetWorldMatrix();
-        FVector WorldCenter = ComponentToWorld.TransformPosition(LocalCenter);
-
-        // FOV 기반 거리 계산
-        float VerticalFOV = FMath::DegreesToRadians(FOV);
-        float Distance = Radius / FMath::Tan(VerticalFOV * 0.5f);
-
-        // 카메라 위치 설정
-        Camera.SetLocation(WorldCenter - Camera.GetForwardVector() * Distance);
-    }
-
-    if (AEditorPlayer* Player = GetEditorPlayer())
-    {
-        Player->SetCoordMode(ECoordMode::CDM_LOCAL);
-    }
-}
-
-
-void UEditorEngine::StartPhysicsAssetViewer(FName PhysicsAssetName, UPhysicsAssetViewerWorld* PhysicsAsset)
+void UEditorEngine::StartPhysicsAssetViewer(FName PhysicsAssetName, UPhysicsAsset* PhysicsAsset)
 {
     if (PhysicsAssetName == "")
     {
@@ -525,11 +428,6 @@ void UEditorEngine::StartPhysicsAssetViewer(FName PhysicsAssetName, UPhysicsAsse
     SkeletalActor->SetActorLabel(TEXT("OBJ_SKELETALMESH"));
     MeshComp->SetSkeletalMeshAsset(UAssetManager::Get().GetSkeletalMesh(PhysicsAssetName.ToString()));
     SkeletalMeshViewerWorld->SetSkeletalMeshComponent(MeshComp);
-
-    //MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-    //MeshComp->PlayAnimation(PhysicsAsset, true);
-    //MeshComp->DEBUG_SetAnimationEnabled(true);
-    //MeshComp->SetPlaying(true);
 
     ADirectionalLight* DirectionalLight = SkeletalMeshViewerWorld->SpawnActor<ADirectionalLight>();
     DirectionalLight->SetActorRotation(FRotator(45.f, 45.f, 0.f));
