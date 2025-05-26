@@ -63,13 +63,18 @@ void USkeletalMeshComponent::TickComponent(float DeltaTime)
 {
     Super::TickComponent(DeltaTime);
 
-    if(TickGroup == ETickGroup::TG_PrePhysics)
+    if(!bSimulate)
     {
         TickPose(DeltaTime);
     }
-    else if (TickGroup == ETickGroup::TG_PostPhysics)
+}
+
+void USkeletalMeshComponent::EndPhysicsTickComponent(float DeltaTime)
+{
+    Super::EndPhysicsTickComponent(DeltaTime);
+    if (bSimulate)
     {
-        for(FBodyInstance* BI : Bodies)
+        for (FBodyInstance* BI : Bodies)
         {
             BI->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
         }

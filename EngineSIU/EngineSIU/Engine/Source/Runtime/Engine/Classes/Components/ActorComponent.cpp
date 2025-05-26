@@ -90,6 +90,10 @@ void UActorComponent::TickComponent(float DeltaTime)
 {
 }
 
+void UActorComponent::EndPhysicsTickComponent(float DeltaTime)
+{
+}
+
 void UActorComponent::OnComponentDestroyed()
 {
 }

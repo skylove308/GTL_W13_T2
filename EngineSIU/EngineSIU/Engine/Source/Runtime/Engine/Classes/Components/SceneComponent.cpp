@@ -75,6 +75,10 @@ void USceneComponent::TickComponent(float DeltaTime)
     Super::TickComponent(DeltaTime);
 }
 
+void USceneComponent::EndPhysicsTickComponent(float DeltaTime) 
+{
+    Super::EndPhysicsTickComponent(DeltaTime);
+}
 
 int USceneComponent::CheckRayIntersection(const FVector& InRayOrigin, const FVector& InRayDirection, float& OutHitDistance) const
 {

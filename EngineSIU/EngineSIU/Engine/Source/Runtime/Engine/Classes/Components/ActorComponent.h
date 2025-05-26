@@ -3,12 +3,6 @@
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
 
-enum class ETickGroup : uint8
-{
-    TG_PrePhysics,
-    TG_PostPhysics,
-};
-
 class AActor;
 
 class UActorComponent : public UObject
@@ -44,6 +38,8 @@ public:
 
     /** 매 틱마다 호출됩니다. */
     virtual void TickComponent(float DeltaTime);
+
+    virtual void EndPhysicsTickComponent(float DeltaTime);
 
     /** Component가 제거되었을 때 호출됩니다. */
     virtual void OnComponentDestroyed();
@@ -91,6 +87,4 @@ private:
 public:
     /** Component가 초기화 되었을 때, 자동으로 활성화할지 여부 */
     uint8 bAutoActive : 1 = true;
-
-    ETickGroup TickGroup = ETickGroup::TG_PrePhysics;
 };
