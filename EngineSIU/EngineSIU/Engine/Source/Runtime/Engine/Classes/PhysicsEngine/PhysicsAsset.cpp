@@ -1,7 +1,21 @@
 ﻿
 #include "PhysicsAsset.h"
 
+#include "Engine/AssetManager.h"
 #include "Engine/SkeletalMesh.h"
+#include "UObject/Casts.h"
+
+void UBodySetupCore::SerializeAsset(FArchive& Ar)
+{
+    Ar << BoneName;
+}
+
+void UBodySetup::SerializeAsset(FArchive& Ar)
+{
+    UBodySetupCore::SerializeAsset(Ar);
+
+    Ar << AggGeom;
+}
 
 bool UPhysicsAsset::SetPreviewMesh(USkeletalMesh* PreviewMesh)
 {
@@ -30,5 +44,22 @@ USkeletalMesh* UPhysicsAsset::GetPreviewMesh() const
 
 void UPhysicsAsset::SerializeAsset(FArchive& Ar)
 {
-    
+    FName SkeletalMeshName = NAME_None;
+    if (Ar.IsSaving())
+    {
+        SkeletalMeshName = UAssetManager::Get().GetAssetKeyByObject(EAssetType::SkeletalMesh, PreviewSkeletalMesh);
+    }
+
+    Ar << SkeletalMeshName;
+
+    if (Ar.IsLoading())
+    {
+        if (UObject* Asset = UAssetManager::Get().GetAsset(EAssetType::SkeletalMesh, SkeletalMeshName))
+        {
+            PreviewSkeletalMesh = Cast<USkeletalMesh>(Asset);
+        }
+    }
+
+    BodySetups.SerializePtrAsset(Ar);
+    ConstraintInstances.SerializePtrAsset(Ar);
 }

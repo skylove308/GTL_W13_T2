@@ -118,6 +118,18 @@ void UAssetManager::GetAssetKeys(EAssetType AssetType, TArray<FName>& OutKeys) c
     }
 }
 
+const FName& UAssetManager::GetAssetKeyByObject(EAssetType AssetType, const UObject* AssetObject) const
+{
+    for (const auto& [Key, Object] : AssetMap[AssetType])
+    {
+        if (Object == AssetObject)
+        {
+            return Key;
+        }
+    }
+    return NAME_None;
+}
+
 void UAssetManager::AddAssetInfo(const FAssetInfo& Info)
 {
     AssetRegistry->PathNameToAssetInfo.Add(Info.AssetName, Info);
@@ -234,7 +246,7 @@ void UAssetManager::LoadContentFiles()
         AssetInfo.AssetType = EAssetType::PhysicsAsset;
         AssetInfo.Size = static_cast<uint32>(std::filesystem::file_size(Entry.path()));
 
-        // TODO: 피직스 에셋 로드
+        HandlePhysicsAsset(AssetInfo);
     }
 }
 
@@ -481,6 +493,52 @@ bool UAssetManager::SaveFbxBinary(const FString& FilePath, FAssetLoadResult& Res
 
     OutputStream.close();
     return true;
+}
+
+void UAssetManager::HandlePhysicsAsset(FAssetInfo& AssetInfo)
+{
+    TArray<uint8> LoadData;
+    {
+        std::ifstream InputStream{ *AssetInfo.SourceFilePath, std::ios::binary | std::ios::ate };
+        if (!InputStream.is_open())
+        {
+            return;
+        }
+
+        const std::streamsize FileSize = InputStream.tellg();
+        if (FileSize < 0)
+        {
+            // Error getting size
+            InputStream.close();
+            return;
+        }
+        if (FileSize == 0)
+        {
+            // Empty file is valid
+            InputStream.close();
+            return; // Buffer remains empty
+        }
+
+        InputStream.seekg(0, std::ios::beg);
+
+        LoadData.SetNum(static_cast<int32>(FileSize));
+        InputStream.read(reinterpret_cast<char*>(LoadData.GetData()), FileSize);
+
+        if (InputStream.fail() || InputStream.gcount() != FileSize)
+        {
+            return;
+        }
+        InputStream.close();
+    }
+
+    FMemoryReader Reader(LoadData);
+    
+    UPhysicsAsset* PhysicsAsset = FObjectFactory::ConstructObject<UPhysicsAsset>(nullptr, AssetInfo.AssetName);
+    PhysicsAsset->SerializeAsset(Reader);
+    
+    AssetInfo.AssetObject = PhysicsAsset;
+    AddAsset(AssetInfo.GetFullPath(), PhysicsAsset);
+    AddAssetInfo(AssetInfo);
 }
 
 bool UAssetManager::SerializeVersion(FArchive& Ar)

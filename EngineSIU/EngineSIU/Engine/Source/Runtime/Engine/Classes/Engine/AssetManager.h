@@ -97,6 +97,8 @@ public:
     void GetAssetKeys(EAssetType AssetType, TSet<FName>& OutKeys) const;
     void GetAssetKeys(EAssetType AssetType, TArray<FName>& OutKeys) const;
 
+    const FName& GetAssetKeyByObject(EAssetType AssetType, const UObject* AssetObject) const;
+    
     void AddAssetInfo(const FAssetInfo& Info);
     
     void AddAsset(const FName& Key, UObject* AssetObject);
@@ -119,6 +121,8 @@ private:
 
     bool SaveFbxBinary(const FString& FilePath, FAssetLoadResult& Result, const FString& BaseName, const FString& FolderPath);
 
+    void HandlePhysicsAsset(FAssetInfo& AssetInfo);
+    
     static constexpr uint32 Version = 1;
 
     bool SerializeVersion(FArchive& Ar);
