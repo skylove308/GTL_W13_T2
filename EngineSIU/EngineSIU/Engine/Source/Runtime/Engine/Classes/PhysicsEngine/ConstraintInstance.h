@@ -82,14 +82,23 @@ struct FTwistConstraint
     UPROPERTY_WITH_FLAGS(EditAnywhere, EAngularConstraintMotion, TwistMotion)
 };
 
-struct FConstraintInstance {
+struct FConstraintInstanceBase
+{
+    DECLARE_STRUCT(FConstraintInstanceBase)
+    FConstraintInstanceBase() = default;
+
+    physx::PxScene* PhysScene = nullptr;
+};
+
+struct FConstraintInstance : public FConstraintInstanceBase
+{
     DECLARE_STRUCT(FConstraintInstance)
     FConstraintInstance();
     
     // 기본 정보
-    FString JointName;                          // 조인트 이름
-    FString ConstraintBone1;                    // 첫 번째 본 이름
-    FString ConstraintBone2;                    // 두 번째 본 이름
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FString, JointName)                          // 조인트 이름
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FString, ConstraintBone1)                    // 첫 번째 본 이름
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FString, ConstraintBone2)                    // 두 번째 본 이름
     
     /** 선형 제약 설정 (위치/이동 제한) */
     UPROPERTY_WITH_FLAGS(EditAnywhere, FLinearConstraint, LinearLimit)
@@ -101,10 +110,10 @@ struct FConstraintInstance {
     UPROPERTY_WITH_FLAGS(EditAnywhere, FTwistConstraint, TwistLimit)
     
     // 모터 설정 (PhysX 4.1+)
-    uint8 bLinearPositionDrive:1;               // 선형 위치 모터
-    uint8 bLinearVelocityDrive:1;               // 선형 속도 모터
-    uint8 bAngularOrientationDrive:1;           // 각도 위치 모터
-    uint8 bAngularVelocityDrive:1;              // 각속도 모터
+    UPROPERTY(EditAnywhere, uint8, bLinearPositionDrive, = 1)               // 선형 위치 모터
+    UPROPERTY(EditAnywhere, uint8, bLinearVelocityDrive, = 1)               // 선형 속도 모터
+    UPROPERTY(EditAnywhere, uint8, bAngularOrientationDrive, = 1)           // 각도 위치 모터
+    UPROPERTY(EditAnywhere, uint8, bAngularVelocityDrive, = 1)              // 각속도 모터
     
     // PhysX 제약 객체
     physx::PxJoint* ConstraintData;             // PhysX 조인트 참조

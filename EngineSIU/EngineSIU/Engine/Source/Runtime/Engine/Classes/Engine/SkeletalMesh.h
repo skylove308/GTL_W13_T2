@@ -1,9 +1,9 @@
 #pragma once
 #include "SkinnedAsset.h"
-#include "Asset/SkeletalMeshAsset.h" 
+#include "Asset/SkeletalMeshAsset.h"
+
 class UPhysicsAsset;
 class USkeleton;
-//struct FSkeletalMeshRenderData;
 
 class USkeletalMesh : public USkinnedAsset
 {
