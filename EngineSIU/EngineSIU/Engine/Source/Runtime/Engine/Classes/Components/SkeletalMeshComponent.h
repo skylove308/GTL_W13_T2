@@ -120,6 +120,12 @@ public:
     virtual void InitAnim();
 
     virtual GameObject* CreatePhysXGameObject() override;
+
+    TArray<FBodyInstance*>& GetBodies() { return Bodies; }
+    TArray<FConstraintInstance*>& GetConstraints() { return Constraints; }
+    void AddBodyInstance(FBodyInstance* BodyInstance);
+    void AddConstraintInstance(FConstraintInstance* ConstraintInstance);
+
     
 protected:
     bool NeedToSpawnAnimScriptInstance() const;

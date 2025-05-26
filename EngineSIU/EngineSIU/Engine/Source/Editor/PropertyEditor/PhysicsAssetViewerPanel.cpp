@@ -2,22 +2,16 @@
 
 #include "SkeletalMeshViewerPanel.h"
 #include "Engine/EditorEngine.h"
-#include <ReferenceSkeleton.h>
-
-// #include "Animation/AnimSequence.h"
-// #include "Animation/AnimSingleNodeInstance.h"
-// #include "Animation/AnimData/AnimDataModel.h"
+#include "ReferenceSkeleton.h"
 #include "Engine/Classes/Engine/SkeletalMesh.h"
-// #include "Engine/Classes/Animation/Skeleton.h"
 #include "Engine/Classes/Engine/FbxLoader.h"
-// #include "ThirdParty/ImGui/include/ImGui/imgui_neo_sequencer.h"
 #include "Engine/Classes/Components/SkeletalMeshComponent.h"
-// #include "Engine/Classes/Animation/AnimTypes.h"
 #include "UnrealEd/ImGuiWidget.h"
-// #include "Contents/AnimInstance/MyAnimInstance.h"
-// #include "Animation/AnimSoundNotify.h"
-// #include "SoundManager.h"
-
+#include "PhysicsEngine/BodyInstance.h"
+#include "PhysicsEngine/ConstraintInstance.h"
+#include "PhysicsEngine/PhysicsAsset.h"
+#include "Physics/PhysicsManager.h"
+#include <PxPhysicsAPI.h>
 
 PhysicsAssetViewerPanel::PhysicsAssetViewerPanel()
 {
@@ -129,15 +123,15 @@ void PhysicsAssetViewerPanel::Render()
 
     ImGui::Separator();
     ImGui::Text("Current Constraints:");
-    for (int32 i = 0; i < Constraints.Num(); ++i)
-    {
-        auto& C = Constraints[i];
-        ImGui::Text("%d: %s - %s", i, *C.ConstraintBone1, *C.ConstraintBone2);
-        if (ImGui::SmallButton(("Remove##" + FString::FromInt(i)).operator*()))
-        {
-            RemoveConstraint(i);
-        }
-    }
+    //for (int32 i = 0; i < Constraints.Num(); ++i)
+    //{
+    //    auto& C = Constraints[i];
+    //    ImGui::Text("%d: %s - %s", i, *C.ConstraintBone1, *C.ConstraintBone2);
+    //    if (ImGui::SmallButton(("Remove##" + FString::FromInt(i)).operator*()))
+    //    {
+    //        RemoveConstraint(i);
+    //    }
+    //}
 }
 
 void PhysicsAssetViewerPanel::OnResize(HWND hWnd)
@@ -182,23 +176,62 @@ void PhysicsAssetViewerPanel::ClearRefSkeletalMeshComponent()
     //}
 }
 
-void PhysicsAssetViewerPanel::AddConstraint(const FString& BoneName1, const FString& BoneName2)
+void PhysicsAssetViewerPanel::AddBodyInstance()
 {
-    // 1) 빈 FConstraintInstance 상자 하나를 배열에 추가
-    int32 NewIndex = Constraints.AddDefaulted();
+    // 새 본 인스턴스 생성
+    FBodyInstance* NewBodyInstance = new FBodyInstance(RefSkeletalMeshComponent);
+    NewBodyInstance->BodyInstanceName = GetSelectedBoneName();
+    
+    physx::PxVec3 BonePos = physx::PxVec3(CopiedRefSkeleton->RawRefBonePose[SelectedBoneIndex].GetTranslation().X, CopiedRefSkeleton->RawRefBonePose[SelectedBoneIndex].GetTranslation().Y, CopiedRefSkeleton->RawRefBonePose[SelectedBoneIndex].GetTranslation().Z);
+    physx::PxVec3 Rotation = physx::PxVec3(CopiedRefSkeleton->RawRefBonePose[SelectedBoneIndex].GetRotation().X, CopiedRefSkeleton->RawRefBonePose[SelectedBoneIndex].GetRotation().Y, CopiedRefSkeleton->RawRefBonePose[SelectedBoneIndex].GetRotation().Z);
+    physx::PxVec3 HalfScale = physx::PxVec3(0.5f, 0.5f, 0.5f); // 예시로 0.5로 설정, 실제 스케일은 필요에 따라 조정
 
-    Constraints[NewIndex].ConstraintBone1 = BoneName1;
-    Constraints[NewIndex].ConstraintBone2 = BoneName2;
+    TArray<UBodySetup*> BodySetups;
+    UBodySetup* BodySetup = FObjectFactory::ConstructObject<UBodySetup>(nullptr);
+    PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(BonePos, Rotation, HalfScale);
+    BodySetup->AggGeom.CapsuleElems.Add(PxBox);
+
+    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(BonePos, NewBodyInstance, BodySetups);
+
+    NewBodyInstance->SetGameObject(obj);
+    NewBodyInstance->BoneIndex = SelectedBoneIndex;
+    RefSkeletalMeshComponent->AddBodyInstance(NewBodyInstance);
+
+    delete NewBodyInstance;
+}
+
+void PhysicsAssetViewerPanel::AddConstraint(const FBodyInstance* BodyInstance1, const FBodyInstance* BodyInstance2)
+{
+    FConstraintInstance* NewConstraint = new FConstraintInstance();
+    NewConstraint->JointName = BodyInstance1->BodyInstanceName.ToString() + ":" + BodyInstance2->BodyInstanceName.ToString();
+    NewConstraint->ConstraintBone1 = BodyInstance1->BodyInstanceName.ToString();
+    NewConstraint->ConstraintBone2 = BodyInstance2->BodyInstanceName.ToString();
+
+    PxTransform GlobalPose1 = BodyInstance1->RigidActorSync->getGlobalPose();
+    PxTransform GlobalPose2 = BodyInstance2->RigidActorSync->getGlobalPose();
+    PxTransform LocalFrameParent = GlobalPose2.getInverse() * GlobalPose1;
+    PxTransform LocalFrameChild = PxTransform(PxVec3(0));
+
+    // PhysX D6 Joint 생성
+    physx::PxD6Joint* Joint = physx::PxD6JointCreate(*GEngine->PhysicsManager->GetPhysics(), BodyInstance1->RigidActorAsync, LocalFrameParent, BodyInstance2->RigidActorAsync, LocalFrameChild);
+
+    // 각도 제한 설정
+    Joint->setMotion(physx::PxD6Axis::eTWIST, physx::PxD6Motion::eLIMITED);
+    Joint->setMotion(physx::PxD6Axis::eSWING1, physx::PxD6Motion::eLIMITED);
+    Joint->setMotion(physx::PxD6Axis::eSWING2, physx::PxD6Motion::eLIMITED);
+    Joint->setTwistLimit(physx::PxJointAngularLimitPair(-physx::PxPi / 4, physx::PxPi / 4));
+    Joint->setSwingLimit(physx::PxJointLimitCone(physx::PxPi / 6, physx::PxPi / 6));
+
+    NewConstraint->ConstraintData = Joint;
+
+    // 추가된 제약 조건을 Constraints 배열에 저장
+    RefSkeletalMeshComponent->AddConstraintInstance(NewConstraint);
 }
 
 void PhysicsAssetViewerPanel::RemoveConstraint(int32 ConstraintIndex)
 {
-    if (Constraints.IsValidIndex(ConstraintIndex))
-    {
-        Constraints.RemoveAt(ConstraintIndex);
-    }
 }
-
+ 
 void PhysicsAssetViewerPanel::LoadBoneIcon()
 {
     BoneIconSRV = FEngineLoop::ResourceManager.GetTexture(L"Assets/Viewer/Bone_16x.PNG")->TextureSRV;
@@ -290,8 +323,8 @@ void PhysicsAssetViewerPanel::RenderBoneTree(const FReferenceSkeleton& RefSkelet
     {
         if (ImGui::MenuItem("Add Constraint"))
         {
-            // 예: 이 본을 Bone1으로, 부모 본을 Bone2로 지정
-            AddConstraint(ShortBoneName, ParentBoneName);
+            // 수정 필요
+            AddConstraint(RefSkeletalMeshComponent->GetBodies()[0], RefSkeletalMeshComponent->GetBodies()[1]);
         }
         ImGui::EndPopup();
     }

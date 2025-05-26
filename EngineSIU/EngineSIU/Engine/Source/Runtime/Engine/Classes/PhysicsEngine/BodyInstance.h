@@ -1,8 +1,5 @@
 #pragma once
 #include <PxRigidActor.h>
-
-// #include "Container/Array.h"
-// #include "Math/Vector.h"
 #include "UObject/ObjectMacros.h"
 
 class UPrimitiveComponent;
@@ -14,6 +11,10 @@ struct FBodyInstance
     FBodyInstance(UPrimitiveComponent* InOwner); // TODO: 초기값 설정?
 
     void SetGameObject(GameObject* InGameObject);
+
+    // BodyInstance Name
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FName, BodyInstanceName);
+
     // ==================== 질량과 관성 ====================
     
     /** 바디의 질량 (킬로그램) */
@@ -111,5 +112,5 @@ struct FBodyInstance
 
     UPrimitiveComponent* OwnerComponent;
     
-    int32 BodyIndex; // 바디 인덱스 (PhysX 내부 식별자)
+    int32 BoneIndex;
 };
