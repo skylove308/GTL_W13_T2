@@ -505,30 +505,33 @@ void UPrimitiveComponent::BeginPlay()
 {
     USceneComponent::BeginPlay();
 
-    bSimulate = true; // (임시) 기본적으로 시뮬레이션을 활성화합니다.
+    //bSimulate = true; // (임시) 기본적으로 시뮬레이션을 활성화합니다.
     if (bSimulate)
     {
         for (const auto& BoxShape : GetOwner()->GetComponentsByClass<UBoxComponent>())
         {
             PxVec3 Offset = PxVec3(BoxShape->RelativeLocation.X, BoxShape->RelativeLocation.Y, BoxShape->RelativeLocation.Z);
+            PxVec3 Rotation = PxVec3(BoxShape->RelativeRotation.Roll, BoxShape->RelativeRotation.Pitch, BoxShape->RelativeRotation.Yaw);
             PxVec3 HalfScale = PxVec3(BoxShape->RelativeScale3D.X, BoxShape->RelativeScale3D.Y, BoxShape->RelativeScale3D.Z) / 2;
-            PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, HalfScale);
+            PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, Rotation, HalfScale);
             BodySetup->AggGeom.BoxElems.Add(PxBox);
         }
 
         for (const auto& SphereShape : GetOwner()->GetComponentsByClass<USphereComponent>())
         {
             PxVec3 Offset = PxVec3(SphereShape->RelativeLocation.X, SphereShape->RelativeLocation.Y, SphereShape->RelativeLocation.Z);
+            PxVec3 Rotation = PxVec3(SphereShape->RelativeRotation.Roll, SphereShape->RelativeRotation.Pitch, SphereShape->RelativeRotation.Yaw);
             PxVec3 HalfScale = PxVec3(SphereShape->RelativeScale3D.X, SphereShape->RelativeScale3D.Y, SphereShape->RelativeScale3D.Z) / 2;
-            PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, HalfScale);
+            PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, HalfScale);
             BodySetup->AggGeom.SphereElems.Add(PxSphere);
         }
 
         for (const auto& CapsuleShape : GetOwner()->GetComponentsByClass<UCapsuleComponent>())
         {
             PxVec3 Offset = PxVec3(CapsuleShape->RelativeLocation.X, CapsuleShape->RelativeLocation.Y, CapsuleShape->RelativeLocation.Z);
+            PxVec3 Rotation = PxVec3(CapsuleShape->RelativeRotation.Roll, CapsuleShape->RelativeRotation.Pitch, CapsuleShape->RelativeRotation.Yaw);
             PxVec3 HalfScale = PxVec3(CapsuleShape->RelativeScale3D.X, CapsuleShape->RelativeScale3D.Y, CapsuleShape->RelativeScale3D.Z) / 2;
-            PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, HalfScale);
+            PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, HalfScale);
             BodySetup->AggGeom.SphereElems.Add(PxCapsule);
         }
     
