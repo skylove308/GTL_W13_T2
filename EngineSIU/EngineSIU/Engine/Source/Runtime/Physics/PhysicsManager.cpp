@@ -10,9 +10,9 @@ FPhysicsManager::FPhysicsManager()
 
 void FPhysicsManager::InitPhysX()
 {
-    gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
-    gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale());
-    gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+    Foundation = PxCreateFoundation(PX_PHYSICS_VERSION, Allocator, ErrorCallback);
+    Physics = PxCreatePhysics(PX_PHYSICS_VERSION, *Foundation, PxTolerancesScale());
+    Material = Physics->createMaterial(0.5f, 0.5f, 0.6f);
 }
 
 PxScene* FPhysicsManager::CreateScene(UWorld* World)
@@ -22,12 +22,12 @@ PxScene* FPhysicsManager::CreateScene(UWorld* World)
         return SceneMap[World];
     }
     
-    PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
+    PxSceneDesc sceneDesc(Physics->getTolerancesScale());
     
     sceneDesc.gravity = PxVec3(0, 0, -9.81f);
     
-    gDispatcher = PxDefaultCpuDispatcherCreate(4);
-    sceneDesc.cpuDispatcher = gDispatcher;
+    Dispatcher = PxDefaultCpuDispatcherCreate(4);
+    sceneDesc.cpuDispatcher = Dispatcher;
     
     sceneDesc.filterShader = PxDefaultSimulationFilterShader;
     
@@ -37,22 +37,22 @@ PxScene* FPhysicsManager::CreateScene(UWorld* World)
     sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
     sceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
     
-    PxScene* NewScene = gPhysics->createScene(sceneDesc);
+    PxScene* NewScene = Physics->createScene(sceneDesc);
     SceneMap.Add(World, NewScene);
 
     return NewScene;
 }
 
-GameObject FPhysicsManager::CreateBox(const PxVec3& pos, const PxVec3& halfExtents) const
+GameObject FPhysicsManager::CreateBox(const PxVec3& Pos, const PxVec3& HalfExtents) const
 {
     GameObject obj;
-    PxTransform pose(pos);
-    obj.rigidBody = gPhysics->createRigidDynamic(pose);
-    PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtents), *gMaterial);
+    PxTransform pose(Pos);
+    obj.rigidBody = Physics->createRigidDynamic(pose);
+    PxShape* shape = Physics->createShape(PxBoxGeometry(HalfExtents), *Material);
     obj.rigidBody->attachShape(*shape);
     PxRigidBodyExt::updateMassAndInertia(*obj.rigidBody, 10.0f);
-    gScene->addActor(*obj.rigidBody);
-    obj.UpdateFromPhysics(gScene);
+    CurrentScene->addActor(*obj.rigidBody);
+    obj.UpdateFromPhysics(CurrentScene);
     return obj;
 }
 
@@ -60,7 +60,7 @@ GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* 
 {
     GameObject* Obj = new GameObject();
     const PxTransform Pose(Pos);
-    Obj->rigidBody = gPhysics->createRigidDynamic(Pose);
+    Obj->rigidBody = Physics->createRigidDynamic(Pose);
     for (const auto& BodySetup : BodySetups)
     {
         for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
@@ -80,71 +80,71 @@ GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* 
     }
     
     PxRigidBodyExt::updateMassAndInertia(*Obj->rigidBody, 10.0f);
-    gScene->addActor(*Obj->rigidBody);
-    Obj->UpdateFromPhysics(gScene);
+    CurrentScene->addActor(*Obj->rigidBody);
+    Obj->UpdateFromPhysics(CurrentScene);
     Obj->rigidBody->userData = (void*)BodyInstance;
     
     return Obj;
 }
 
-PxShape* FPhysicsManager::CreateBoxShape(const PxVec3& pos, const PxVec3& halfExtents) const
+PxShape* FPhysicsManager::CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
 {
-    PxShape* Result = gPhysics->createShape(PxSphereGeometry(halfExtents.x), *gMaterial);
-    PxTransform localPose(pos);
+    PxShape* Result = Physics->createShape(PxBoxGeometry(HalfExtents), *Material);
+    PxTransform localPose(Pos);
     Result->setLocalPose(localPose);
     return Result;
 }
 
-PxShape* FPhysicsManager::CreateSphereShape(const PxVec3& pos, const PxVec3& halfExtents) const
+PxShape* FPhysicsManager::CreateSphereShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
 {
-    PxShape* Result = gPhysics->createShape(PxBoxGeometry(halfExtents), *gMaterial);
-    PxTransform localPose(pos);
+    PxShape* Result = Physics->createShape(PxSphereGeometry(HalfExtents.x), *Material);
+    PxTransform localPose(Pos);
     Result->setLocalPose(localPose);
     return Result;
 }
 
-PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& pos, const PxVec3& halfExtents) const
+PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
 {
-    PxShape* Result = gPhysics->createShape(PxCapsuleGeometry(halfExtents.x, halfExtents.z), *gMaterial);
-    PxTransform localPose(pos);
+    PxShape* Result = Physics->createShape(PxCapsuleGeometry(HalfExtents.x, HalfExtents.z), *Material);
+    PxTransform localPose(Pos);
     Result->setLocalPose(localPose);
     return Result;
 }
 
-void FPhysicsManager::Simulate(float dt)
+void FPhysicsManager::Simulate(float DeltaTime)
 {
-    if (gScene)
+    if (CurrentScene)
     {
-        gScene->simulate(dt);
-        gScene->fetchResults(true);
+        CurrentScene->simulate(DeltaTime);
+        CurrentScene->fetchResults(true);
     }
 }
 
 void FPhysicsManager::ShutdownPhysX()
 {
-    if(gScene)
+    if(CurrentScene)
     {
-        gScene->release();
-        gScene = nullptr;
+        CurrentScene->release();
+        CurrentScene = nullptr;
     }
-    if(gDispatcher)
+    if(Dispatcher)
     {
-        gDispatcher->release();
-        gDispatcher = nullptr;
+        Dispatcher->release();
+        Dispatcher = nullptr;
     }
-    if(gMaterial)
+    if(Material)
     {
-        gMaterial->release();
-        gMaterial = nullptr;
+        Material->release();
+        Material = nullptr;
     }
-    if(gPhysics)
+    if(Physics)
     {
-        gPhysics->release();
-        gPhysics = nullptr;
+        Physics->release();
+        Physics = nullptr;
     }
-    if(gFoundation)
+    if(Foundation)
     {
-        gFoundation->release();
-        gFoundation = nullptr;
+        Foundation->release();
+        Foundation = nullptr;
     }
 }

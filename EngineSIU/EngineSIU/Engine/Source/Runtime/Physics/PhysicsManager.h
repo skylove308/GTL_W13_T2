@@ -41,26 +41,26 @@ public:
     PxScene* CreateScene(UWorld* World);
     PxScene* GetScene(UWorld* World) { return SceneMap[World]; }
     void RemoveScene(UWorld* World) { SceneMap.Remove(World); }
-    void SetCurrentScene(UWorld* World) { gScene = SceneMap[World]; }
-    void SetCurrentScene(PxScene* Scene) { gScene = Scene; }
+    void SetCurrentScene(UWorld* World) { CurrentScene = SceneMap[World]; }
+    void SetCurrentScene(PxScene* Scene) { CurrentScene = Scene; }
     
-    GameObject CreateBox(const PxVec3& pos, const PxVec3& halfExtents) const;
+    GameObject CreateBox(const PxVec3& Pos, const PxVec3& HalfExtents) const;
     GameObject* CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const;
-    PxShape* CreateBoxShape(const PxVec3& pos, const PxVec3& halfExtents) const;
-    PxShape* CreateSphereShape(const PxVec3& pos, const PxVec3& halfExtents) const;
-    PxShape* CreateCapsuleShape(const PxVec3& pos, const PxVec3& halfExtents) const;
+    PxShape* CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
+    PxShape* CreateSphereShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
+    PxShape* CreateCapsuleShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
     
-    void Simulate(float dt);
+    void Simulate(float DeltaTime);
     void ShutdownPhysX();
 
 private:
-    PxDefaultAllocator      gAllocator;
-    PxDefaultErrorCallback  gErrorCallback;
-    PxFoundation* gFoundation = nullptr;
-    PxPhysics* gPhysics = nullptr;
+    PxDefaultAllocator      Allocator;
+    PxDefaultErrorCallback  ErrorCallback;
+    PxFoundation* Foundation = nullptr;
+    PxPhysics* Physics = nullptr;
     TMap<UWorld*, PxScene*> SceneMap;
-    PxScene* gScene = nullptr;
-    PxMaterial* gMaterial = nullptr;
-    PxDefaultCpuDispatcher* gDispatcher = nullptr;
+    PxScene* CurrentScene = nullptr;
+    PxMaterial* Material = nullptr;
+    PxDefaultCpuDispatcher* Dispatcher = nullptr;
 };
 
