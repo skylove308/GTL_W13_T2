@@ -527,6 +527,7 @@ GameObject* UPrimitiveComponent::CreatePhysXGameObject()
     }
     
     GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance,  BodySetups);
+    obj->rigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bApplyGravity);
     BodyInstance->BIGameObject = obj;
 
     return obj;
