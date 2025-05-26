@@ -38,13 +38,20 @@ enum class EResourceType : uint8
     ERT_MAX,
 };
 
+/**
+ * 텍스처의 한 축을 기준으로 길이를 얼마나 줄일지를 결정
+ * 
+ *   e.g. 2x: Down Sampled Width = Original Width / 2;
+ *            Down Sampled Height = Original Height / 2;
+ *            --> Down Sampled Size = Original Size / (2 * 2);
+ */
 enum class EDownSampleScale : uint8
 {
     DSS_None = 1,
     DSS_2x   = 2,
     DSS_4x   = 4,
     DSS_8x   = 8,
-    DSS_MAX  = UINT_MAX,
+    DSS_MAX  = UINT8_MAX,
 };
 
 struct FRenderTargetRHI
