@@ -37,10 +37,10 @@ void PhysicsAssetViewerPanel::Render()
     }
 
     /* Pre Setup */
-    float PanelWidth = (Width) * 0.2f - 6.0f;
-    float PanelHeight = (Height) * 0.7f;
+    float PanelWidth = (Width) * 0.2f - 5.0f;
+    float PanelHeight = (Height) * 0.9f;
 
-    float PanelPosX = (Width) * 0.8f + 5.0f;
+    float PanelPosX = 5.0f;
     float PanelPosY = 5.0f;
 
     ImVec2 MinSize(140, 100);
