@@ -9,7 +9,7 @@
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
 
-struct PxAggregateGeom
+struct FKAggregateGeom
 {
     TArray<physx::PxShape*> SphereElems;
     TArray<physx::PxShape*> BoxElems;
@@ -35,7 +35,7 @@ public:
     UBodySetup() = default;
 
     // DisplayName = Primitives
-    PxAggregateGeom AggGeom;
+    FKAggregateGeom AggGeom;
 };
 
 class UPhysicsAsset : public UObject
