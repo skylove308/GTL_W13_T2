@@ -180,7 +180,7 @@ void PhysicsAssetViewerPanel::LoadBoneIcon()
 void PhysicsAssetViewerPanel::CopyRefSkeleton()
 {
     UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
-    const FReferenceSkeleton& OrigRef = Engine->SkeletalMeshViewerWorld
+    const FReferenceSkeleton& OrigRef = Engine->PhysicsAssetViewerWorld
         ->GetSkeletalMeshComponent()->GetSkeletalMeshAsset()
         ->GetSkeleton()->GetReferenceSkeleton();
 
@@ -190,7 +190,7 @@ void PhysicsAssetViewerPanel::CopyRefSkeleton()
     CopiedRefSkeleton->InverseBindPoseMatrices = OrigRef.InverseBindPoseMatrices;
     CopiedRefSkeleton->RawNameToIndexMap = OrigRef.RawNameToIndexMap;
 
-    RefSkeletalMeshComponent = Engine->SkeletalMeshViewerWorld->GetSkeletalMeshComponent();
+    RefSkeletalMeshComponent = Engine->PhysicsAssetViewerWorld->GetSkeletalMeshComponent();
 }
 
 void PhysicsAssetViewerPanel::RenderBoneTree(const FReferenceSkeleton& RefSkeleton, int32 BoneIndex, UEditorEngine* Engine /*, const FString& SearchFilter */)
@@ -249,11 +249,11 @@ void PhysicsAssetViewerPanel::RenderBoneTree(const FReferenceSkeleton& RefSkelet
     bool bNodeOpen = ImGui::TreeNodeEx(*ShortBoneName, NodeFlags);
 
     // --- 클릭 이벤트 처리 ---
-    if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) // 왼쪽 마우스 버튼 클릭 시
-    {
-        // 엔진에 선택된 본 인덱스 설정 (가상의 함수 호출)
-        Engine->SkeletalMeshViewerWorld->SelectBoneIndex = (BoneIndex);
-    }
+    //if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) // 왼쪽 마우스 버튼 클릭 시
+    //{
+    //    // 엔진에 선택된 본 인덱스 설정 (가상의 함수 호출)
+    //    Engine->SkeletalMeshViewerWorld->SelectBoneIndex = (BoneIndex);
+    //}
 
     if (bNodeOpen) // 노드가 열려있다면
     {
