@@ -19,6 +19,7 @@ struct PxAggregateGeom
 class UBodySetupCore : public UObject
 {
     DECLARE_CLASS(UBodySetupCore, UObject)
+    
 public:
     UBodySetupCore() = default;
 
@@ -29,6 +30,7 @@ private:
 class UBodySetup : public UBodySetupCore
 {
     DECLARE_CLASS(UBodySetup, UBodySetupCore)
+    
 public:
     UBodySetup() = default;
 
@@ -38,6 +40,10 @@ public:
 
 class UPhysicsAsset : public UObject
 {
+    DECLARE_CLASS(UPhysicsAsset, UObject)
+    
 public:
+    UPhysicsAsset() = default;
+    
     TArray<UBodySetup*> BodySetups;
 };

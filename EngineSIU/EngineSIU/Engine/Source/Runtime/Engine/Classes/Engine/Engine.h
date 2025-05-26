@@ -19,6 +19,7 @@ public:
 
 public:
     UWorld* ActiveWorld;
+    
     UAssetManager* AssetManager = nullptr;
     FPhysicsManager* PhysicsManager = nullptr;
 

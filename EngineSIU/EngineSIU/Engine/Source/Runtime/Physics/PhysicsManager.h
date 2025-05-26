@@ -19,15 +19,17 @@ using namespace DirectX;
 class UPrimitiveComponent;
 
 // 게임 오브젝트
-struct GameObject {
-    PxRigidDynamic* rigidBody = nullptr;
-    XMMATRIX worldMatrix = XMMatrixIdentity();
+struct GameObject
+{
+    PxRigidDynamic* RigidBody = nullptr;
+    XMMATRIX WorldMatrix = XMMatrixIdentity();
 
-    void UpdateFromPhysics(PxScene* gScene) {
+    void UpdateFromPhysics(PxScene* Scene)
+    {
         // SCOPED_READ_LOCK(gScene);
-        PxTransform t = rigidBody->getGlobalPose();
-        PxMat44 mat(t);
-        worldMatrix = XMLoadFloat4x4(reinterpret_cast<const XMFLOAT4X4*>(&mat));
+        PxTransform Transform = RigidBody->getGlobalPose();
+        PxMat44 Matrix(Transform);
+        WorldMatrix = XMLoadFloat4x4(reinterpret_cast<const XMFLOAT4X4*>(&Matrix));
     }
 };
 
@@ -38,6 +40,7 @@ public:
     ~FPhysicsManager() = default;
 
     void InitPhysX();
+    
     PxScene* CreateScene(UWorld* World);
     PxScene* GetScene(UWorld* World) { return SceneMap[World]; }
     void RemoveScene(UWorld* World) { SceneMap.Remove(World); }
@@ -46,6 +49,7 @@ public:
     
     GameObject CreateBox(const PxVec3& Pos, const PxVec3& HalfExtents) const;
     GameObject* CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const;
+
     PxShape* CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
     PxShape* CreateSphereShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
     PxShape* CreateCapsuleShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
@@ -54,8 +58,8 @@ public:
     void ShutdownPhysX();
 
 private:
-    PxDefaultAllocator      Allocator;
-    PxDefaultErrorCallback  ErrorCallback;
+    PxDefaultAllocator Allocator;
+    PxDefaultErrorCallback ErrorCallback;
     PxFoundation* Foundation = nullptr;
     PxPhysics* Physics = nullptr;
     TMap<UWorld*, PxScene*> SceneMap;

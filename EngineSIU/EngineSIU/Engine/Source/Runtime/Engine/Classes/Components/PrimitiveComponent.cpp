@@ -203,7 +203,7 @@ void UPrimitiveComponent::TickComponent(float DeltaTime)
         if(BodyInstance)
         {
             BodyInstance->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
-            XMMATRIX Matrix = BodyInstance->BIGameObject->worldMatrix;
+            XMMATRIX Matrix = BodyInstance->BIGameObject->WorldMatrix;
             float x = XMVectorGetX(Matrix.r[3]);
             float y = XMVectorGetY(Matrix.r[3]);
             float z = XMVectorGetZ(Matrix.r[3]);
