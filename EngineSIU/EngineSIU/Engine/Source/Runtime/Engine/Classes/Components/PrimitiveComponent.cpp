@@ -546,8 +546,6 @@ void UPrimitiveComponent::CreatePhysXGameObject()
 void UPrimitiveComponent::BeginPlay()
 {
     USceneComponent::BeginPlay();
-
-    CreatePhysXGameObject();
 }
 
 void UPrimitiveComponent::UpdateOverlapsImpl(const TArray<FOverlapInfo>* NewPendingOverlaps, bool bDoNotifies, const TArray<const FOverlapInfo>* OverlapsAtEndLocation)

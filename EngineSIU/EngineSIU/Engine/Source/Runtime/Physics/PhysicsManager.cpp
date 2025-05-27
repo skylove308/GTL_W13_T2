@@ -57,6 +57,15 @@ PxScene* FPhysicsManager::CreateScene(UWorld* World)
 {
     if (SceneMap[World])
     {
+        // PVD 클라이언트 생성 및 씬 연결
+        if (Pvd && Pvd->isConnected()) {
+            PxPvdSceneClient* pvdClient = SceneMap[World]->getScenePvdClient();
+            if (pvdClient) {
+                pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
+                pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
+                pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
+            }
+        }
         return SceneMap[World];
     }
     
