@@ -20,16 +20,6 @@ enum class EGeomType : uint8
     MAX,
 };
 
-struct AggregateGeomAttributes
-{
-    DECLARE_STRUCT(AggregateGeomAttributes)
-
-    UPROPERTY_WITH_FLAGS(EditAnywhere, EGeomType, GeomType)
-    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Offset)
-    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Rotation)
-    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Extent)
-};
-
 struct FKAggregateGeom
 {
     TArray<physx::PxShape*> SphereElems;
@@ -46,13 +36,6 @@ private:
     void SerializeSphere(FArchive& Ar, physx::PxShape* Shape);
     void SerializeBox(FArchive& Ar, physx::PxShape* Shape);
     void SerializeCapsule(FArchive& Ar, physx::PxShape* Shape);
-};
-
-enum class EGeomType
-{
-    ESphere,
-    EBox,
-    ECapsule,
 };
 
 enum class ERigidBodyType {

@@ -128,13 +128,13 @@ GameObject FPhysicsManager::CreateBox(const PxVec3& Pos, const PxVec3& HalfExten
     GameObject Obj;
     
     PxTransform Pose(Pos);
-    Obj.RigidBody = Physics->createRigidDynamic(Pose);
+    Obj.DynamicRigidBody = Physics->createRigidDynamic(Pose);
     
     PxShape* Shape = Physics->createShape(PxBoxGeometry(HalfExtents), *Material);
-    Obj.RigidBody->attachShape(*Shape);
+    Obj.DynamicRigidBody->attachShape(*Shape);
     
-    PxRigidBodyExt::updateMassAndInertia(*Obj.RigidBody, 10.0f);
-    CurrentScene->addActor(*Obj.RigidBody);
+    PxRigidBodyExt::updateMassAndInertia(*Obj.DynamicRigidBody, 10.0f);
+    CurrentScene->addActor(*Obj.DynamicRigidBody);
     
     Obj.UpdateFromPhysics(CurrentScene);
     
@@ -226,11 +226,12 @@ PxRigidStatic* FPhysicsManager::CreateStaticRigidBody(const PxVec3& Pos, FBodyIn
 
 void FPhysicsManager::DestroyGameObject(GameObject* GameObject) const
 {
-    if (GameObject && GameObject->RigidBody)
+    // TODO: StaticRigidBody 분기 처리 필요
+    if (GameObject && GameObject->DynamicRigidBody)
     {
-        CurrentScene->removeActor(*GameObject->RigidBody);
-        GameObject->RigidBody->release();
-        GameObject->RigidBody = nullptr;
+        CurrentScene->removeActor(*GameObject->DynamicRigidBody);
+        GameObject->DynamicRigidBody->release();
+        GameObject->DynamicRigidBody = nullptr;
     }
     delete GameObject;
 }
