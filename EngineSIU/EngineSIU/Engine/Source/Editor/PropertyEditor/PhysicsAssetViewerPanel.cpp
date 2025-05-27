@@ -117,11 +117,10 @@ void PhysicsAssetViewerPanel::Render()
 
     if (RefSkeletalMeshComponent)
     {
-        for (int32 i = 0; i < RefSkeletalMeshComponent->GetBodies().Num(); ++i)
+        for (int32 i = 0; i < RefSkeletalMeshComponent->GetConstraints().Num(); ++i)
         {
-            FBodyInstance* BodyInstance = RefSkeletalMeshComponent->GetBodies()[i];
-            ImGui::Text("%d: %s", i, *BodyInstance->BodyInstanceName.ToString());
-            auto Temp = BodyInstance->BodyInstanceName.ToString();
+            FConstraintInstance* Constraint = RefSkeletalMeshComponent->GetConstraints()[i];
+            ImGui::Text("%d: %s", i, *Constraint->JointName);
             if (ImGui::SmallButton(("Remove##" + FString::FromInt(i)).operator*()))
             {
                 RemoveBodySetup(i);
@@ -225,7 +224,7 @@ void PhysicsAssetViewerPanel::RemoveBodySetup(int32 BodyIndex)
 void PhysicsAssetViewerPanel::AddConstraint(const FBodyInstance* BodyInstance1, const FBodyInstance* BodyInstance2)
 {
     FConstraintInstance* NewConstraint = new FConstraintInstance();
-    NewConstraint->JointName = BodyInstance1->BodyInstanceName.ToString() + ":" + BodyInstance2->BodyInstanceName.ToString();
+    NewConstraint->JointName = GetCleanBoneName(BodyInstance1->BodyInstanceName.ToString()) + ":" + GetCleanBoneName(BodyInstance2->BodyInstanceName.ToString());
     NewConstraint->ConstraintBone1 = BodyInstance1->BodyInstanceName.ToString();
     NewConstraint->ConstraintBone2 = BodyInstance2->BodyInstanceName.ToString();
 

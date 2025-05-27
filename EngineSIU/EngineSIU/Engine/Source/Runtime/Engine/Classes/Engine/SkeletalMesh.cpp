@@ -2,6 +2,7 @@
 #include "Asset/SkeletalMeshAsset.h"
 #include "SkeletalMesh.h"
 
+#include "Animation/Skeleton.h"
 #include "PhysicsEngine/PhysicsAsset.h"
 #include "UObject/ObjectFactory.h"
 
@@ -22,6 +23,15 @@ const FSkeletalMeshRenderData* USkeletalMesh::GetRenderData() const
     return RenderData.get(); 
 }
 
+void USkeletalMesh::SetSkeleton(USkeleton* InSkeleton)
+{
+    if (InSkeleton && InSkeleton != Skeleton)
+    {
+        Skeleton = InSkeleton;
+        RefSkeleton = InSkeleton->GetReferenceSkeleton();
+    }
+}
+
 void USkeletalMesh::SerializeAsset(FArchive& Ar)
 {
     if (Ar.IsLoading())
@@ -33,6 +43,11 @@ void USkeletalMesh::SerializeAsset(FArchive& Ar)
     }
 
     RenderData->Serialize(Ar);
+}
+
+FReferenceSkeleton& USkeletalMesh::GetRefSkeleton()
+{
+    return RefSkeleton;
 }
 
 

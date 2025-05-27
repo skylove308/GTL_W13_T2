@@ -22,22 +22,22 @@ PxScene* FPhysicsManager::CreateScene(UWorld* World)
         return SceneMap[World];
     }
     
-    PxSceneDesc sceneDesc(Physics->getTolerancesScale());
+    PxSceneDesc SceneDesc(Physics->getTolerancesScale());
     
-    sceneDesc.gravity = PxVec3(0, 0, -9.81f);
+    SceneDesc.gravity = PxVec3(0, 0, -9.81f);
     
     Dispatcher = PxDefaultCpuDispatcherCreate(4);
-    sceneDesc.cpuDispatcher = Dispatcher;
+    SceneDesc.cpuDispatcher = Dispatcher;
     
-    sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+    SceneDesc.filterShader = PxDefaultSimulationFilterShader;
     
     // sceneDesc.simulationEventCallback = gMyCallback; // TODO: 이벤트 핸들러 등록(옵저버 or component 별 override)
     
-    sceneDesc.flags |= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
-    sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
-    sceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
+    SceneDesc.flags |= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
+    SceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
+    SceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
     
-    PxScene* NewScene = Physics->createScene(sceneDesc);
+    PxScene* NewScene = Physics->createScene(SceneDesc);
     SceneMap.Add(World, NewScene);
 
     return NewScene;
@@ -45,55 +45,64 @@ PxScene* FPhysicsManager::CreateScene(UWorld* World)
 
 GameObject FPhysicsManager::CreateBox(const PxVec3& Pos, const PxVec3& HalfExtents) const
 {
-    GameObject obj;
-    PxTransform pose(Pos);
-    obj.rigidBody = Physics->createRigidDynamic(pose);
-    PxShape* shape = Physics->createShape(PxBoxGeometry(HalfExtents), *Material);
-    obj.rigidBody->attachShape(*shape);
-    PxRigidBodyExt::updateMassAndInertia(*obj.rigidBody, 10.0f);
-    CurrentScene->addActor(*obj.rigidBody);
-    obj.UpdateFromPhysics(CurrentScene);
-    return obj;
+    GameObject Obj;
+    
+    PxTransform Pose(Pos);
+    Obj.RigidBody = Physics->createRigidDynamic(Pose);
+    
+    PxShape* Shape = Physics->createShape(PxBoxGeometry(HalfExtents), *Material);
+    Obj.RigidBody->attachShape(*Shape);
+    
+    PxRigidBodyExt::updateMassAndInertia(*Obj.RigidBody, 10.0f);
+    CurrentScene->addActor(*Obj.RigidBody);
+    
+    Obj.UpdateFromPhysics(CurrentScene);
+    
+    return Obj;
 }
 
 GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const
 {
     GameObject* Obj = new GameObject();
+    
     const PxTransform Pose(Pos);
-    Obj->rigidBody = Physics->createRigidDynamic(Pose);
+    Obj->RigidBody = Physics->createRigidDynamic(Pose);
+    
     for (const auto& BodySetup : BodySetups)
     {
         for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
         {
-            Obj->rigidBody->attachShape(*Sphere);
+            Obj->RigidBody->attachShape(*Sphere);
         }
 
         for (const auto& Box : BodySetup->AggGeom.BoxElems)
         {
-            Obj->rigidBody->attachShape(*Box);
+            Obj->RigidBody->attachShape(*Box);
         }
 
         for (const auto& Capsule : BodySetup->AggGeom.CapsuleElems)
         {
-            Obj->rigidBody->attachShape(*Capsule);
+            Obj->RigidBody->attachShape(*Capsule);
         }
     }
     
-    PxRigidBodyExt::updateMassAndInertia(*Obj->rigidBody, 10.0f);
-    CurrentScene->addActor(*Obj->rigidBody);
+    PxRigidBodyExt::updateMassAndInertia(*Obj->RigidBody, 10.0f);
+    
+    CurrentScene->addActor(*Obj->RigidBody);
+    
     Obj->UpdateFromPhysics(CurrentScene);
-    Obj->rigidBody->userData = (void*)BodyInstance;
+    Obj->RigidBody->userData = static_cast<void*>(BodyInstance);
     
     return Obj;
 }
 
 void FPhysicsManager::DestroyGameObject(GameObject* GameObject) const
 {
-    if (GameObject && GameObject->rigidBody)
+    if (GameObject && GameObject->RigidBody)
     {
-        CurrentScene->removeActor(*GameObject->rigidBody);
-        GameObject->rigidBody->release();
-        GameObject->rigidBody = nullptr;
+        CurrentScene->removeActor(*GameObject->RigidBody);
+        GameObject->RigidBody->release();
+        GameObject->RigidBody = nullptr;
     }
     delete GameObject;
 }
@@ -101,24 +110,24 @@ void FPhysicsManager::DestroyGameObject(GameObject* GameObject) const
 PxShape* FPhysicsManager::CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
 {
     PxShape* Result = Physics->createShape(PxBoxGeometry(HalfExtents), *Material);
-    PxTransform localPose(Pos);
-    Result->setLocalPose(localPose);
+    PxTransform LocalPos(Pos);
+    Result->setLocalPose(LocalPos);
     return Result;
 }
 
 PxShape* FPhysicsManager::CreateSphereShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
 {
     PxShape* Result = Physics->createShape(PxSphereGeometry(HalfExtents.x), *Material);
-    PxTransform localPose(Pos);
-    Result->setLocalPose(localPose);
+    PxTransform LocalPos(Pos);
+    Result->setLocalPose(LocalPos);
     return Result;
 }
 
 PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
 {
     PxShape* Result = Physics->createShape(PxCapsuleGeometry(HalfExtents.x, HalfExtents.z), *Material);
-    PxTransform localPose(Pos);
-    Result->setLocalPose(localPose);
+    PxTransform LocalPos(Pos);
+    Result->setLocalPose(LocalPos);
     return Result;
 }
 

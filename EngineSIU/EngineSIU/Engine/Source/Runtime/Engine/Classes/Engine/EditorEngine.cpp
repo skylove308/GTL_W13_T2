@@ -19,6 +19,7 @@
 #include "UnrealEd/UnrealEd.h"
 #include "World/ParticleViewerWorld.h"
 #include "Physics/PhysicsManager.h"
+#include "SkeletalMesh.h"
 #include "PhysicsEngine/PhysicsAsset.h"
 
 extern FEngineLoop GEngineLoop;
@@ -48,12 +49,6 @@ void UEditorEngine::Init()
 
     EditorPlayer = FObjectFactory::ConstructObject<AEditorPlayer>(this);
 
-    if (AssetManager == nullptr)
-    {
-        AssetManager = FObjectFactory::ConstructObject<UAssetManager>(this);
-        assert(AssetManager);
-        AssetManager->InitAssetManager();
-    }
     // TODO: 필요할 때 활성화 하기
     // LoadLevel("Saved/AutoSaves.scene");
 }
@@ -68,6 +63,8 @@ void UEditorEngine::Release()
     }
     WorldList.Empty();
     PhysicsManager->ShutdownPhysX();
+    
+    Super::Release();
 }
 
 void UEditorEngine::Tick(float DeltaTime)
@@ -390,9 +387,9 @@ void UEditorEngine::StartParticleViewer(FName ParticleName, UParticleSystem* Par
     ClearComponentSelection();
 }
 
-void UEditorEngine::StartPhysicsAssetViewer(FName PhysicsAssetName, UPhysicsAsset* PhysicsAsset)
+void UEditorEngine::StartPhysicsAssetViewer(FName PreviewMeshKey, FName PhysicsAssetName)
 {
-    if (PhysicsAssetName == "")
+    if (PreviewMeshKey == "")
     {
         return;
     }
@@ -428,9 +425,29 @@ void UEditorEngine::StartPhysicsAssetViewer(FName PhysicsAssetName, UPhysicsAsse
     USkeletalMeshComponent* MeshComp = SkeletalActor->AddComponent<USkeletalMeshComponent>();
     SkeletalActor->SetRootComponent(MeshComp);
     SkeletalActor->SetActorLabel(TEXT("OBJ_SKELETALMESH"));
-    MeshComp->SetSkeletalMeshAsset(UAssetManager::Get().GetSkeletalMesh(PhysicsAssetName.ToString()));
 
-    if (PhysicsAssetViewerWorld)
+    USkeletalMesh* PreviewMesh = Cast<USkeletalMesh>(UAssetManager::Get().GetAsset(EAssetType::SkeletalMesh, PreviewMeshKey.ToString()));
+    MeshComp->SetSkeletalMeshAsset(PreviewMesh);
+
+    // Set Physics Asset
+    UPhysicsAsset* PhysicsAsset = Cast<UPhysicsAsset>(UAssetManager::Get().GetAsset(EAssetType::PhysicsAsset, PhysicsAssetName.ToString()));
+    if (!PhysicsAsset)
+    {
+        PhysicsAsset = FObjectFactory::ConstructObject<UPhysicsAsset>(nullptr);
+        PhysicsAsset->SetPreviewMesh(PreviewMesh);
+        
+        FAssetInfo Info;
+        Info.AssetName = PhysicsAsset->GetName();
+        Info.PackagePath = TEXT("Contents/PhysicsAsset");
+        Info.AssetType = EAssetType::PhysicsAsset;
+        Info.AssetObject = PhysicsAsset;
+        UAssetManager::Get().AddAssetInfo(Info);
+
+        UAssetManager::Get().AddAsset(Info.GetFullPath(), PhysicsAsset);
+    }
+    PreviewMesh->SetPhysicsAsset(PhysicsAsset);
+    
+    if (PhysicsAssetViewerWorld) // PhysicsAssetViewerWorld가 유효한지 다시 확인하는 것이 좋습니다.
     {
         PhysicsAssetViewerWorld->SetSkeletalMeshComponent(MeshComp);
     }

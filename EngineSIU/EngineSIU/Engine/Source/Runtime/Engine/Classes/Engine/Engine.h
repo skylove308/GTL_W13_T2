@@ -19,6 +19,7 @@ public:
 
 public:
     UWorld* ActiveWorld;
+    
     UAssetManager* AssetManager = nullptr;
     FPhysicsManager* PhysicsManager = nullptr;
 
@@ -29,7 +30,7 @@ protected:
 public:
     virtual void Init();
     virtual void Tick(float DeltaTime) = 0;
-    virtual void Release() = 0;
+    virtual void Release();
 
     // TODO: UObject->GetWorld() 구현 이후 추가.
     UWorld* GetWorldFromContextObject(const UObject* Object) const;

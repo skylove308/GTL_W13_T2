@@ -723,7 +723,7 @@ void PropertyEditorPanel::RenderForSkeletalMesh(USkeletalMeshComponent* Skeletal
     ImGui::PopStyleColor();
 }
 
-void PropertyEditorPanel::RenderForPhysicsAsset(USkeletalMeshComponent* SkeletalMeshComp) const
+void PropertyEditorPanel::RenderForPhysicsAsset(const USkeletalMeshComponent* SkeletalMeshComp) const
 {
     ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
     if (ImGui::TreeNodeEx("Physics Asset", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
@@ -731,50 +731,56 @@ void PropertyEditorPanel::RenderForPhysicsAsset(USkeletalMeshComponent* Skeletal
         ImGui::Text("SkeletalMesh");
         ImGui::SameLine();
 
-        FString SelectedSkeletalMeshName = FString("None");
-        if (USkeletalMesh* SkeletalMesh = SkeletalMeshComp->GetSkeletalMeshAsset())
+        FString SelectedPhysicsAssetKey = FString("None");
+        
+        USkeletalMesh* SkeletalMesh = SkeletalMeshComp->GetSkeletalMeshAsset();
+        if (SkeletalMesh)
         {
-            if (const FSkeletalMeshRenderData* RenderData = SkeletalMesh->GetRenderData())
+            if (UPhysicsAsset* PhysicsAsset = SkeletalMesh->GetPhysicsAsset())
             {
-                SelectedSkeletalMeshName = RenderData->DisplayName;
+                const FName AssetKey = UAssetManager::Get().GetAssetKeyByObject(EAssetType::PhysicsAsset, PhysicsAsset);
+                SelectedPhysicsAssetKey = AssetKey.ToString();
             }
         }
 
-        const TMap<FName, FAssetInfo> SkeletalMeshAssets = UAssetManager::Get().GetAssetRegistry();
+        const TMap<FName, FAssetInfo> AllAssets = UAssetManager::Get().GetAssetRegistry();
 
-        if (ImGui::BeginCombo("##SkeletalMesh", GetData(SelectedSkeletalMeshName), ImGuiComboFlags_None))
+        if (ImGui::BeginCombo("##PhysicsAsset", GetData(SelectedPhysicsAssetKey), ImGuiComboFlags_None))
         {
-            for (const auto& Asset : SkeletalMeshAssets)
+            for (const auto& Asset : AllAssets)
             {
-                if (Asset.Value.AssetType != EAssetType::SkeletalMesh)
+                if (Asset.Value.AssetType != EAssetType::PhysicsAsset)
                 {
                     continue;
                 }
 
                 if (ImGui::Selectable(GetData(Asset.Value.AssetName.ToString()), false))
                 {
-                    FString AssetName = Asset.Value.PackagePath.ToString() + "/" + Asset.Value.AssetName.ToString();
-                    USkeletalMesh* SkeletalMesh = UAssetManager::Get().GetSkeletalMesh(FName(AssetName));
-                    if (SkeletalMesh)
+                    FString AssetKey = Asset.Key.ToString();
+                    UObject* AssetObject = UAssetManager::Get().GetAsset(EAssetType::PhysicsAsset, FName(AssetKey));
+                    if (UPhysicsAsset* PhysicsAsset = Cast<UPhysicsAsset>(AssetObject))
                     {
-                        SkeletalMeshComp->SetSkeletalMeshAsset(SkeletalMesh);
+                        if (PhysicsAsset->SetPreviewMesh(SkeletalMesh))
+                        {
+                            SkeletalMesh->SetPhysicsAsset(PhysicsAsset);
+
+                            SelectedPhysicsAssetKey = AssetKey;
+                        }
                     }
                 }
             }
             ImGui::EndCombo();
         }
 
-        if (ImGui::Button("Open Viewer"))
+        if (SkeletalMesh && ImGui::Button("Open Viewer"))
         {
             UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
             if (!Engine)
             {
                 return;
             }
-            if (SkeletalMeshComp->GetSkeletalMeshAsset())
-            {
-                Engine->StartPhysicsAssetViewer(FName(SkeletalMeshComp->GetSkeletalMeshAsset()->GetRenderData()->ObjectName), SkeletalMeshComp->GetSkeletalMeshAsset()->GetPhysicsAsset());
-            }
+            
+            Engine->StartPhysicsAssetViewer(FName(SkeletalMesh->GetRenderData()->ObjectName), SelectedPhysicsAssetKey);
         }
         ImGui::TreePop();
     }
@@ -796,7 +802,7 @@ void PropertyEditorPanel::RenderForParticleSystem(UParticleSystemComponent* Part
             if (ParticleSystem == nullptr)
             {
                 ParticleSystem = FObjectFactory::ConstructObject<UParticleSystem>(nullptr);
-                UAssetManager::Get().AddParticleSystem(ParticleSystem->GetName(), ParticleSystem);
+                UAssetManager::Get().AddAsset(ParticleSystem->GetName(), ParticleSystem);
                 ParticleSystemComponent->SetParticleSystem(ParticleSystem);
             }
             Engine->StartParticleViewer(FName("TempParticle"), ParticleSystem);

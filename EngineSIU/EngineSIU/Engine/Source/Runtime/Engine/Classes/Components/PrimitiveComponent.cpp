@@ -202,7 +202,7 @@ void UPrimitiveComponent::EndPhysicsTickComponent(float DeltaTime)
     if (bSimulate && BodyInstance)
     {
         BodyInstance->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
-        XMMATRIX Matrix = BodyInstance->BIGameObject->worldMatrix;
+        XMMATRIX Matrix = BodyInstance->BIGameObject->WorldMatrix;
         float x = XMVectorGetX(Matrix.r[3]);
         float y = XMVectorGetY(Matrix.r[3]);
         float z = XMVectorGetZ(Matrix.r[3]);
@@ -505,6 +505,7 @@ void UPrimitiveComponent::BeginPlay()
 
     if (bSimulate)
     {
+        /*
         for (const auto& BoxShape : GetOwner()->GetComponentsByClass<UBoxComponent>())
         {
             PxVec3 Offset = PxVec3(BoxShape->RelativeLocation.X, BoxShape->RelativeLocation.Y, BoxShape->RelativeLocation.Z);
@@ -531,7 +532,7 @@ void UPrimitiveComponent::BeginPlay()
             PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, HalfScale);
             BodySetup->AggGeom.SphereElems.Add(PxCapsule);
         }
-    
+        */
         CreatePhysXGameObject();
     }
 }
