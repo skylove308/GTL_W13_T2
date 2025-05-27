@@ -1,6 +1,7 @@
 #include "PhysicsManager.h"
 
 #include "PhysicsEngine/BodyInstance.h"
+#include "PhysicsEngine/ConstraintInstance.h"
 #include "PhysicsEngine/PhysicsAsset.h"
 
 #include "World/World.h"
@@ -141,7 +142,7 @@ GameObject FPhysicsManager::CreateBox(const PxVec3& Pos, const PxVec3& HalfExten
     return Obj;
 }
 
-GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetup,ERigidBodyType RigidBodyType) const
+GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetup, ERigidBodyType RigidBodyType) const
 {
     GameObject* Obj = new GameObject();
     
@@ -151,17 +152,20 @@ GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* 
     case ERigidBodyType::STATIC:
     {
         Obj->StaticRigidBody = CreateStaticRigidBody(Pos, BodyInstance, BodySetup);
+        ApplyBodyInstanceSettings(Obj->StaticRigidBody, BodyInstance);
         break;
     }
     case ERigidBodyType::DYNAMIC:
     {
         Obj->DynamicRigidBody = CreateDynamicRigidBody(Pos, BodyInstance, BodySetup);
+        ApplyBodyInstanceSettings(Obj->DynamicRigidBody, BodyInstance);
         break;
     }
     case ERigidBodyType::KINEMATIC:
     {
         Obj->DynamicRigidBody = CreateDynamicRigidBody(Pos, BodyInstance, BodySetup);
         Obj->DynamicRigidBody->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+        ApplyBodyInstanceSettings(Obj->DynamicRigidBody, BodyInstance);
         break;
     }
     }
@@ -176,23 +180,14 @@ PxRigidDynamic* FPhysicsManager::CreateDynamicRigidBody(const PxVec3& Pos, FBody
     const PxTransform Pose(Pos);
     PxRigidDynamic* DynamicRigidBody = Physics->createRigidDynamic(Pose);
     
-    for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
-    {
-        DynamicRigidBody->attachShape(*Sphere);
-    }
-
-    for (const auto& Box : BodySetup->AggGeom.BoxElems)
-    {
-        DynamicRigidBody->attachShape(*Box);
-    }
-
-    for (const auto& Capsule : BodySetup->AggGeom.CapsuleElems)
-    {
-        DynamicRigidBody->attachShape(*Capsule);
-    }
-
-    PxRigidBodyExt::updateMassAndInertia(*DynamicRigidBody, 10.0f);
-    CurrentScene->addActor(*DynamicRigidBody); // 여기에 넣을지 CreateGameObject에 넣을지 고민해보기
+    // Shape 추가
+    AttachShapesToActor(DynamicRigidBody, BodySetup);
+    
+    // 질량과 관성 설정
+    ApplyMassAndInertiaSettings(DynamicRigidBody, BodyInstance);
+    
+    // Scene에 추가
+    CurrentScene->addActor(*DynamicRigidBody);
     DynamicRigidBody->userData = (void*)BodyInstance;
 
     return DynamicRigidBody;
@@ -203,25 +198,428 @@ PxRigidStatic* FPhysicsManager::CreateStaticRigidBody(const PxVec3& Pos, FBodyIn
     const PxTransform Pose(Pos);
     PxRigidStatic* StaticRigidBody = Physics->createRigidStatic(Pose);
     
-    for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
-    {
-        StaticRigidBody->attachShape(*Sphere);
-    }
-
-    for (const auto& Box : BodySetup->AggGeom.BoxElems)
-    {
-        StaticRigidBody->attachShape(*Box);
-    }
-
-    for (const auto& Capsule : BodySetup->AggGeom.CapsuleElems)
-    {
-        StaticRigidBody->attachShape(*Capsule);
-    }
-
-    CurrentScene->addActor(*StaticRigidBody); // 여기에 넣을지 CreateGameObject에 넣을지 고민해보기
+    // Shape 추가
+    AttachShapesToActor(StaticRigidBody, BodySetup);
+    
+    // Scene에 추가
+    CurrentScene->addActor(*StaticRigidBody);
     StaticRigidBody->userData = (void*)BodyInstance;
 
     return StaticRigidBody;
+}
+
+// === Shape 추가 헬퍼 함수 ===
+void FPhysicsManager::AttachShapesToActor(PxRigidActor* Actor, UBodySetup* BodySetup) const
+{
+    // Sphere 추가
+    for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
+    {
+        Actor->attachShape(*Sphere);
+    }
+
+    // Box 추가
+    for (const auto& Box : BodySetup->AggGeom.BoxElems)
+    {
+        Actor->attachShape(*Box);
+    }
+
+    // Capsule 추가
+    for (const auto& Capsule : BodySetup->AggGeom.CapsuleElems)
+    {
+        Actor->attachShape(*Capsule);
+    }
+}
+
+// === 질량과 관성 설정 ===
+void FPhysicsManager::ApplyMassAndInertiaSettings(PxRigidDynamic* DynamicBody, const FBodyInstance* BodyInstance) const
+{
+    // 기본 질량 설정
+    if (BodyInstance->MassInKg > 0.0f)
+    {
+        PxRigidBodyExt::setMassAndUpdateInertia(*DynamicBody, BodyInstance->MassInKg);
+    }
+    else
+    {
+        // 기본 밀도로 질량 계산
+        PxRigidBodyExt::updateMassAndInertia(*DynamicBody, 1000.0f); // 기본 밀도
+    }
+    
+    // 질량 중심 오프셋 적용
+    if (!BodyInstance->COMNudge.IsZero())
+    {
+        PxVec3 COMOffset(BodyInstance->COMNudge.X, BodyInstance->COMNudge.Y, BodyInstance->COMNudge.Z);
+        PxRigidBodyExt::setMassAndUpdateInertia(*DynamicBody, DynamicBody->getMass(), &COMOffset);
+    }
+    
+    // 관성 텐서 스케일 적용
+    if (BodyInstance->InertiaTensorScale != FVector::OneVector)
+    {
+        PxVec3 Inertia = DynamicBody->getMassSpaceInertiaTensor();
+        Inertia.x *= BodyInstance->InertiaTensorScale.X;
+        Inertia.y *= BodyInstance->InertiaTensorScale.Y;
+        Inertia.z *= BodyInstance->InertiaTensorScale.Z;
+        DynamicBody->setMassSpaceInertiaTensor(Inertia);
+    }
+}
+
+// === 모든 BodyInstance 설정 적용 ===
+void FPhysicsManager::ApplyBodyInstanceSettings(PxRigidActor* Actor, const FBodyInstance* BodyInstance) const
+{
+    PxRigidDynamic* DynamicBody = Actor->is<PxRigidDynamic>();
+    
+    if (DynamicBody)
+    {
+        // === 시뮬레이션 설정 ===
+        
+        // 물리 시뮬레이션 활성화/비활성화
+        if (!BodyInstance->bSimulatePhysics)
+        {
+            DynamicBody->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+        }
+        
+        // 중력 설정
+        DynamicBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !BodyInstance->bEnableGravity);
+        
+        // 시작 상태 설정
+        if (!BodyInstance->bStartAwake)
+        {
+            DynamicBody->putToSleep();
+        }
+        
+        // === 움직임 제한 설정 ===
+        ApplyLockConstraints(DynamicBody, BodyInstance);
+        
+        // === 댐핑 설정 ===
+        DynamicBody->setLinearDamping(BodyInstance->LinearDamping);
+        DynamicBody->setAngularDamping(BodyInstance->AngularDamping);
+        
+        // === 고급 물리 설정 ===
+        
+        // 연속 충돌 검출 (CCD)
+        DynamicBody->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, BodyInstance->bUseCCD);
+        
+        // 최대 각속도 제한
+        if (BodyInstance->MaxAngularVelocity > 0.0f)
+        {
+            DynamicBody->setMaxAngularVelocity(BodyInstance->MaxAngularVelocity);
+        }
+        
+        // 솔버 반복 횟수 설정
+        DynamicBody->setSolverIterationCounts(
+            BodyInstance->PositionSolverIterationCount, 
+            BodyInstance->VelocitySolverIterationCount
+        );
+    }
+    
+    // === 충돌 설정 (Static/Dynamic 공통) ===
+    ApplyCollisionSettings(Actor, BodyInstance);
+}
+
+// === 움직임 제한 적용 ===
+void FPhysicsManager::ApplyLockConstraints(PxRigidDynamic* DynamicBody, const FBodyInstance* BodyInstance) const
+{
+    PxRigidDynamicLockFlags LockFlags = PxRigidDynamicLockFlags(0);
+    
+    // 이동 제한
+    if (BodyInstance->bLockXTranslation) LockFlags |= PxRigidDynamicLockFlag::eLOCK_LINEAR_X;
+    if (BodyInstance->bLockYTranslation) LockFlags |= PxRigidDynamicLockFlag::eLOCK_LINEAR_Y;
+    if (BodyInstance->bLockZTranslation) LockFlags |= PxRigidDynamicLockFlag::eLOCK_LINEAR_Z;
+    
+    // 회전 제한
+    if (BodyInstance->bLockXRotation) LockFlags |= PxRigidDynamicLockFlag::eLOCK_ANGULAR_X;
+    if (BodyInstance->bLockYRotation) LockFlags |= PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y;
+    if (BodyInstance->bLockZRotation) LockFlags |= PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z;
+    
+    DynamicBody->setRigidDynamicLockFlags(LockFlags);
+}
+
+// === 충돌 설정 적용 ===
+void FPhysicsManager::ApplyCollisionSettings(const PxRigidActor* Actor, const FBodyInstance* BodyInstance) const
+{
+    // 모든 Shape에 대해 충돌 설정 적용
+    PxU32 ShapeCount = Actor->getNbShapes();
+    TArray<PxShape*> Shapes;
+    Shapes.SetNum(ShapeCount);
+    Actor->getShapes(Shapes.GetData(), ShapeCount);
+    
+    for (PxShape* Shape : Shapes)
+    {
+        if (Shape)
+        {
+            ApplyShapeCollisionSettings(Shape, BodyInstance);
+        }
+    }
+}
+
+void FPhysicsManager::ApplyShapeCollisionSettings(PxShape* Shape, const FBodyInstance* BodyInstance) const
+{
+    PxShapeFlags ShapeFlags = Shape->getFlags();
+    
+    // 기존 플래그 초기화
+    ShapeFlags &= ~(PxShapeFlag::eSIMULATION_SHAPE | PxShapeFlag::eSCENE_QUERY_SHAPE | PxShapeFlag::eTRIGGER_SHAPE);
+    
+    // CollisionEnabled에 따른 플래그 설정
+    switch (BodyInstance->CollisionEnabled)
+    {
+    case ECollisionEnabled::NoCollision:
+        // 모든 충돌 비활성화
+        break;
+        
+    case ECollisionEnabled::QueryOnly:
+        // 쿼리만 활성화 (트레이스, 오버랩)
+        ShapeFlags |= PxShapeFlag::eSCENE_QUERY_SHAPE;
+        break;
+        
+    case ECollisionEnabled::PhysicsOnly:
+        // 물리 시뮬레이션만 활성화
+        ShapeFlags |= PxShapeFlag::eSIMULATION_SHAPE;
+        break;
+        
+    case ECollisionEnabled::QueryAndPhysics:
+        // 둘 다 활성화
+        ShapeFlags |= (PxShapeFlag::eSIMULATION_SHAPE | PxShapeFlag::eSCENE_QUERY_SHAPE);
+        break;
+    }
+    
+    // 복잡한 충돌을 단순 충돌로 사용 설정
+    if (BodyInstance->bUseComplexAsSimpleCollision)
+    {
+        // 복잡한 메시를 단순 충돌로 사용하는 로직
+        // (구체적인 구현은 메시 충돌 시스템에 따라 다름)
+    }
+    
+    Shape->setFlags(ShapeFlags);
+}
+
+// // === 런타임 설정 변경 함수들 === TODO : 필요하면 GameObject 안으로 옮기기
+//
+// void FPhysicsManager::SetSimulatePhysics(GameObject* Obj, bool bSimulate) const
+// {
+//     if (Obj && Obj->DynamicRigidBody)
+//     {
+//         Obj->DynamicRigidBody->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, !bSimulate);
+//     }
+// }
+//
+// void FPhysicsManager::SetEnableGravity(GameObject* Obj, bool bEnableGravity) const
+// {
+//     if (Obj && Obj->DynamicRigidBody)
+//     {
+//         Obj->DynamicRigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bEnableGravity);
+//     }
+// }
+//
+// void FPhysicsManager::SetMass(GameObject* Obj, float NewMass) const
+// {
+//     if (Obj && Obj->DynamicRigidBody && NewMass > 0.0f)
+//     {
+//         PxRigidBodyExt::setMassAndUpdateInertia(*Obj->DynamicRigidBody, NewMass);
+//     }
+// }
+//
+// void FPhysicsManager::SetLinearDamping(GameObject* Obj, float Damping) const
+// {
+//     if (Obj && Obj->DynamicRigidBody)
+//     {
+//         Obj->DynamicRigidBody->setLinearDamping(Damping);
+//     }
+// }
+//
+// void FPhysicsManager::SetAngularDamping(GameObject* Obj, float Damping) const
+// {
+//     if (Obj && Obj->DynamicRigidBody)
+//     {
+//         Obj->DynamicRigidBody->setAngularDamping(Damping);
+//     }
+// }
+
+void FPhysicsManager::CreateJoint(const GameObject* Obj1, const GameObject* Obj2, FConstraintInstance* ConstraintInstance, const FConstraintSetup* ConstraintSetup) const
+{
+    PxTransform GlobalPose1 = Obj1->DynamicRigidBody->getGlobalPose();
+    PxTransform GlobalPose2 = Obj2->DynamicRigidBody->getGlobalPose();
+        
+    PxTransform LocalFrameParent = GlobalPose2.getInverse() * GlobalPose1;
+    PxTransform LocalFrameChild = PxTransform(PxVec3(0));
+
+    // PhysX D6 Joint 생성
+    PxD6Joint* Joint = PxD6JointCreate(*Physics,
+        Obj1->DynamicRigidBody, LocalFrameParent,
+        Obj2->DynamicRigidBody, LocalFrameChild);
+
+    if (Joint && ConstraintSetup)
+    {
+        // === Linear Constraint 설정 ===
+        
+        // X축 선형 제약
+        switch (ConstraintSetup->LinearLimit.XMotion)
+        {
+        case ELinearConstraintMotion::LCM_Free:
+            Joint->setMotion(PxD6Axis::eX, PxD6Motion::eFREE);
+            break;
+        case ELinearConstraintMotion::LCM_Limited:
+            Joint->setMotion(PxD6Axis::eX, PxD6Motion::eLIMITED);
+            break;
+        case ELinearConstraintMotion::LCM_Locked:
+            Joint->setMotion(PxD6Axis::eX, PxD6Motion::eLOCKED);
+            break;
+        }
+
+        // Y축 선형 제약
+        switch (ConstraintSetup->LinearLimit.YMotion)
+        {
+        case ELinearConstraintMotion::LCM_Free:
+            Joint->setMotion(PxD6Axis::eY, PxD6Motion::eFREE);
+            break;
+        case ELinearConstraintMotion::LCM_Limited:
+            Joint->setMotion(PxD6Axis::eY, PxD6Motion::eLIMITED);
+            break;
+        case ELinearConstraintMotion::LCM_Locked:
+            Joint->setMotion(PxD6Axis::eY, PxD6Motion::eLOCKED);
+            break;
+        }
+
+        // Z축 선형 제약
+        switch (ConstraintSetup->LinearLimit.ZMotion)
+        {
+        case ELinearConstraintMotion::LCM_Free:
+            Joint->setMotion(PxD6Axis::eZ, PxD6Motion::eFREE);
+            break;
+        case ELinearConstraintMotion::LCM_Limited:
+            Joint->setMotion(PxD6Axis::eZ, PxD6Motion::eLIMITED);
+            break;
+        case ELinearConstraintMotion::LCM_Locked:
+            Joint->setMotion(PxD6Axis::eZ, PxD6Motion::eLOCKED);
+            break;
+        }
+
+        // 선형 제한 값 설정 (Limited 모션이 하나라도 있을 때)
+        if (ConstraintSetup->LinearLimit.XMotion == ELinearConstraintMotion::LCM_Limited ||
+            ConstraintSetup->LinearLimit.YMotion == ELinearConstraintMotion::LCM_Limited ||
+            ConstraintSetup->LinearLimit.ZMotion == ELinearConstraintMotion::LCM_Limited)
+        {
+            float LinearLimitValue = ConstraintSetup->LinearLimit.Limit;
+            Joint->setLinearLimit(PxJointLinearLimit(LinearLimitValue, PxSpring(0, 0)));
+        }
+
+        // === Angular Constraint 설정 ===
+
+        // Twist 제약 (X축 회전)
+        switch (ConstraintSetup->TwistLimit.TwistMotion)
+        {
+        case EAngularConstraintMotion::EAC_Free:
+            Joint->setMotion(PxD6Axis::eTWIST, PxD6Motion::eFREE);
+            break;
+        case EAngularConstraintMotion::EAC_Limited:
+            Joint->setMotion(PxD6Axis::eTWIST, PxD6Motion::eLIMITED);
+            break;
+        case EAngularConstraintMotion::EAC_Locked:
+            Joint->setMotion(PxD6Axis::eTWIST, PxD6Motion::eLOCKED);
+            break;
+        }
+
+        // Swing1 제약 (Y축 회전)
+        switch (ConstraintSetup->ConeLimit.Swing1Motion)
+        {
+        case EAngularConstraintMotion::EAC_Free:
+            Joint->setMotion(PxD6Axis::eSWING1, PxD6Motion::eFREE);
+            break;
+        case EAngularConstraintMotion::EAC_Limited:
+            Joint->setMotion(PxD6Axis::eSWING1, PxD6Motion::eLIMITED);
+            break;
+        case EAngularConstraintMotion::EAC_Locked:
+            Joint->setMotion(PxD6Axis::eSWING1, PxD6Motion::eLOCKED);
+            break;
+        }
+
+        // Swing2 제약 (Z축 회전)
+        switch (ConstraintSetup->ConeLimit.Swing2Motion)
+        {
+        case EAngularConstraintMotion::EAC_Free:
+            Joint->setMotion(PxD6Axis::eSWING2, PxD6Motion::eFREE);
+            break;
+        case EAngularConstraintMotion::EAC_Limited:
+            Joint->setMotion(PxD6Axis::eSWING2, PxD6Motion::eLIMITED);
+            break;
+        case EAngularConstraintMotion::EAC_Locked:
+            Joint->setMotion(PxD6Axis::eSWING2, PxD6Motion::eLOCKED);
+            break;
+        }
+
+        // === Angular Limit 값 설정 ===
+
+        // Twist 제한 값 설정 (도를 라디안으로 변환)
+        if (ConstraintSetup->TwistLimit.TwistMotion == EAngularConstraintMotion::EAC_Limited)
+        {
+            float TwistLimitRad = FMath::DegreesToRadians(ConstraintSetup->TwistLimit.TwistLimitDegrees);
+            Joint->setTwistLimit(PxJointAngularLimitPair(-TwistLimitRad, TwistLimitRad, PxSpring(0, 0)));
+        }
+
+        // Swing 제한 값 설정 (원뿔 제한)
+        if (ConstraintSetup->ConeLimit.Swing1Motion == EAngularConstraintMotion::EAC_Limited ||
+            ConstraintSetup->ConeLimit.Swing2Motion == EAngularConstraintMotion::EAC_Limited)
+        {
+            float Swing1LimitRad = FMath::DegreesToRadians(ConstraintSetup->ConeLimit.Swing1LimitDegrees);
+            float Swing2LimitRad = FMath::DegreesToRadians(ConstraintSetup->ConeLimit.Swing2LimitDegrees);
+            Joint->setSwingLimit(PxJointLimitCone(Swing1LimitRad, Swing2LimitRad, PxSpring(0, 0)));
+        }
+
+        // === Drive/Motor 설정 ===
+
+        // Linear Position Drive
+        if (ConstraintSetup->bLinearPositionDrive)
+        {
+            PxD6JointDrive LinearDrive;
+            LinearDrive.stiffness = 1000.0f;     // 강성 (조정 가능)
+            LinearDrive.damping = 100.0f;        // 댐핑 (조정 가능)
+            LinearDrive.forceLimit = PX_MAX_F32;  // 힘 제한
+            LinearDrive.flags = PxD6JointDriveFlag::eACCELERATION;
+
+            Joint->setDrive(PxD6Drive::eX, LinearDrive);
+            Joint->setDrive(PxD6Drive::eY, LinearDrive);
+            Joint->setDrive(PxD6Drive::eZ, LinearDrive);
+        }
+
+        // Angular Position Drive (Slerp)
+        if (ConstraintSetup->bAngularOrientationDrive)
+        {
+            PxD6JointDrive AngularDrive;
+            AngularDrive.stiffness = 1000.0f;
+            AngularDrive.damping = 100.0f;
+            AngularDrive.forceLimit = PX_MAX_F32;
+            AngularDrive.flags = PxD6JointDriveFlag::eACCELERATION;
+
+            Joint->setDrive(PxD6Drive::eSLERP, AngularDrive);
+        }
+
+        // Angular Velocity Drive
+        if (ConstraintSetup->bAngularVelocityDrive)
+        {
+            PxD6JointDrive AngularVelDrive;
+            AngularVelDrive.stiffness = 0.0f;     // 속도 제어시 강성은 0
+            AngularVelDrive.damping = 100.0f;
+            AngularVelDrive.forceLimit = PX_MAX_F32;
+            AngularVelDrive.flags = PxD6JointDriveFlag::eACCELERATION;
+
+            Joint->setDrive(PxD6Drive::eTWIST, AngularVelDrive);
+            Joint->setDrive(PxD6Drive::eSWING, AngularVelDrive);
+        }
+
+        // === 기본 조인트 설정 ===
+        
+        // 조인트 이름 설정 (디버깅용)
+        if (!ConstraintSetup->JointName.IsEmpty())
+        {
+            Joint->setName(GetData(ConstraintSetup->JointName));
+        }
+
+        // 조인트 활성화
+        Joint->setConstraintFlags(PxConstraintFlag::eVISUALIZATION);
+        
+        // 파괴 임계값 설정 (선택사항)
+        Joint->setBreakForce(PX_MAX_F32, PX_MAX_F32);  // 무한대로 설정하여 파괴되지 않음
+    }
+
+    ConstraintInstance->ConstraintData = Joint;
 }
 
 void FPhysicsManager::DestroyGameObject(GameObject* GameObject) const
