@@ -1,6 +1,6 @@
 #pragma once
 
-enum EParticleScreenAlignment : int
+enum class EParticleScreenAlignment : uint8
 {
     PSA_FacingCameraPosition,
     PSA_Square,

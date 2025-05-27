@@ -48,3 +48,10 @@ void UParticleModuleLocation::Spawn(FParticleEmitterInstance* Owner, int32 Offse
 
     ParticleBase->Location = Location;
 }
+
+void UParticleModuleLocation::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    Ar << StartLocation << LocationOffset;
+}

@@ -790,25 +790,16 @@ void PropertyEditorPanel::RenderForPhysicsAsset(const USkeletalMeshComponent* Sk
     ImGui::PopStyleColor();
 }
 
-void PropertyEditorPanel::RenderForParticleSystem(UParticleSystemComponent* ParticleSystemComponent) const
+void PropertyEditorPanel::RenderForParticleSystem(const UParticleSystemComponent* ParticleSystemComponent) const
 {
     if (ImGui::Button("Open Viewer"))
     {
         UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
-        if (!Engine)
-        {
-            return;
-        }
-        if (ParticleSystemComponent)
+        if (Engine && ParticleSystemComponent)
         {
             UParticleSystem* ParticleSystem = ParticleSystemComponent->GetParticleSystem();
-            if (ParticleSystem == nullptr)
-            {
-                ParticleSystem = FObjectFactory::ConstructObject<UParticleSystem>(nullptr);
-                UAssetManager::Get().AddAsset(ParticleSystem->GetName(), ParticleSystem);
-                ParticleSystemComponent->SetParticleSystem(ParticleSystem);
-            }
-            Engine->StartParticleViewer(FName("TempParticle"), ParticleSystem);
+            FName AssetName = UAssetManager::Get().GetAssetKeyByObject(EAssetType::ParticleSystem, ParticleSystem);
+            Engine->StartParticleViewer(AssetName);
         }
     }
 }

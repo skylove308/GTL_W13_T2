@@ -13,5 +13,7 @@ public:
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bInWorldSpace)
     // Emitter 위치를 시작 위치에 더할지 여부
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bApplyEmitterLocation)
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };
 

@@ -66,7 +66,7 @@ private:
     void RenderForStaticMesh(UStaticMeshComponent* StaticMeshComp) const;
     void RenderForSkeletalMesh(USkeletalMeshComponent* SkeletalMeshComp) const;
     void RenderForPhysicsAsset(const USkeletalMeshComponent* SkeletalMeshComp) const;
-    void RenderForParticleSystem(UParticleSystemComponent* ParticleSystemComponent) const;
+    void RenderForParticleSystem(const UParticleSystemComponent* ParticleSystemComponent) const;
 
     void RenderForAmbientLightComponent(UAmbientLightComponent* AmbientLightComponent) const;
     void RenderForDirectionalLightComponent(UDirectionalLightComponent* DirectionalLightComponent) const;

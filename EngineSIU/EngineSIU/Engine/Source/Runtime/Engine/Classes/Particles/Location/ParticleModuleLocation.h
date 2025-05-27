@@ -15,5 +15,7 @@ public:
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, FDistributionVector, StartLocation)
     UPROPERTY_WITH_FLAGS(EditAnywhere, FDistributionVector, LocationOffset)
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };
 

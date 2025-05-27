@@ -13,4 +13,6 @@ public:
     virtual void Spawn(FParticleEmitterInstance* Owner, int32 Offset, float SpawnTime, FBaseParticle* ParticleBase) override;
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, FDistributionVector, StartSize)
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };

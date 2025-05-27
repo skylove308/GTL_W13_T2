@@ -56,3 +56,10 @@ void UParticleModuleColorOverLife::DisplayProperty()
         ImGui::PopID();
     }
 }
+
+void UParticleModuleColorOverLife::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    Ar << ColorOverLife << AlphaOverLife;
+}
