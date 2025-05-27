@@ -8,6 +8,7 @@
 
 #include "Container/Array.h"
 #include "Container/Map.h"
+#include "PhysicsEngine/ConstraintInstance.h"
 #include "PhysicsEngine/PhysicsAsset.h"
 
 
@@ -59,6 +60,7 @@ public:
     GameObject CreateBox(const PxVec3& Pos, const PxVec3& HalfExtents) const;
     GameObject* CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetup, ERigidBodyType RigidBodyType =
                                      ERigidBodyType::DYNAMIC) const;
+    void CreateJoint(const GameObject* Obj1, const GameObject* Obj2, FConstraintInstance* ConstraintInstance, const FConstraintSetup* ConstraintSetup) const;
 
     PxShape* CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
     PxShape* CreateSphereShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
@@ -86,5 +88,11 @@ private:
 
     PxRigidDynamic* CreateDynamicRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetups) const;
     PxRigidStatic* CreateStaticRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetups) const;
+    void AttachShapesToActor(PxRigidActor* Actor, UBodySetup* BodySetup) const;
+    void ApplyMassAndInertiaSettings(PxRigidDynamic* DynamicBody, const FBodyInstance* BodyInstance) const;
+    void ApplyBodyInstanceSettings(PxRigidActor* Actor, const FBodyInstance* BodyInstance) const;
+    void ApplyLockConstraints(PxRigidDynamic* DynamicBody, const FBodyInstance* BodyInstance) const;
+    void ApplyCollisionSettings(const PxRigidActor* Actor, const FBodyInstance* BodyInstance) const;
+    void ApplyShapeCollisionSettings(PxShape* Shape, const FBodyInstance* BodyInstance) const;
 };
 

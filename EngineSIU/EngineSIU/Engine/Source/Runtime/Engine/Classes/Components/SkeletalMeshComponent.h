@@ -128,7 +128,6 @@ public:
     void RemoveBodyInstance(FBodyInstance* BodyInstance);
     void RemoveConstraintInstance(FConstraintInstance* ConstraintInstance);
 
-    
 protected:
     bool NeedToSpawnAnimScriptInstance() const;
 
