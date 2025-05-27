@@ -18,11 +18,13 @@ struct FGameInfo
 class AGameMode : public AActor
 {
     DECLARE_CLASS(AGameMode, AActor)
+    
 public:
     AGameMode();
     virtual ~AGameMode() override;
+    
     void InitializeComponent();
-    UObject* Duplicate(UObject* InOuter) override;
+    virtual UObject* Duplicate(UObject* InOuter) override;
 
     //virtual void BeginPlay() override;
     //virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -47,11 +49,10 @@ public:
     FOnGameEnd OnGameEnd;
 
     FGameInfo GameInfo;
+    
 private:
-    UCameraComponent* MainCamera = nullptr;
-
-    bool     bGameRunning = false; // 내부 
-    bool     bGameEnded = true;
+    bool bGameRunning = false; // 내부 
+    bool bGameEnded = true;
 
     float LogTimer = 0.f;
     float LogInterval = 1.f;  // 1초마다 로그

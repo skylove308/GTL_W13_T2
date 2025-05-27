@@ -7,9 +7,6 @@
 #include "Level.h"
 #include "Actors/Player.h"
 #include "GameFramework/PlayerController.h"
-#include "Camera/CameraComponent.h"
-#include "Camera/PlayerCameraManager.h"
-#include "Engine/Engine.h"
 #include "Engine/EventManager.h"
 #include "UObject/UObjectIterator.h"
 
@@ -30,12 +27,11 @@ class UWorld : public UObject
 
 public:
     UWorld() = default;
-    ~UWorld();
+    virtual ~UWorld() override;
 
     static UWorld* CreateWorld(UObject* InOuter, const EWorldType InWorldType, const FString& InWorldName = "DefaultWorld");
 
     void InitializeNewWorld();
-    void InitializeLightScene();
     virtual UObject* Duplicate(UObject* InOuter) override;
 
     virtual void Tick(float DeltaTime);

@@ -28,7 +28,6 @@
 #include "Components/ProjectileMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SphereComponent.h"
-#include "Contents/AnimInstance/MyAnimInstance.h"
 #include "Engine/AssetManager.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/Asset/SkeletalMeshAsset.h"
@@ -575,13 +574,16 @@ void PropertyEditorPanel::RenderForSkeletalMesh(USkeletalMeshComponent* Skeletal
                         SelectedIndex = i;
                     }
                     if (bIsSelected)
+                    {
                         ImGui::SetItemDefaultFocus();
+                    }
                 }
                 ImGui::EndCombo();
             }
 
             if (CompClasses.IsValidIndex(SelectedIndex))
             {
+                /*
                 UClass* SelectedClass = CompClasses[SelectedIndex];
                 UMyAnimInstance* AnimInstance = Cast<UMyAnimInstance>(SkeletalMeshComp->GetAnimInstance());
 
@@ -622,6 +624,7 @@ void PropertyEditorPanel::RenderForSkeletalMesh(USkeletalMeshComponent* Skeletal
                     
                     AnimInstance->SetAnimState(AnimStateMachine->GetState());
                 }
+                */
             }
         }
         else
