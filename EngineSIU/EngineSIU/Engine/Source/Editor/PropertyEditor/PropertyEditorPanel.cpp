@@ -731,7 +731,7 @@ void PropertyEditorPanel::RenderForPhysicsAsset(const USkeletalMeshComponent* Sk
     ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
     if (ImGui::TreeNodeEx("Physics Asset", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
     {
-        ImGui::Text("SkeletalMesh");
+        ImGui::Text("Physics Asset");
         ImGui::SameLine();
 
         FString SelectedPhysicsAssetKey = FString("None");
