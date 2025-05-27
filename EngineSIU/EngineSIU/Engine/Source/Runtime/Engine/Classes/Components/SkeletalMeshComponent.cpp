@@ -16,6 +16,7 @@
 #include "UObject/Casts.h"
 #include "UObject/ObjectFactory.h"
 #include "Engine/Engine.h"
+#include "PhysicsEngine/ConstraintInstance.h"
 
 bool USkeletalMeshComponent::bIsCPUSkinning = false;
 
@@ -398,6 +399,45 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
         physx::PxVec3 BonePos = physx::PxVec3(CopiedRefSkeleton.RawRefBonePose[i].GetTranslation().X, CopiedRefSkeleton.RawRefBonePose[i].GetTranslation().Y, CopiedRefSkeleton.RawRefBonePose[i].GetTranslation().Z);
         GameObject* obj = GEngine->PhysicsManager->CreateGameObject(BonePos, Bodies[i], SkeletalMeshAsset->GetPhysicsAsset()->BodySetups);
         Bodies[i]->SetGameObject(obj);
+    }
+
+    for(int i=0; i < Constraints.Num(); i++)
+    {
+        FConstraintInstance* NewConstraint = Constraints[i];
+        FBodyInstance* BodyInstance1 = nullptr;
+        FBodyInstance* BodyInstance2 = nullptr;
+
+        for(int j = 0; j < Bodies.Num(); j++)
+        {
+            if (NewConstraint->ConstraintBone1 == Bodies[j]->BodyInstanceName)
+            {
+                BodyInstance1 = Bodies[j];
+            }
+            if (NewConstraint->ConstraintBone2 == Bodies[j]->BodyInstanceName)
+            {
+                BodyInstance2 = Bodies[j];
+            }
+        }
+
+        PxTransform GlobalPose1 = BodyInstance1->BIGameObject->rigidBody->getGlobalPose();
+        PxTransform GlobalPose2 = BodyInstance2->BIGameObject->rigidBody->getGlobalPose();
+        PxTransform LocalFrameParent = GlobalPose2.getInverse() * GlobalPose1;
+        PxTransform LocalFrameChild = PxTransform(PxVec3(0));
+
+        // PhysX D6 Joint 생성
+        physx::PxD6Joint* Joint = physx::PxD6JointCreate(*GEngine->PhysicsManager->GetPhysics(), BodyInstance1->BIGameObject->rigidBody, LocalFrameParent, BodyInstance2->BIGameObject->rigidBody, LocalFrameChild);
+
+        if (Joint)
+        {
+            // 각도 제한 설정
+            Joint->setMotion(physx::PxD6Axis::eTWIST, physx::PxD6Motion::eLIMITED);
+            Joint->setMotion(physx::PxD6Axis::eSWING1, physx::PxD6Motion::eLIMITED);
+            Joint->setMotion(physx::PxD6Axis::eSWING2, physx::PxD6Motion::eLIMITED);
+            Joint->setTwistLimit(physx::PxJointAngularLimitPair(-physx::PxPi / 4, physx::PxPi / 4));
+            Joint->setSwingLimit(physx::PxJointLimitCone(physx::PxPi / 6, physx::PxPi / 6));
+        }
+
+        NewConstraint->ConstraintData = Joint;
     }
 }
 

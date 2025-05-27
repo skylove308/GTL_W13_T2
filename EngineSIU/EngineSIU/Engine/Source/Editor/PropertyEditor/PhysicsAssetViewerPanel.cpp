@@ -114,6 +114,7 @@ void PhysicsAssetViewerPanel::Render()
 
     ImGui::Separator();
     ImGui::Text("Current Bodies:");
+
     if (RefSkeletalMeshComponent)
     {
         for (int32 i = 0; i < RefSkeletalMeshComponent->GetBodies().Num(); ++i)
@@ -123,7 +124,7 @@ void PhysicsAssetViewerPanel::Render()
             auto Temp = BodyInstance->BodyInstanceName.ToString();
             if (ImGui::SmallButton(("Remove##" + FString::FromInt(i)).operator*()))
             {
-                RemoveBodyInstance(i);
+                RemoveBodySetup(i);
             }
         }
     }
@@ -172,13 +173,8 @@ void PhysicsAssetViewerPanel::ClearRefSkeletalMeshComponent()
     //}
 }
 
-void PhysicsAssetViewerPanel::AddBodyInstance(int32 BoneIndex, const FName& BoneName)
+void PhysicsAssetViewerPanel::AddBodySetup(int32 BoneIndex, const FName& BoneName)
 {
-    // 새 본 인스턴스 생성
-    FBodyInstance* NewBodyInstance = new FBodyInstance(RefSkeletalMeshComponent);
-    NewBodyInstance->BodyInstanceName = BoneName;
-    NewBodyInstance->BoneIndex = BoneIndex;
-    
     physx::PxVec3 BonePos = physx::PxVec3(CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().X, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().Y, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().Z);
     physx::PxVec3 Rotation = physx::PxVec3(CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().X, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().Y, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().Z);
     physx::PxVec3 HalfScale = physx::PxVec3(0.5f, 0.5f, 0.5f); // 예시로 0.5로 설정, 실제 스케일은 필요에 따라 조정
@@ -188,12 +184,22 @@ void PhysicsAssetViewerPanel::AddBodyInstance(int32 BoneIndex, const FName& Bone
     BodySetup->AggGeom.CapsuleElems.Add(PxCapsule);
     BodySetup->SetBoneName(BoneName);
     RefSkeletalMeshComponent->GetSkeletalMeshAsset()->GetPhysicsAsset()->BodySetups.Add(BodySetup);
-
-    RefSkeletalMeshComponent->AddBodyInstance(NewBodyInstance);
 }
 
-void PhysicsAssetViewerPanel::RemoveBodyInstance(int32 BodyIndex)
+void PhysicsAssetViewerPanel::RemoveBodySetup(int32 BodyIndex)
 {
+    TArray<UBodySetup*>& BodySetups = RefSkeletalMeshComponent->GetSkeletalMeshAsset()->GetPhysicsAsset()->BodySetups;  
+
+    for(int i = 0; i < BodySetups.Num(); ++i)
+    {
+        if (BodySetups[i]->BoneName)
+        {
+            // 해당 BodySetup을 제거
+            BodySetups.RemoveAt(i);
+            break;
+        }
+    }
+
     if(RefSkeletalMeshComponent && BodyIndex >= 0)
     {
         for(int32 i = 0; i < RefSkeletalMeshComponent->GetBodies().Num(); ++i)
@@ -222,26 +228,6 @@ void PhysicsAssetViewerPanel::AddConstraint(const FBodyInstance* BodyInstance1, 
     NewConstraint->JointName = BodyInstance1->BodyInstanceName.ToString() + ":" + BodyInstance2->BodyInstanceName.ToString();
     NewConstraint->ConstraintBone1 = BodyInstance1->BodyInstanceName.ToString();
     NewConstraint->ConstraintBone2 = BodyInstance2->BodyInstanceName.ToString();
-
-    PxTransform GlobalPose1 = BodyInstance1->BIGameObject->rigidBody->getGlobalPose();
-    PxTransform GlobalPose2 = BodyInstance2->BIGameObject->rigidBody->getGlobalPose();
-    PxTransform LocalFrameParent = GlobalPose2.getInverse() * GlobalPose1;
-    PxTransform LocalFrameChild = PxTransform(PxVec3(0));
-
-    // PhysX D6 Joint 생성
-    physx::PxD6Joint* Joint = physx::PxD6JointCreate(*GEngine->PhysicsManager->GetPhysics(), BodyInstance1->BIGameObject->rigidBody, LocalFrameParent, BodyInstance2->BIGameObject->rigidBody, LocalFrameChild);
-
-    if (Joint)
-    {
-        // 각도 제한 설정
-        Joint->setMotion(physx::PxD6Axis::eTWIST, physx::PxD6Motion::eLIMITED);
-        Joint->setMotion(physx::PxD6Axis::eSWING1, physx::PxD6Motion::eLIMITED);
-        Joint->setMotion(physx::PxD6Axis::eSWING2, physx::PxD6Motion::eLIMITED);
-        Joint->setTwistLimit(physx::PxJointAngularLimitPair(-physx::PxPi / 4, physx::PxPi / 4));
-        Joint->setSwingLimit(physx::PxJointLimitCone(physx::PxPi / 6, physx::PxPi / 6));
-    }
-
-    NewConstraint->ConstraintData = Joint;
 
     // 추가된 제약 조건을 Constraints 배열에 저장
     RefSkeletalMeshComponent->AddConstraintInstance(NewConstraint);
@@ -324,7 +310,7 @@ void PhysicsAssetViewerPanel::RenderBoneTree(const FReferenceSkeleton& RefSkelet
     {
         if (ImGui::MenuItem("Add BodyInstance"))
         {
-            AddBodyInstance(BoneIndex, BoneInfo.Name);
+            AddBodySetup(BoneIndex, BoneInfo.Name);
         }
         ImGui::EndPopup();
     }
