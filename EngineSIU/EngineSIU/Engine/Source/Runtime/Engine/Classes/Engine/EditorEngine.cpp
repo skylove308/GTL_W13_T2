@@ -320,23 +320,11 @@ void UEditorEngine::StartSkeletalMeshViewer(FName SkeletalMeshName, UAnimationAs
     }
 }
 
-void UEditorEngine::StartParticleViewer(FName ParticleSystemAssetName)
+void UEditorEngine::StartParticleViewer(UParticleSystem* ParticleSystemAsset)
 {
-    // Set Particle System Asset
-    UObject* Object = UAssetManager::Get().GetAsset(EAssetType::ParticleSystem, ParticleSystemAssetName.ToString());
-    UParticleSystem* ParticleSystemAsset = Cast<UParticleSystem>(Object);
     if (!ParticleSystemAsset)
     {
-        ParticleSystemAsset = FObjectFactory::ConstructObject<UParticleSystem>(nullptr);
-        
-        FAssetInfo Info;
-        Info.AssetName = ParticleSystemAsset->GetName();
-        Info.PackagePath = TEXT("Contents/ParticleSystem");
-        Info.AssetType = EAssetType::ParticleSystem;
-        Info.AssetObject = ParticleSystemAsset;
-        UAssetManager::Get().AddAssetInfo(Info);
-
-        UAssetManager::Get().AddAsset(Info.GetFullPath(), ParticleSystemAsset);
+        return;
     }
 
     ClearActorSelection();

@@ -790,16 +790,30 @@ void PropertyEditorPanel::RenderForPhysicsAsset(const USkeletalMeshComponent* Sk
     ImGui::PopStyleColor();
 }
 
-void PropertyEditorPanel::RenderForParticleSystem(const UParticleSystemComponent* ParticleSystemComponent) const
+void PropertyEditorPanel::RenderForParticleSystem(UParticleSystemComponent* ParticleSystemComponent) const
 {
     if (ImGui::Button("Open Viewer"))
     {
         UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
         if (Engine && ParticleSystemComponent)
         {
-            UParticleSystem* ParticleSystem = ParticleSystemComponent->GetParticleSystem();
-            FName AssetName = UAssetManager::Get().GetAssetKeyByObject(EAssetType::ParticleSystem, ParticleSystem);
-            Engine->StartParticleViewer(AssetName);
+            UParticleSystem* ParticleSystemAsset = ParticleSystemComponent->GetParticleSystem();
+            if (!ParticleSystemAsset)
+            {
+                ParticleSystemAsset = FObjectFactory::ConstructObject<UParticleSystem>(nullptr);
+        
+                FAssetInfo Info;
+                Info.AssetName = ParticleSystemAsset->GetName();
+                Info.PackagePath = TEXT("Contents/ParticleSystem");
+                Info.AssetType = EAssetType::ParticleSystem;
+                Info.AssetObject = ParticleSystemAsset;
+                UAssetManager::Get().AddAssetInfo(Info);
+
+                UAssetManager::Get().AddAsset(Info.GetFullPath(), ParticleSystemAsset);
+                ParticleSystemComponent->SetParticleSystem(ParticleSystemAsset);
+            }
+            
+            Engine->StartParticleViewer(ParticleSystemAsset);
         }
     }
 }
