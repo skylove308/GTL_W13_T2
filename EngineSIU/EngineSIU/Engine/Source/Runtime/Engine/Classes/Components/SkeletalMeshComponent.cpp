@@ -376,7 +376,7 @@ void USkeletalMeshComponent::InitAnim()
     }
 }
 
-GameObject* USkeletalMeshComponent::CreatePhysXGameObject()
+void USkeletalMeshComponent::CreatePhysXGameObject()
 {
     BodyInstance = new FBodyInstance(this);
     
@@ -384,8 +384,6 @@ GameObject* USkeletalMeshComponent::CreatePhysXGameObject()
     PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
     
     GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance, SkeletalMeshAsset->GetPhysicsAsset()->BodySetups, RigidBodyType);
-
-    return obj;
 }
 
 bool USkeletalMeshComponent::NeedToSpawnAnimScriptInstance() const

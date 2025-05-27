@@ -52,7 +52,7 @@ public:
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bSimulate, = false)
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bApplyGravity, = false)
-    UPROPERTY_WITH_FLAGS(EditAnywhere, ERigidBodyType, RigidBodyType)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, ERigidBodyType, RigidBodyType, = ERigidBodyType::DYNAMIC)
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, TArray<AggregateGeomAttributes>, GeomAttributes)
 
@@ -113,7 +113,7 @@ public:
     /** Returns list of components this component is overlapping. */
     const TArray<FOverlapInfo>& GetOverlapInfos() const;
 
-    virtual GameObject* CreatePhysXGameObject();
+    virtual void CreatePhysXGameObject();
 
     virtual void BeginPlay() override;
 protected:

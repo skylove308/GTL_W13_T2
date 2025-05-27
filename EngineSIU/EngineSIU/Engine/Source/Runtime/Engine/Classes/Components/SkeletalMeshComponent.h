@@ -119,7 +119,7 @@ public:
 
     virtual void InitAnim();
 
-    virtual GameObject* CreatePhysXGameObject() override;
+    virtual void CreatePhysXGameObject() override;
     
 protected:
     bool NeedToSpawnAnimScriptInstance() const;

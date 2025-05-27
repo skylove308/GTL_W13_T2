@@ -489,7 +489,7 @@ const TArray<FOverlapInfo>& UPrimitiveComponent::GetOverlapInfos() const
     return OverlappingComponents;
 }
 
-GameObject* UPrimitiveComponent::CreatePhysXGameObject()
+void UPrimitiveComponent::CreatePhysXGameObject()
 {
     BodyInstance = new FBodyInstance(this);
     
@@ -499,29 +499,38 @@ GameObject* UPrimitiveComponent::CreatePhysXGameObject()
     TArray<UBodySetup*> BodySetups;
     BodySetups.Add(BodySetup);
 
+    if (GeomAttributes.Num() == 0)
+    {
+        AggregateGeomAttributes DefaultAttribute;
+        DefaultAttribute.GeomType = EGeomType::EBox;
+        DefaultAttribute.Offset = FVector(AABB.MaxLocation + AABB.MinLocation) / 2;
+        DefaultAttribute.Extent = FVector(AABB.MaxLocation - AABB.MinLocation) / 2 * GetComponentScale3D();
+        GeomAttributes.Add(DefaultAttribute);
+    }
+
     for (const auto& GeomAttribute : GeomAttributes)
     {
         PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
         PxVec3 Rotation = PxVec3(GeomAttribute.Rotation.Roll, GeomAttribute.Rotation.Pitch, GeomAttribute.Rotation.Yaw);
-        PxVec3 HalfScale = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
+        PxVec3 Extent = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
 
         switch (GeomAttribute.GeomType)
         {
         case EGeomType::ESphere:
         {
-            PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, HalfScale);
+            PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, Extent);
             BodySetup->AggGeom.SphereElems.Add(PxSphere);
             break;
         }
         case EGeomType::EBox:
         {
-            PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, Rotation, HalfScale);
+            PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, Rotation, Extent);
             BodySetup->AggGeom.BoxElems.Add(PxBox);
             break;
         }
         case EGeomType::ECapsule:
         {
-            PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, HalfScale);
+            PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, Extent);
             BodySetup->AggGeom.SphereElems.Add(PxCapsule);
             break;
         }
@@ -534,8 +543,6 @@ GameObject* UPrimitiveComponent::CreatePhysXGameObject()
         obj->DynamicRigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bApplyGravity);
     }
     BodyInstance->BIGameObject = obj;
-
-    return obj;
 }
 
 void UPrimitiveComponent::BeginPlay()
