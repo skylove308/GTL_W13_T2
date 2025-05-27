@@ -411,6 +411,22 @@ void USkeletalMeshComponent::AddConstraintInstance(FConstraintInstance* Constrai
     Constraints.Add(ConstraintInstance);
 }
 
+void USkeletalMeshComponent::RemoveBodyInstance(FBodyInstance* BodyInstance)
+{
+    if (BodyInstance)
+    {
+        Bodies.Remove(BodyInstance);
+    }
+}
+
+void USkeletalMeshComponent::RemoveConstraintInstance(FConstraintInstance* ConstraintInstance)
+{
+    if (ConstraintInstance)
+    {
+        Constraints.Remove(ConstraintInstance);
+    }
+}
+
 bool USkeletalMeshComponent::NeedToSpawnAnimScriptInstance() const
 {
     USkeletalMesh* MeshAsset = GetSkeletalMeshAsset();

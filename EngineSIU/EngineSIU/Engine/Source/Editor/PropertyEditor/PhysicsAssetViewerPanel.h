@@ -23,7 +23,8 @@ public:
 
     void ClearRefSkeletalMeshComponent();
 
-    void AddBodyInstance();
+    void AddBodyInstance(int32 BoneIndex, const FName& BoneName);
+    void RemoveBodyInstance(int32 BodyIndex);
 
     void AddConstraint(const FBodyInstance* BodyInstance1, const FBodyInstance* BodyInstance2);
     void RemoveConstraint(int32 ConstraintIndex);

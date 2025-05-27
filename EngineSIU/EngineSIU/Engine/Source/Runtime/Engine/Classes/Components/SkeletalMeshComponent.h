@@ -125,6 +125,8 @@ public:
     TArray<FConstraintInstance*>& GetConstraints() { return Constraints; }
     void AddBodyInstance(FBodyInstance* BodyInstance);
     void AddConstraintInstance(FConstraintInstance* ConstraintInstance);
+    void RemoveBodyInstance(FBodyInstance* BodyInstance);
+    void RemoveConstraintInstance(FConstraintInstance* ConstraintInstance);
 
     
 protected:

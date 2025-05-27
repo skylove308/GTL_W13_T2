@@ -418,18 +418,28 @@ void UEditorEngine::StartPhysicsAssetViewer(FName PhysicsAssetName, UPhysicsAsse
 
     ActiveWorld = PhysicsAssetViewerWorld;
     PhysicsAssetViewerWorld->WorldType = EWorldType::PhysicsAssetViewer;
+    PhysicsManager->CreateScene(ActiveWorld);
+    PhysicsManager->SetCurrentScene(ActiveWorld);
 
     // 스켈레탈 액터 스폰
-    ASkeletalMeshActor* SkeletalActor = SkeletalMeshViewerWorld->SpawnActor<ASkeletalMeshActor>();
+    ASkeletalMeshActor* SkeletalActor = PhysicsAssetViewerWorld->SpawnActor<ASkeletalMeshActor>();
     SkeletalActor->SetActorTickInEditor(true);
 
     USkeletalMeshComponent* MeshComp = SkeletalActor->AddComponent<USkeletalMeshComponent>();
     SkeletalActor->SetRootComponent(MeshComp);
     SkeletalActor->SetActorLabel(TEXT("OBJ_SKELETALMESH"));
     MeshComp->SetSkeletalMeshAsset(UAssetManager::Get().GetSkeletalMesh(PhysicsAssetName.ToString()));
-    SkeletalMeshViewerWorld->SetSkeletalMeshComponent(MeshComp);
 
-    ADirectionalLight* DirectionalLight = SkeletalMeshViewerWorld->SpawnActor<ADirectionalLight>();
+    if (PhysicsAssetViewerWorld)
+    {
+        PhysicsAssetViewerWorld->SetSkeletalMeshComponent(MeshComp);
+    }
+    else
+    {
+        UE_LOG(ELogLevel::Error, TEXT("PhysicsAssetViewerWorld is null after creation attempt in StartPhysicsAssetViewer."));
+    }
+
+    ADirectionalLight* DirectionalLight = PhysicsAssetViewerWorld->SpawnActor<ADirectionalLight>();
     DirectionalLight->SetActorRotation(FRotator(45.f, 45.f, 0.f));
     DirectionalLight->GetComponentByClass<UDirectionalLightComponent>()->SetIntensity(4.0f);
 
@@ -570,6 +580,31 @@ void UEditorEngine::EndParticleViewer()
         Camera.SetLocation(CameraLocation);
         Camera.SetRotation(CameraRotation);
         
+        ClearActorSelection();
+        ClearComponentSelection();
+    }
+    ActiveWorld = EditorWorld;
+
+    if (AEditorPlayer* Player = GetEditorPlayer())
+    {
+        Player->SetCoordMode(ECoordMode::CDM_WORLD);
+    }
+}
+
+void UEditorEngine::EndPhysicsAssetViewer()
+{
+    if (PhysicsAssetViewerWorld)
+    {
+        this->ClearActorSelection();
+        WorldList.Remove(GetWorldContextFromWorld(PhysicsAssetViewerWorld));
+        PhysicsAssetViewerWorld->Release();
+        GUObjectArray.MarkRemoveObject(PhysicsAssetViewerWorld);
+        PhysicsAssetViewerWorld = nullptr;
+
+        FViewportCamera& Camera = *GEngineLoop.GetLevelEditor()->GetActiveViewportClient()->GetPerspectiveCamera();
+        Camera.SetLocation(CameraLocation);
+        Camera.SetRotation(CameraRotation);
+
         ClearActorSelection();
         ClearComponentSelection();
     }

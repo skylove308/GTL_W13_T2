@@ -37,7 +37,6 @@ public:
     void StartPIE();
     void StartSkeletalMeshViewer(FName SkeletalMeshName, UAnimationAsset* AnimAsset);
     void StartParticleViewer(FName ParticleName, UParticleSystem* ParticleSystem);
-
     void StartPhysicsAssetViewer(FName PhysicsAssetName, UPhysicsAsset* PhysicsAsset);
 
     void BindEssentialObjects();
@@ -45,6 +44,7 @@ public:
     void EndPIE();
     void EndSkeletalMeshViewer();
     void EndParticleViewer();
+    void EndPhysicsAssetViewer();
 
     void SetPhysXScene(UWorld* World);
 
