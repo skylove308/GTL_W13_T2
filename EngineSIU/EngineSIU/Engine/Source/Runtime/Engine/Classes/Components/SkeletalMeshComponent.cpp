@@ -40,6 +40,7 @@ UObject* USkeletalMeshComponent::Duplicate(UObject* InOuter)
 {
     ThisClass* NewComponent = Cast<ThisClass>(Super::Duplicate(InOuter));
 
+    NewComponent->SetRelativeTransform(GetRelativeTransform());
     NewComponent->SetSkeletalMeshAsset(SkeletalMeshAsset);
     NewComponent->SetAnimationMode(AnimationMode);
     if (AnimationMode == EAnimationMode::AnimationBlueprint)
@@ -70,7 +71,7 @@ void USkeletalMeshComponent::TickComponent(float DeltaTime)
 
 void USkeletalMeshComponent::EndPhysicsTickComponent(float DeltaTime)
 {
-    Super::EndPhysicsTickComponent(DeltaTime);
+    //Super::EndPhysicsTickComponent(DeltaTime);
     if (bSimulate)
     {
         for (FBodyInstance* BI : Bodies)
@@ -78,7 +79,7 @@ void USkeletalMeshComponent::EndPhysicsTickComponent(float DeltaTime)
             if (RigidBodyType != ERigidBodyType::STATIC)
             {
                 BI->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
-                XMMATRIX DXMatrix = BodyInstance->BIGameObject->WorldMatrix;
+                XMMATRIX DXMatrix = BI->BIGameObject->WorldMatrix;
                 XMFLOAT4X4 dxMat;
                 XMStoreFloat4x4(&dxMat, DXMatrix);
 
@@ -404,6 +405,35 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
     {
         FBodyInstance* NewBody = new FBodyInstance(this);
 
+        for (const auto& GeomAttribute : BodySetups[i]->GeomAttributes)
+        {
+            PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
+            PxVec3 Rotation = PxVec3(GeomAttribute.Rotation.Roll, GeomAttribute.Rotation.Pitch, GeomAttribute.Rotation.Yaw);
+            PxVec3 Extent = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
+
+            switch (GeomAttribute.GeomType)
+            {
+            case EGeomType::ESphere:
+            {
+                PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, Extent);
+                BodySetups[i]->AggGeom.SphereElems.Add(PxSphere);
+                break;
+            }
+            case EGeomType::EBox:
+            {
+                PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, Rotation, Extent);
+                BodySetups[i]->AggGeom.BoxElems.Add(PxBox);
+                break;
+            }
+            case EGeomType::ECapsule:
+            {
+                PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, Extent);
+                BodySetups[i]->AggGeom.SphereElems.Add(PxCapsule);
+                break;
+            }
+            }
+        }
+
         int BoneIndex = Skeleton.FindBoneIndex(BodySetups[i]->BoneName);
         FVector Location = Skeleton.GetRawRefBonePose()[BoneIndex].Translation;
         PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
@@ -415,6 +445,7 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
         }
         
         NewBody->SetGameObject(Obj);
+        NewBody->BodyInstanceName = BodySetups[i]->BoneName;
         NewBody->BoneIndex = BoneIndex;
 
         Bodies.Add(NewBody);
@@ -428,7 +459,7 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
         FBodyInstance* BodyInstance1 = nullptr;
         FBodyInstance* BodyInstance2 = nullptr;
 
-        for(int j = 0; j < ConstraintSetups.Num(); j++)
+        for(int j = 0; j < Bodies.Num(); j++)
         {
             if (ConstraintSetups[i]->ConstraintBone1 == Bodies[j]->BodyInstanceName.ToString())
             {
