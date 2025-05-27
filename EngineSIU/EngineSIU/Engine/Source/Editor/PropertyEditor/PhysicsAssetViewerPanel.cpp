@@ -182,7 +182,7 @@ void PhysicsAssetViewerPanel::AddBody(int32 BoneIndex, const FName& BoneName)
 
     AggregateGeomAttributes GeomAttributes;
     GeomAttributes.Offset = FVector(BonePos.x, BonePos.y, BonePos.z);
-    GeomAttributes.Rotation = FVector(Rotation.x, Rotation.y, Rotation.z); 
+    GeomAttributes.Rotation = FRotator(Rotation.x, Rotation.y, Rotation.z); 
     GeomAttributes.Extent = FVector(HalfScale.x, HalfScale.y, HalfScale.z);
 
     BodySetup->GeomAttributes.Add(GeomAttributes);

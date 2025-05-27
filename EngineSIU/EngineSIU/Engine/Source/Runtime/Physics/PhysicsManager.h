@@ -1,15 +1,20 @@
 #pragma once
 
 #include "Core/HAL/PlatformType.h" // TCHAR 재정의 문제때문에 다른 헤더들보다 앞에 있어야 함
-#include "World/World.h"
 
 #include <PxPhysicsAPI.h>
-#include <d3d11.h>
 #include <DirectXMath.h>
-#include <vector>
+#include <pvd/PxPvd.h>
+
+#include "Container/Array.h"
+#include "Container/Map.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 
 
+enum class ERigidBodyType;
+struct FBodyInstance;
 class UBodySetup;
+class UWorld;
 
 using namespace physx;
 using namespace DirectX;
@@ -19,18 +24,19 @@ using namespace DirectX;
 class UPrimitiveComponent;
 
 // 게임 오브젝트
-struct GameObject
-{
-    PxRigidDynamic* RigidBody = nullptr;
+struct GameObject {
+    PxRigidDynamic* DynamicRigidBody = nullptr;
+    PxRigidStatic* StaticRigidBody = nullptr;
     XMMATRIX WorldMatrix = XMMatrixIdentity();
 
-    void UpdateFromPhysics(PxScene* Scene)
-    {
+    void UpdateFromPhysics(PxScene* Scene) {
         // SCOPED_READ_LOCK(gScene);
-        PxTransform Transform = RigidBody->getGlobalPose();
-        PxMat44 Matrix(Transform);
-        WorldMatrix = XMLoadFloat4x4(reinterpret_cast<const XMFLOAT4X4*>(&Matrix));
+        PxTransform t = DynamicRigidBody->getGlobalPose();
+        PxMat44 mat(t);
+        WorldMatrix = XMLoadFloat4x4(reinterpret_cast<const XMFLOAT4X4*>(&mat));
     }
+
+    void SetRigidBodyType(ERigidBodyType RigidBody) const;
 };
 
 class FPhysicsManager
@@ -43,6 +49,7 @@ public:
     
     PxScene* CreateScene(UWorld* World);
     PxScene* GetScene(UWorld* World) { return SceneMap[World]; }
+    bool ConnectPVD();
     void RemoveScene(UWorld* World) { SceneMap.Remove(World); }
     void SetCurrentScene(UWorld* World) { CurrentScene = SceneMap[World]; }
     void SetCurrentScene(PxScene* Scene) { CurrentScene = Scene; }
@@ -50,7 +57,8 @@ public:
     void DestroyGameObject(GameObject* GameObject) const;
     
     GameObject CreateBox(const PxVec3& Pos, const PxVec3& HalfExtents) const;
-    GameObject* CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const;
+    GameObject* CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetup, ERigidBodyType RigidBodyType =
+                                     ERigidBodyType::DYNAMIC) const;
 
     PxShape* CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
     PxShape* CreateSphereShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
@@ -61,6 +69,7 @@ public:
     
     void Simulate(float DeltaTime);
     void ShutdownPhysX();
+    void CleanupPVD();
 
 private:
     PxDefaultAllocator Allocator;
@@ -71,5 +80,11 @@ private:
     PxScene* CurrentScene = nullptr;
     PxMaterial* Material = nullptr;
     PxDefaultCpuDispatcher* Dispatcher = nullptr;
+    // 디버깅용
+    PxPvd* Pvd;
+    PxPvdTransport* Transport;
+
+    PxRigidDynamic* CreateDynamicRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetups) const;
+    PxRigidStatic* CreateStaticRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetups) const;
 };
 
