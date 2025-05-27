@@ -51,6 +51,8 @@ void FPhysicsManager::InitPhysX()
     Physics = PxCreatePhysics(PX_PHYSICS_VERSION, *Foundation, PxTolerancesScale(), true, Pvd);
     
     Material = Physics->createMaterial(0.5f, 0.5f, 0.6f);
+
+    PxInitExtensions(*Physics, Pvd);
 }
 
 PxScene* FPhysicsManager::CreateScene(UWorld* World)
