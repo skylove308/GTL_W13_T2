@@ -46,12 +46,15 @@ public:
     ~FPhysicsManager() = default;
 
     void InitPhysX();
+    
     PxScene* CreateScene(UWorld* World);
     PxScene* GetScene(UWorld* World) { return SceneMap[World]; }
     bool ConnectPVD();
     void RemoveScene(UWorld* World) { SceneMap.Remove(World); }
     void SetCurrentScene(UWorld* World) { CurrentScene = SceneMap[World]; }
     void SetCurrentScene(PxScene* Scene) { CurrentScene = Scene; }
+    
+    void DestroyGameObject(GameObject* GameObject) const;
     
     GameObject CreateBox(const PxVec3& Pos, const PxVec3& HalfExtents) const;
     GameObject* CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetup, ERigidBodyType RigidBodyType =
@@ -60,14 +63,17 @@ public:
     PxShape* CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
     PxShape* CreateSphereShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
     PxShape* CreateCapsuleShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
+
+    PxPhysics* GetPhysics() { return Physics; }
+    PxMaterial* GetMaterial() const { return Material; }
     
     void Simulate(float DeltaTime);
     void ShutdownPhysX();
     void CleanupPVD();
 
 private:
-    PxDefaultAllocator      Allocator;
-    PxDefaultErrorCallback  ErrorCallback;
+    PxDefaultAllocator Allocator;
+    PxDefaultErrorCallback ErrorCallback;
     PxFoundation* Foundation = nullptr;
     PxPhysics* Physics = nullptr;
     TMap<UWorld*, PxScene*> SceneMap;

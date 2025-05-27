@@ -6,6 +6,7 @@
 #include "PropertyEditor/ParticleViewerPanel.h"
 #include "PropertyEditor/PropertyEditorPanel.h"
 #include "PropertyEditor/SkeletalMeshViewerPanel.h"
+#include "PropertyEditor/PhysicsAssetViewerPanel.h"
 #include "World/World.h"
 void UnrealEd::Initialize()
 {
@@ -20,10 +21,13 @@ void UnrealEd::Initialize()
 
     // TODO : SkeletalViewe 전용 UI 분리
     auto BoneHierarchyPanel = std::make_shared<SkeletalMeshViewerPanel>();
-    Panels["BoneHierarchyPaenl"] = BoneHierarchyPanel;
+    Panels["BoneHierarchyPanel"] = BoneHierarchyPanel;
     
     auto ParticleViewPanel = std::make_shared<ParticleViewerPanel>();
     Panels["ParticleViewerPanel"] = ParticleViewPanel;
+
+    auto PhysicsAssetPanel = std::make_shared<PhysicsAssetViewerPanel>();
+    Panels["PhysicsAssetViewerPanel"] = PhysicsAssetPanel;
 }
 
 void UnrealEd::Render() const
@@ -54,6 +58,9 @@ void UnrealEd::Render() const
         break;
     case EWorldType::ParticleViewer:
         currentMask = EWorldTypeBitFlag::ParticleViewer;
+        break;
+    case EWorldType::PhysicsAssetViewer:
+        currentMask = EWorldTypeBitFlag::PhysicsAssetViewer;
         break;
     case EWorldType::Inactive:
         currentMask = EWorldTypeBitFlag::Inactive;

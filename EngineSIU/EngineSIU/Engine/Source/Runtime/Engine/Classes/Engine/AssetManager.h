@@ -1,5 +1,7 @@
 #pragma once
 #include "StaticMesh.h"
+#include "DirectXTK/Keyboard.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
 
@@ -17,6 +19,8 @@ enum class EAssetType : uint8
     Texture2D,
     Material,
     ParticleSystem,
+    PhysicsAsset,
+    MAX
 };
 
 struct FAssetInfo
@@ -26,6 +30,7 @@ struct FAssetInfo
     FString SourceFilePath; // 원본 파일 경로
     EAssetType AssetType;   // Asset의 타입
     uint32 Size;            // Asset의 크기 (바이트 단위)
+    UObject* AssetObject;
 
     [[nodiscard]] FString GetFullPath() const { return PackagePath.ToString() / AssetName.ToString(); }
 
@@ -78,6 +83,8 @@ public:
     
     void InitAssetManager();
 
+    void ReleaseAssetManager();
+
     const TMap<FName, FAssetInfo>& GetAssetRegistry();
     TMap<FName, FAssetInfo>& GetAssetRegistryRef();
 
@@ -89,22 +96,24 @@ public:
     UAnimationAsset* GetAnimation(const FName& Name) const;
     UParticleSystem* GetParticleSystem(const FName& Name) const;
 
-    void GetMaterialKeys(TSet<FName>& OutKeys) const;
-    void GetMaterialKeys(TArray<FName>& OutKeys) const;
+    void GetAssetKeys(EAssetType AssetType, TSet<FName>& OutKeys) const;
+    void GetAssetKeys(EAssetType AssetType, TArray<FName>& OutKeys) const;
 
+    const FName& GetAssetKeyByObject(EAssetType AssetType, const UObject* AssetObject) const;
+    
     void AddAssetInfo(const FAssetInfo& Info);
-    void AddSkeleton(const FName& Key, USkeleton* Skeleton);
-    void AddSkeletalMesh(const FName& Key, USkeletalMesh* SkeletalMesh);
-    void AddMaterial(const FName& Key, UMaterial* Material);
-    void AddStaticMesh(const FName& Key, UStaticMesh* StaticMesh);
-    void AddAnimation(const FName& Key, UAnimationAsset* Animation);
-    void AddParticleSystem(const FName& Key, UParticleSystem* ParticleSystem);
+    
+    void AddAsset(const FName& Key, UObject* AssetObject);
+
+    bool SavePhysicsAsset(const FString& FilePath, UPhysicsAsset* PhysicsAsset);
 
 private:
     inline static TMap<EAssetType, TMap<FName, UObject*>> AssetMap;
     
     double FbxLoadTime = 0.0;
     double BinaryLoadTime = 0.0;
+
+    EAssetType GetAssetType(const UObject* AssetObject) const;
 
     void LoadContentFiles();
 
@@ -116,6 +125,8 @@ private:
 
     bool SaveFbxBinary(const FString& FilePath, FAssetLoadResult& Result, const FString& BaseName, const FString& FolderPath);
 
+    void HandlePhysicsAsset(FAssetInfo& AssetInfo);
+    
     static constexpr uint32 Version = 1;
 
     bool SerializeVersion(FArchive& Ar);

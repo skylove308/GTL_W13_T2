@@ -80,8 +80,23 @@ void USkeletalMeshComponent::EndPhysicsTickComponent(float DeltaTime)
             if (RigidBodyType != ERigidBodyType::STATIC)
             {
                 BI->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
+                XMMATRIX DXMatrix = BodyInstance->BIGameObject->WorldMatrix;
+                XMFLOAT4X4 dxMat;
+                XMStoreFloat4x4(&dxMat, DXMatrix);
+
+                FMatrix WorldMatrix;
+                for (int32 Row = 0; Row < 4; ++Row)
+                {
+                    for (int32 Col = 0; Col < 4; ++Col)
+                    {
+                        WorldMatrix.M[Row][Col] = *(&dxMat._11 + Row * 4 + Col);
+                    }
+                }
+
+                BonePoseContext.Pose[BI->BoneIndex] = FTransform(WorldMatrix);
             }
         }
+        CPUSkinning();
     }
 }
 
@@ -377,28 +392,80 @@ void USkeletalMeshComponent::InitAnim()
     }
 }
 
-void USkeletalMeshComponent::CreatePhysXGameObject() // TODO: 민석님꺼랑 합치고 PhysicAsset 등 필요한 거 복사하고 사용하게 변경
+void USkeletalMeshComponent::CreatePhysXGameObject()
 {
-    const auto& Skeleton = SkeletalMeshAsset->GetSkeleton()->GetReferenceSkeleton();
-    TArray<UBodySetup*> BodySetups = SkeletalMeshAsset->GetPhysicsAsset()->BodySetups;
-    for (int i=0;i<BodySetups.Num();i++)
+    Super::CreatePhysXGameObject();
+    for (int i = 0; i < Bodies.Num(); i++)
     {
-        FBodyInstance* NewBody = new FBodyInstance(this);
-        
-        FVector Location = Skeleton.GetRawRefBonePose()[Skeleton.FindBoneIndex(BodySetups[i]->BoneName)].Translation;
-        PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
-        GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(Pos, NewBody, BodySetups[i], RigidBodyType);
-        if (RigidBodyType != ERigidBodyType::STATIC)
-        {
-            Obj->DynamicRigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bApplyGravity);
-        }
+        FReferenceSkeleton CopiedRefSkeleton = SkeletalMeshAsset->GetSkeleton()->GetReferenceSkeleton();
+        physx::PxVec3 BonePos = physx::PxVec3(CopiedRefSkeleton.RawRefBonePose[i].GetTranslation().X, CopiedRefSkeleton.RawRefBonePose[i].GetTranslation().Y, CopiedRefSkeleton.RawRefBonePose[i].GetTranslation().Z);
+        GameObject* obj = GEngine->PhysicsManager->CreateGameObject(BonePos, Bodies[i], SkeletalMeshAsset->GetPhysicsAsset()->BodySetups);
+        Bodies[i]->SetGameObject(obj);
     }
 
-    for (int i=0;i<Constraints.Num();i++)
+    for(int i=0; i < Constraints.Num(); i++)
     {
-        FConstraintInstance* NewConstraint = new FConstraintInstance();
+        FConstraintInstance* NewConstraint = Constraints[i];
+        FBodyInstance* BodyInstance1 = nullptr;
+        FBodyInstance* BodyInstance2 = nullptr;
 
-        
+        for(int j = 0; j < Bodies.Num(); j++)
+        {
+            if (NewConstraint->ConstraintBone1 == Bodies[j]->BodyInstanceName.ToString())
+            {
+                BodyInstance1 = Bodies[j];
+            }
+            if (NewConstraint->ConstraintBone2 == Bodies[j]->BodyInstanceName.ToString())
+            {
+                BodyInstance2 = Bodies[j];
+            }
+        }
+
+        PxTransform GlobalPose1 = BodyInstance1->BIGameObject->RigidBody->getGlobalPose();
+        PxTransform GlobalPose2 = BodyInstance2->BIGameObject->RigidBody->getGlobalPose();
+        PxTransform LocalFrameParent = GlobalPose2.getInverse() * GlobalPose1;
+        PxTransform LocalFrameChild = PxTransform(PxVec3(0));
+
+        // PhysX D6 Joint 생성
+        physx::PxD6Joint* Joint = physx::PxD6JointCreate(*GEngine->PhysicsManager->GetPhysics(), BodyInstance1->BIGameObject->RigidBody, LocalFrameParent, BodyInstance2->BIGameObject->RigidBody, LocalFrameChild);
+
+        if (Joint)
+        {
+            // 각도 제한 설정
+            Joint->setMotion(physx::PxD6Axis::eTWIST, physx::PxD6Motion::eLIMITED);
+            Joint->setMotion(physx::PxD6Axis::eSWING1, physx::PxD6Motion::eLIMITED);
+            Joint->setMotion(physx::PxD6Axis::eSWING2, physx::PxD6Motion::eLIMITED);
+            Joint->setTwistLimit(physx::PxJointAngularLimitPair(-physx::PxPi / 4, physx::PxPi / 4));
+            Joint->setSwingLimit(physx::PxJointLimitCone(physx::PxPi / 6, physx::PxPi / 6));
+        }
+
+        NewConstraint->ConstraintData = Joint;
+    }
+}
+
+void USkeletalMeshComponent::AddBodyInstance(FBodyInstance* BodyInstance)
+{
+    Bodies.Add(BodyInstance);
+}
+
+void USkeletalMeshComponent::AddConstraintInstance(FConstraintInstance* ConstraintInstance)
+{
+    Constraints.Add(ConstraintInstance);
+}
+
+void USkeletalMeshComponent::RemoveBodyInstance(FBodyInstance* BodyInstance)
+{
+    if (BodyInstance)
+    {
+        Bodies.Remove(BodyInstance);
+    }
+}
+
+void USkeletalMeshComponent::RemoveConstraintInstance(FConstraintInstance* ConstraintInstance)
+{
+    if (ConstraintInstance)
+    {
+        Constraints.Remove(ConstraintInstance);
     }
 }
 

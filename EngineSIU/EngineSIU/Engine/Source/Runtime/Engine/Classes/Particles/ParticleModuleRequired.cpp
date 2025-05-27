@@ -6,7 +6,7 @@ UParticleModuleRequired::UParticleModuleRequired()
 {
     // 기본 재질 없음 (필수로 설정되어야 함)
     TSet<FName> MaterialKeys;
-    UAssetManager::Get().GetMaterialKeys(MaterialKeys);
+    UAssetManager::Get().GetAssetKeys(EAssetType::Material, MaterialKeys);
     MaterialInterface = UAssetManager::Get().GetMaterial(*MaterialKeys.begin());
 
     // 모듈 타입은 Required로 고정

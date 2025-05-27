@@ -116,6 +116,7 @@ public:
     virtual void CreatePhysXGameObject();
 
     virtual void BeginPlay() override;
+    
 protected:
     TArray<FOverlapInfo> OverlappingComponents;
 
