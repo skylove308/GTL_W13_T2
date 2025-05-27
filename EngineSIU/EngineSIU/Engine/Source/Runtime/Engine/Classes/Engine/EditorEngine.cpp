@@ -7,9 +7,7 @@
 #include "Animation/SkeletalMeshActor.h"
 #include "GameFramework/Actor.h"
 #include "Classes/Engine/AssetManager.h"
-#include "Contents/Actors/SkeletalMeshActorTest.h"
 #include "UObject/UObjectIterator.h"
-#include "Animation/SkeletalMeshActor.h"
 #include "Actors/DirectionalLightActor.h"
 #include "Components/Light/DirectionalLightComponent.h"
 #include "LevelEditor/SLevelEditor.h"
@@ -217,8 +215,9 @@ void UEditorEngine::StartPIE()
         UE_LOG(ELogLevel::Warning, TEXT("PIEWorld already exists!"));
         return;
     }
-    this->ClearActorSelection(); // Editor World 기준 Select Actor 해제
-    this->ClearComponentSelection();
+    
+    ClearActorSelection(); // Editor World 기준 Select Actor 해제
+    ClearComponentSelection();
     
     FSlateAppMessageHandler* Handler = GEngineLoop.GetAppMessageHandler();
 

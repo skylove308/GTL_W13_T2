@@ -5,6 +5,7 @@
 #include "PhysicsManager.h"
 #include "SphereComp.h"
 #include "SphereComponent.h"
+#include "Engine/Engine.h"
 #include "UObject/Casts.h"
 #include "Engine/OverlapInfo.h"
 #include "Engine/OverlapResult.h"

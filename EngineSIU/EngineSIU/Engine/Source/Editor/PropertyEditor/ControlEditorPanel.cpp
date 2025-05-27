@@ -34,15 +34,8 @@
 #include "Actors/CubeActor.h"
 #include "Actors/SphereActor.h"
 #include "Actors/CapsuleActor.h"
-#include "Animation/SkeletalMeshActor.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/PlayerController.h"
-#include "Contents/Actors/Fish.h"
-#include "Contents/Actors/ItemActor.h"
-#include "Contents/Actors/PlatformActor.h"
-#include "Contents/Actors/GoalPlatformActor.h"
-#include "Contents/Actors/SkeletalMeshActorTest.h"
-#include "Contents/Actors/TriggerBox.h"
 #include "Renderer/CompositingPass.h"
 #include <Engine/FbxLoader.h>
 #include "Engine/Classes/Engine/AssetManager.h"
@@ -377,11 +370,6 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
             {.Label = "BoxCol", .OBJ = OBJ_BOX_COLLISION},
             {.Label = "SphereCol", .OBJ = OBJ_SPHERE_COLLISION},
             {.Label = "CapsuleCol", .OBJ = OBJ_CAPSULE_COLLISION},
-            {.Label = "Fish", .OBJ = OBJ_FISH},
-            {.Label = "Platform", .OBJ = OBJ_PLATFORM},
-            {.Label = "GoalPlatform", .OBJ = OBJ_GOALPLATFORM},
-            {.Label = "Coin", .OBJ = OBJ_COIN},
-            {.Label = "TriggerBox", .OBJ = OBJ_TRIGGERBOX},
             {.Label = "SkeletalMeshActor", .OBJ = OBJ_SKELETALMESH},
             {.Label = "SequencerPlayer", .OBJ = OBJ_SEQUENCERPLAYER},
         };
@@ -501,26 +489,6 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                     SpawnedActor->SetActorTickInEditor(true); // TODO: 콜리전 테스트 용도
                     break;
                 }
-                case OBJ_FISH:
-                    SpawnedActor = World->SpawnActor<AFish>();
-                    SpawnedActor->SetActorLabel(TEXT("OBJ_FISH"));
-                    break;
-                case OBJ_PLATFORM:
-                    SpawnedActor = World->SpawnActor<APlatformActor>();
-                    SpawnedActor->SetActorLabel(TEXT("OBJ_PLATFORM"));
-                    break;
-                case OBJ_GOALPLATFORM:
-                    SpawnedActor = World->SpawnActor<AGoalPlatformActor>();
-                    SpawnedActor->SetActorLabel(TEXT("OBJ_GoalPLATFORM"));
-                    break;
-                case OBJ_COIN:
-                    SpawnedActor = World->SpawnActor<AItemActor>();
-                    SpawnedActor->SetActorLabel(TEXT("OBJ_COIN"));
-                    break;
-                case OBJ_TRIGGERBOX:
-                    SpawnedActor = World->SpawnActor<ATriggerBox>();
-                    SpawnedActor->SetActorLabel(TEXT("OBJ_TRIGGERBOX"));
-                    break;
                 case OBJ_SKELETALMESH:
                     {
                         SpawnedActor = World->SpawnActor<AActor>();

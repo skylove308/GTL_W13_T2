@@ -4,8 +4,6 @@
 #include "SoundManager.h"
 #include "InputCore/InputCoreTypes.h"
 #include "Camera/CameraComponent.h"
-#include "Contents/Actors/Fish.h"
-#include "Contents/Actors/ItemActor.h"
 #include "Engine/Engine.h"
 #include "Engine/World/World.h"
 
@@ -83,21 +81,7 @@ void AGameMode::StartMatch()
     bGameEnded = false;
     GameInfo.ElapsedGameTime = 0.0f;
     GameInfo.TotalGameTime = 0.0f;
-
-    for (const auto& Coin : TObjectRange<AItemActor>())
-    {
-        if (Coin->GetWorld()->WorldType == GEngine->ActiveWorld->WorldType)
-        {
-            Coin->SetHidden(false);
-        }
-    }
-
-    AFish* Fish = Cast<AFish>(GEngine->ActiveWorld->GetMainPlayer());
-    Fish->Reset();
-    // GEngine->ActiveWorld->GetMainPlayer()->SetActorLocation(FVector(0, 0, 10));
-    GEngine->ActiveWorld->GetPlayerController()->Possess(GEngine->ActiveWorld->GetMainPlayer());
     
-    FSoundManager::GetInstance().PlaySound("fishdream");
     OnGameStart.Broadcast();
 }
 
@@ -115,20 +99,14 @@ void AGameMode::EndMatch(bool bIsWin)
 {
     // 이미 종료된 상태라면 무시
     if (!bGameRunning || bGameEnded)
+    {
         return;
+    }
 
     this->Reset();
     
-
     GameInfo.TotalGameTime = GameInfo.ElapsedGameTime;
-
-    AFish* Fish = Cast<AFish>(GEngine->ActiveWorld->GetMainPlayer());
-    Fish->SetVelocity(FVector(0.0f, 0.0f, 0.0f));
-    GEngine->ActiveWorld->GetPlayerController()->UnPossess();
-
     
-    FSoundManager::GetInstance().StopAllSounds();
-    // 게임 종료 이벤트 브로드캐스트
     OnGameEnd.Broadcast(bIsWin);
 }
 

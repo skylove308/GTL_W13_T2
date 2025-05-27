@@ -8,6 +8,8 @@
 #include "Serialization/Archive.h"
 
 
+struct FArrayHelper;
+
 template <typename T, typename AllocatorType = FDefaultAllocator<T>>
 class TArray
 {
@@ -227,7 +229,7 @@ public:
 
     ElementType Pop();
 
-    void SerializePtrAsset(FArchive& Ar);
+    friend FArrayHelper;
 };
 
 
@@ -681,23 +683,6 @@ typename TArray<T, AllocatorType>::ElementType TArray<T, AllocatorType>::Pop()
     ElementType Element = ContainerPrivate.back();
     ContainerPrivate.pop_back();
     return Element;
-}
-
-template <typename T, typename AllocatorType>
-void TArray<T, AllocatorType>::SerializePtrAsset(FArchive& Ar)
-{
-    uint32 ArraySize = static_cast<uint32>(Num());
-    Ar << ArraySize;
-
-    if (Ar.IsLoading())
-    {
-        SetNum(ArraySize);
-    }
-
-    for (SizeType Index = 0; Index < ArraySize; ++Index)
-    {
-        ContainerPrivate[Index]->SerializeAsset(Ar);
-    }
 }
 
 template <typename ElementType, typename AllocatorType>

@@ -10,7 +10,7 @@
 #include "UObject/ObjectMacros.h"
 
 class USkeletalMesh;
-struct FConstraintInstance;
+struct FConstraintSetup;
 
 enum class EGeomType : uint8
 {
@@ -25,17 +25,6 @@ struct FKAggregateGeom
     TArray<physx::PxShape*> SphereElems;
     TArray<physx::PxShape*> BoxElems;
     TArray<physx::PxShape*> CapsuleElems;
-
-    friend FArchive& operator<<(FArchive& Ar, FKAggregateGeom& AggGeom);
-
-private:
-    void SerializeShapeArray(EGeomType Type, FArchive& Ar, TArray<physx::PxShape*>& ShapeArray);
-
-    void SerializeShape(EGeomType Type, FArchive& Ar, physx::PxShape* Shape);
-
-    void SerializeSphere(FArchive& Ar, physx::PxShape* Shape);
-    void SerializeBox(FArchive& Ar, physx::PxShape* Shape);
-    void SerializeCapsule(FArchive& Ar, physx::PxShape* Shape);
 };
 
 enum class ERigidBodyType {
@@ -53,6 +42,8 @@ struct AggregateGeomAttributes
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Offset)
     UPROPERTY_WITH_FLAGS(EditAnywhere, FRotator, Rotation)
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Extent, = FVector(1,1,1))
+
+    friend FArchive& operator<<(FArchive& Ar, AggregateGeomAttributes& Attributes);
 };
 
 class UBodySetupCore : public UObject
@@ -77,6 +68,7 @@ public:
 
     // DisplayName = Primitives
     FKAggregateGeom AggGeom;
+    
     TArray<AggregateGeomAttributes> GeomAttributes;
 
     virtual void SerializeAsset(FArchive& Ar) override;
@@ -101,7 +93,7 @@ public:
      * FConstraintInstance의 멤버 변수와 겹치기 때문에 사실상 같은 정보로 판단하여
      * FConstraintInstance를 사용.
      */
-    TArray<FConstraintInstance*> ConstraintInstances;
+    TArray<FConstraintSetup*> ConstraintSetups;
 
     virtual bool SetPreviewMesh(USkeletalMesh* PreviewMesh);
     virtual USkeletalMesh* GetPreviewMesh() const;

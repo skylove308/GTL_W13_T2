@@ -167,11 +167,11 @@ void PhysicsAssetViewerPanel::Render()
    
     if (RefSkeletalMeshComponent)
     {
-        TArray<FConstraintInstance*> Constraints = RefSkeletalMeshComponent->GetSkeletalMeshAsset()->GetPhysicsAsset()->ConstraintInstances;
-        for (int32 i = 0; i < Constraints.Num(); ++i)
+        UPhysicsAsset* PhysicsAsset = RefSkeletalMeshComponent->GetSkeletalMeshAsset()->GetPhysicsAsset();
+        for (int32 i = 0; i < PhysicsAsset->ConstraintSetups.Num(); ++i)
         {
-            ImGui::Text("%s ", *Constraints[i]->JointName);
-            ImGui::SameLine();
+            FConstraintSetup* Constraint = PhysicsAsset->ConstraintSetups[i];
+            ImGui::Text("%d: %s", i, *Constraint->JointName);
             if (ImGui::SmallButton(("Remove##" + FString::FromInt(i)).operator*()))
             {
                 RemoveConstraint(i);
@@ -258,7 +258,7 @@ void PhysicsAssetViewerPanel::RemoveBody(const FName& BoneName)
 void PhysicsAssetViewerPanel::AddConstraint(const UBodySetup* Body1, const UBodySetup* Body2)
 {
     UPhysicsAsset* PhysicsAsset = RefSkeletalMeshComponent->GetSkeletalMeshAsset()->GetPhysicsAsset();
-    FConstraintInstance* NewConstraint = new FConstraintInstance();
+    FConstraintSetup* NewConstraint = new FConstraintSetup();
  
     NewConstraint->JointName = GetCleanBoneName(Body1->BoneName.ToString()) + ":" + GetCleanBoneName(Body2->BoneName.ToString());
     NewConstraint->ConstraintBone1 = Body1->BoneName.ToString();
@@ -266,7 +266,7 @@ void PhysicsAssetViewerPanel::AddConstraint(const UBodySetup* Body1, const UBody
 
     if (PhysicsAsset)
     {
-        PhysicsAsset->ConstraintInstances.Add(NewConstraint);
+        PhysicsAsset->ConstraintSetups.Add(NewConstraint);
     }
 }
 
