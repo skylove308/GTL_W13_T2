@@ -34,8 +34,9 @@ void PhysicsAssetViewerPanel::Render()
     float PanelWidth = (Width) * 0.2f - 5.0f;
     float PanelHeight = (Height) * 0.9f;
 
+    const float HeaderHeight = 65.0f;
     float PanelPosX = 5.0f;
-    float PanelPosY = 5.0f;
+    float PanelPosY = 5.0f + HeaderHeight;
 
     ImVec2 MinSize(140, 100);
     ImVec2 MaxSize(FLT_MAX, 1000);
@@ -80,6 +81,55 @@ void PhysicsAssetViewerPanel::Render()
                 RenderBoneTree(*CopiedRefSkeleton, i, Engine /*, SearchFilter */);
             }
         }
+        ImGui::End();
+
+        // (2) Details 창 추가
+        float DetailWidth = Width * 0.20f;           // 전체 너비의 20% 정도
+        float DetailPosX = Width - DetailWidth - 5; // 오른쪽 끝에서 5px 띄우고
+        ImGui::SetNextWindowPos(ImVec2(DetailPosX, PanelPosY), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(DetailWidth, PanelHeight), ImGuiCond_Always);
+        ImGui::Begin("Details", nullptr, PanelFlags);
+
+        if (SelectedBoneIndex != INDEX_NONE && CopiedRefSkeleton)
+        {
+            // 1) 본 이름
+            const FString& FullName =
+                CopiedRefSkeleton->RawRefBoneInfo[SelectedBoneIndex].Name.ToString();
+            std::string BoneNameAnsi(GetData(*FullName));
+            static char NameBuf[128];
+            std::strncpy(NameBuf, BoneNameAnsi.c_str(), sizeof(NameBuf));
+            ImGui::InputText("Bone Name", NameBuf, IM_ARRAYSIZE(NameBuf));
+
+            ImGui::Separator();
+
+            // 2) 본의 로컬 트랜스폼 (Reference Pose)
+            const FTransform& T =
+                CopiedRefSkeleton->RawRefBonePose[SelectedBoneIndex];
+
+            // 위치
+            float pos[3] = { T.GetTranslation().X,
+                             T.GetTranslation().Y,
+                             T.GetTranslation().Z };
+            ImGui::InputFloat3("Location", pos);
+
+            // 회전 (Euler)
+            FRotator rotEuler = T.GetRotation().Rotator();
+            float rot[3] = { rotEuler.Pitch,
+                             rotEuler.Yaw,
+                             rotEuler.Roll };
+            ImGui::InputFloat3("Rotation", rot);
+
+            // 스케일
+            float scl[3] = { T.GetScale3D().X,
+                             T.GetScale3D().Y,
+                             T.GetScale3D().Z };
+            ImGui::InputFloat3("Scale", scl);
+        }
+        else
+        {
+            ImGui::TextWrapped("Select a bone in the hierarchy\nto view its details.");
+        }
+
         ImGui::End();
     }
 
@@ -302,6 +352,12 @@ void PhysicsAssetViewerPanel::RenderBoneTree(const FReferenceSkeleton& RefSkelet
     // 이름 부분만 클릭 가능하도록 하려면 ImGui::Selectable을 함께 사용하거나 커스텀 로직 필요
     // 여기서는 TreeNodeEx 자체의 클릭 이벤트를 사용
     bool bNodeOpen = ImGui::TreeNodeEx(*ShortBoneName, NodeFlags);
+
+    // 여기가 클릭 가능한 텍스트(아이템)이니까, 클릭 시 SelectedBoneIndex 세팅
+    if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
+    {
+        SelectedBoneIndex = BoneIndex;
+    }
 
     if (ImGui::BeginPopupContextItem("BonePopup"))
     {

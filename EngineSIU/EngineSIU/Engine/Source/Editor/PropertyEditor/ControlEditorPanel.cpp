@@ -50,7 +50,7 @@
 
 ControlEditorPanel::ControlEditorPanel()
 {
-    SetSupportedWorldTypes(EWorldTypeBitFlag::Editor | EWorldTypeBitFlag::PIE | EWorldTypeBitFlag::SkeletalViewer);
+    SetSupportedWorldTypes(EWorldTypeBitFlag::Editor | EWorldTypeBitFlag::PIE | EWorldTypeBitFlag::SkeletalViewer | EWorldTypeBitFlag::PhysicsAssetViewer);
 }
 
 void ControlEditorPanel::Render()
