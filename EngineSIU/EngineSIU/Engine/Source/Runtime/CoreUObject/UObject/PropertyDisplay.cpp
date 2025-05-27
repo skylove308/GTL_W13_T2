@@ -923,6 +923,15 @@ void FUnresolvedPtrProperty::DisplayInImGui(UObject* Object) const
     ResolvedProperty->DisplayInImGui(Object);
 }
 
+void FUnresolvedPtrProperty::DisplayRawDataInImGui(const char* PropertyLabel, void* DataPtr, UObject* OwnerObject) const
+{
+    if (Type == EPropertyType::Unknown)
+    {
+        return;
+    }
+    ResolvedProperty->DisplayRawDataInImGui(PropertyLabel, DataPtr, OwnerObject);
+}
+
 void UMaterialProperty::DisplayInImGui(UObject* Object) const
 {
     ImGui::BeginDisabled(HasAnyFlags(Flags, EPropertyFlags::VisibleAnywhere));
@@ -934,8 +943,6 @@ void UMaterialProperty::DisplayInImGui(UObject* Object) const
 
 void UMaterialProperty::DisplayRawDataInImGui_Implement(const char* PropertyLabel, void* DataPtr, UObject* OwnerObject) const
 {
-    // FProperty::DisplayRawDataInImGui(PropertyLabel, DataPtr, OwnerObject);
-
     UObject** Object = static_cast<UObject**>(DataPtr);
     const UMaterial* CurrentMaterial = Cast<UMaterial>(*Object);
 

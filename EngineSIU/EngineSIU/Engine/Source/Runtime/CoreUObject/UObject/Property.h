@@ -1255,6 +1255,7 @@ struct FUnresolvedPtrProperty : public FProperty
     FUnresolvedPtrProperty& operator=(FUnresolvedPtrProperty&&) = delete;
 
     virtual void DisplayInImGui(UObject* Object) const override;
+    virtual void DisplayRawDataInImGui(const char* PropertyLabel, void* DataPtr, UObject* OwnerObject) const override;
     virtual void Resolve() override;
 };
 
