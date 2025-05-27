@@ -408,7 +408,7 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
         for (const auto& GeomAttribute : BodySetups[i]->GeomAttributes)
         {
             PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
-            PxVec3 Rotation = PxVec3(GeomAttribute.Rotation.Roll, GeomAttribute.Rotation.Pitch, GeomAttribute.Rotation.Yaw);
+            PxVec3 Rotation = PxVec3(GeomAttribute.Rotation.Pitch, GeomAttribute.Rotation.Yaw, GeomAttribute.Rotation.Roll);
             PxVec3 Extent = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
 
             switch (GeomAttribute.GeomType)
