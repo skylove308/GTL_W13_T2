@@ -26,8 +26,10 @@ struct AggregateGeomAttributes
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, EGeomType, GeomType)
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Offset)
-    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Rotation)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FRotator, Rotation)
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Extent)
+
+    friend FArchive& operator<<(FArchive& Ar, AggregateGeomAttributes& Attributes);
 };
 
 struct FKAggregateGeom
@@ -35,17 +37,6 @@ struct FKAggregateGeom
     TArray<physx::PxShape*> SphereElems;
     TArray<physx::PxShape*> BoxElems;
     TArray<physx::PxShape*> CapsuleElems;
-
-    friend FArchive& operator<<(FArchive& Ar, FKAggregateGeom& AggGeom);
-
-private:
-    void SerializeShapeArray(EGeomType Type, FArchive& Ar, TArray<physx::PxShape*>& ShapeArray);
-
-    void SerializeShape(EGeomType Type, FArchive& Ar, physx::PxShape* Shape);
-
-    void SerializeSphere(FArchive& Ar, physx::PxShape* Shape);
-    void SerializeBox(FArchive& Ar, physx::PxShape* Shape);
-    void SerializeCapsule(FArchive& Ar, physx::PxShape* Shape);
 };
 
 class UBodySetupCore : public UObject
@@ -70,6 +61,7 @@ public:
 
     // DisplayName = Primitives
     FKAggregateGeom AggGeom;
+    
     TArray<AggregateGeomAttributes> GeomAttributes;
 
     virtual void SerializeAsset(FArchive& Ar) override;
