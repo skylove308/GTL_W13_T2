@@ -54,7 +54,8 @@ public:
     void SetCurrentScene(PxScene* Scene) { CurrentScene = Scene; }
     
     GameObject CreateBox(const PxVec3& Pos, const PxVec3& HalfExtents) const;
-    GameObject* CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, const TArray<UBodySetup*>& BodySetups, ERigidBodyType RigidBodyType  = ERigidBodyType::DYNAMIC) const;
+    GameObject* CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetup, ERigidBodyType RigidBodyType =
+                                     ERigidBodyType::DYNAMIC) const;
 
     PxShape* CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
     PxShape* CreateSphereShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
@@ -77,7 +78,7 @@ private:
     PxPvd* Pvd;
     PxPvdTransport* Transport;
 
-    PxRigidDynamic* CreateDynamicRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const;
-    PxRigidStatic* CreateStaticRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const;
+    PxRigidDynamic* CreateDynamicRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetups) const;
+    PxRigidStatic* CreateStaticRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetups) const;
 };
 

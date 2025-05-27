@@ -16,6 +16,7 @@
 #include "UObject/Casts.h"
 #include "UObject/ObjectFactory.h"
 #include "Engine/Engine.h"
+#include "PhysicsEngine/ConstraintInstance.h"
 
 bool USkeletalMeshComponent::bIsCPUSkinning = false;
 
@@ -376,14 +377,29 @@ void USkeletalMeshComponent::InitAnim()
     }
 }
 
-void USkeletalMeshComponent::CreatePhysXGameObject()
+void USkeletalMeshComponent::CreatePhysXGameObject() // TODO: 민석님꺼랑 합치고 PhysicAsset 등 필요한 거 복사하고 사용하게 변경
 {
-    BodyInstance = new FBodyInstance(this);
-    
-    FVector Location = GetComponentLocation();
-    PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
-    
-    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance, SkeletalMeshAsset->GetPhysicsAsset()->BodySetups, RigidBodyType);
+    const auto& Skeleton = SkeletalMeshAsset->GetSkeleton()->GetReferenceSkeleton();
+    TArray<UBodySetup*> BodySetups = SkeletalMeshAsset->GetPhysicsAsset()->BodySetups;
+    for (int i=0;i<BodySetups.Num();i++)
+    {
+        FBodyInstance* NewBody = new FBodyInstance(this);
+        
+        FVector Location = Skeleton.GetRawRefBonePose()[Skeleton.FindBoneIndex(BodySetups[i]->BoneName)].Translation;
+        PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
+        GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(Pos, NewBody, BodySetups[i], RigidBodyType);
+        if (RigidBodyType != ERigidBodyType::STATIC)
+        {
+            Obj->DynamicRigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bApplyGravity);
+        }
+    }
+
+    for (int i=0;i<Constraints.Num();i++)
+    {
+        FConstraintInstance* NewConstraint = new FConstraintInstance();
+
+        
+    }
 }
 
 bool USkeletalMeshComponent::NeedToSpawnAnimScriptInstance() const

@@ -46,7 +46,6 @@ class UBodySetupCore : public UObject
 public:
     UBodySetupCore() = default;
 
-private:
     FName BoneName;
 };
 

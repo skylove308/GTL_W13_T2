@@ -496,9 +496,6 @@ void UPrimitiveComponent::CreatePhysXGameObject()
     FVector Location = GetComponentLocation();
     PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
 
-    TArray<UBodySetup*> BodySetups;
-    BodySetups.Add(BodySetup);
-
     if (GeomAttributes.Num() == 0)
     {
         AggregateGeomAttributes DefaultAttribute;
@@ -537,12 +534,11 @@ void UPrimitiveComponent::CreatePhysXGameObject()
         }
     }
     
-    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance,  BodySetups, RigidBodyType);
+    GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance,  BodySetup, RigidBodyType);
     if (RigidBodyType != ERigidBodyType::STATIC)
     {
-        obj->DynamicRigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bApplyGravity);
+        Obj->DynamicRigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bApplyGravity);
     }
-    BodyInstance->BIGameObject = obj;
 }
 
 void UPrimitiveComponent::BeginPlay()

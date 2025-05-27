@@ -11,7 +11,7 @@ void GameObject::SetRigidBodyType(ERigidBodyType RigidBodyType) const
     {
     case ERigidBodyType::STATIC:
     {
-        // 재생성해야 함
+        // TODO: 재생성해야 함, BodySetup은 어디서 받아오지?
         break;
     }
         case ERigidBodyType::DYNAMIC:
@@ -136,7 +136,7 @@ GameObject FPhysicsManager::CreateBox(const PxVec3& Pos, const PxVec3& HalfExten
     return obj;
 }
 
-GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, const TArray<UBodySetup*>& BodySetups,ERigidBodyType RigidBodyType) const
+GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetup,ERigidBodyType RigidBodyType) const
 {
     GameObject* Obj = new GameObject();
     
@@ -145,46 +145,45 @@ GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* 
     {
     case ERigidBodyType::STATIC:
     {
-        Obj->StaticRigidBody = CreateStaticRigidBody(Pos, BodyInstance, BodySetups);
+        Obj->StaticRigidBody = CreateStaticRigidBody(Pos, BodyInstance, BodySetup);
         break;
     }
     case ERigidBodyType::DYNAMIC:
     {
-        Obj->DynamicRigidBody = CreateDynamicRigidBody(Pos, BodyInstance, BodySetups);
+        Obj->DynamicRigidBody = CreateDynamicRigidBody(Pos, BodyInstance, BodySetup);
         break;
     }
     case ERigidBodyType::KINEMATIC:
     {
-        Obj->DynamicRigidBody = CreateDynamicRigidBody(Pos, BodyInstance, BodySetups);
+        Obj->DynamicRigidBody = CreateDynamicRigidBody(Pos, BodyInstance, BodySetup);
         Obj->DynamicRigidBody->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
         break;
     }
     }
+
+    BodyInstance->BIGameObject = Obj;
     
     return Obj;
 }
 
-PxRigidDynamic* FPhysicsManager::CreateDynamicRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const
+PxRigidDynamic* FPhysicsManager::CreateDynamicRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetup) const
 {
     const PxTransform Pose(Pos);
     PxRigidDynamic* DynamicRigidBody = Physics->createRigidDynamic(Pose);
-
-    for (const auto& BodySetup : BodySetups)
+    
+    for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
     {
-        for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
-        {
-            DynamicRigidBody->attachShape(*Sphere);
-        }
+        DynamicRigidBody->attachShape(*Sphere);
+    }
 
-        for (const auto& Box : BodySetup->AggGeom.BoxElems)
-        {
-            DynamicRigidBody->attachShape(*Box);
-        }
+    for (const auto& Box : BodySetup->AggGeom.BoxElems)
+    {
+        DynamicRigidBody->attachShape(*Box);
+    }
 
-        for (const auto& Capsule : BodySetup->AggGeom.CapsuleElems)
-        {
-            DynamicRigidBody->attachShape(*Capsule);
-        }
+    for (const auto& Capsule : BodySetup->AggGeom.CapsuleElems)
+    {
+        DynamicRigidBody->attachShape(*Capsule);
     }
 
     PxRigidBodyExt::updateMassAndInertia(*DynamicRigidBody, 10.0f);
@@ -194,27 +193,24 @@ PxRigidDynamic* FPhysicsManager::CreateDynamicRigidBody(const PxVec3& Pos, FBody
     return DynamicRigidBody;
 }
 
-PxRigidStatic* FPhysicsManager::CreateStaticRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const
+PxRigidStatic* FPhysicsManager::CreateStaticRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetup) const
 {
     const PxTransform Pose(Pos);
     PxRigidStatic* StaticRigidBody = Physics->createRigidStatic(Pose);
     
-    for (const auto& BodySetup : BodySetups)
+    for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
     {
-        for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
-        {
-            StaticRigidBody->attachShape(*Sphere);
-        }
+        StaticRigidBody->attachShape(*Sphere);
+    }
 
-        for (const auto& Box : BodySetup->AggGeom.BoxElems)
-        {
-            StaticRigidBody->attachShape(*Box);
-        }
+    for (const auto& Box : BodySetup->AggGeom.BoxElems)
+    {
+        StaticRigidBody->attachShape(*Box);
+    }
 
-        for (const auto& Capsule : BodySetup->AggGeom.CapsuleElems)
-        {
-            StaticRigidBody->attachShape(*Capsule);
-        }
+    for (const auto& Capsule : BodySetup->AggGeom.CapsuleElems)
+    {
+        StaticRigidBody->attachShape(*Capsule);
     }
 
     CurrentScene->addActor(*StaticRigidBody); // 여기에 넣을지 CreateGameObject에 넣을지 고민해보기
