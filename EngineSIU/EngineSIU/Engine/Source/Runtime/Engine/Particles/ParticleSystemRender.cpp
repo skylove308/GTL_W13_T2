@@ -74,19 +74,19 @@ void FDynamicSpriteEmitterReplayDataBase::Serialize(FArchive& Ar)
 
 void FDynamicSpriteEmitterDataBase::SortSpriteParticles(int32 SortMode, bool bLocalSpace, int32 ParticleCount, const uint8* ParticleData, int32 ParticleStride, const uint16* ParticleIndices, const FMatrix& LocalToWorld) const
 {
-    if (SortMode == PSORTMODE_ViewProjDepth)
+    if (SortMode == static_cast<int32>(EParticleSortMode::PSORTMODE_ViewProjDepth))
 	{
 
 	}
-	else if (SortMode == PSORTMODE_DistanceToView)
+	else if (SortMode == static_cast<int32>(EParticleSortMode::PSORTMODE_DistanceToView))
 	{
 
 	}
-	else if (SortMode == PSORTMODE_Age_OldestFirst)
+	else if (SortMode == static_cast<int32>(EParticleSortMode::PSORTMODE_Age_OldestFirst))
 	{
 
 	}
-	else if (SortMode == PSORTMODE_Age_NewestFirst)
+	else if (SortMode == static_cast<int32>(EParticleSortMode::PSORTMODE_Age_NewestFirst))
 	{
 
 	}
@@ -97,7 +97,9 @@ FVector2D GetParticleSize(const FBaseParticle& Particle, const FDynamicSpriteEmi
     FVector2D Size;
     Size.X = FMath::Abs(Particle.Size.X * Source.Scale.X);
     Size.Y = FMath::Abs(Particle.Size.Y * Source.Scale.Y);
-    if (Source.ScreenAlignment == PSA_Square || Source.ScreenAlignment == PSA_FacingCameraPosition || Source.ScreenAlignment == PSA_FacingCameraDistanceBlend)
+    if (Source.ScreenAlignment == static_cast<uint8>(EParticleScreenAlignment::PSA_Square) ||
+        Source.ScreenAlignment == static_cast<uint8>(EParticleScreenAlignment::PSA_FacingCameraPosition) ||
+        Source.ScreenAlignment == static_cast<uint8>(EParticleScreenAlignment::PSA_FacingCameraDistanceBlend))
     {
         Size.Y = Size.X;
     }

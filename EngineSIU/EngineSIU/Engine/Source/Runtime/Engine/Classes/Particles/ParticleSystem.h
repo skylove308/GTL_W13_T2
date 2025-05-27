@@ -16,7 +16,7 @@ public:
 
 class UParticleSystem : public UFXSystemAsset
 {
-    DECLARE_CLASS(UParticleSystem, UObject)
+    DECLARE_CLASS(UParticleSystem, UFXSystemAsset)
 
 public:
     UParticleSystem() = default;
@@ -28,6 +28,8 @@ public:
 
     float GetMacroUVRadius() const { return MacroUVRadius; }
     FVector GetMacroUVPosition() const { return MacroUVPosition; }
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 
 private:
     TArray<UParticleEmitter*> Emitters;

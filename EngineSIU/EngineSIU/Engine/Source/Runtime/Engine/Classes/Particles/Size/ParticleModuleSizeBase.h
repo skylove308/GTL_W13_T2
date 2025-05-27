@@ -10,4 +10,6 @@ public:
     virtual void DisplayProperty() override;
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bUseUniformSize)
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };

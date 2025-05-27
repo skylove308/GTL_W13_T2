@@ -5,6 +5,7 @@
 #include "ParticleModuleRequired.h"
 #include "Color/ParticleModuleColorBase.h"
 #include "Color/ParticleModuleColorOverLife.h"
+#include "Container/ArrayHelper.h"
 #include "Size/ParticleModuleSize.h"
 #include "UObject/ObjectFactory.h"
 #include "Location/ParticleModuleLocation.h"
@@ -80,7 +81,7 @@ int32 UParticleLODLevel::CalculateMaxActiveParticleCount()
 		// We don't care about delay wrt spawning...
 		// MaxDuration = FMath::Max<float>(RequiredModule->EmitterDuration, RequiredModule->EmitterDurationLow); // TODO: 주석 풀기
 		// TotalLoops = RequiredModule->EmitterLoops;
-		TotalDuration = MaxDuration * TotalLoops;
+		TotalDuration = MaxDuration * static_cast<float>(TotalLoops);
 	}
 
 	// Determine the max
@@ -160,4 +161,51 @@ int32 UParticleLODLevel::CalculateMaxActiveParticleCount()
 	PeakActiveParticles = MaxAPC;
 
 	return MaxAPC;
+}
+
+void UParticleLODLevel::SerializeAsset(FArchive& Ar)
+{
+    Ar << Level << bEnabled << PeakActiveParticles;
+
+    /**
+     * Loading인 경우 주의 사항:
+     * 
+     *   UParticleLODLevel 클래스의 생성자에서 기본 모듈 및 일부 모듈들을 미리 생성해두고 있음.
+     *   기본 모듈이 아닌 것들은 언제든지 삭제가 가능하고, 어떤 것들이 삭제되었는지는 현재 시점에서 알 수 없는 문제가 있음.
+     *   
+     *   따라서 Loading일 때는 생성자에서 생성된 모든 모듈을 삭제하고 저장된 정보에 따라 다시 생성해야 함.
+     *   좋은 방법은 생성자에서의 모듈 생성을 막는 것.
+     *
+     *   SerializePtrAsset 함수에서는 Loading일 때 배열에 원소가 있으면 모두 삭제하고 다시 생성하므로,
+     *   현재의 목적과 맞음.
+     */
+    
+    FArrayHelper::SerializePtrAsset(Ar, Modules, this);
+
+    if (Ar.IsLoading())
+    {
+        bool bHasRequiredModule = false;
+        bool bHasSpawnModule = false;
+        
+        for (const UParticleModule* Module : Modules)
+        {
+            if (Module->IsA<UParticleModuleRequired>())
+            {
+                RequiredModule = Cast<UParticleModuleRequired>(Module);
+                bHasRequiredModule = true;
+                continue;
+            }
+            if (Module->IsA<UParticleModuleSpawn>())
+            {
+                SpawnModule = Cast<UParticleModuleSpawn>(Module);
+                bHasSpawnModule = true;
+                continue;
+            }
+
+            if (bHasRequiredModule && bHasSpawnModule)
+            {
+                break;
+            }
+        }
+    }
 }

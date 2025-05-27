@@ -6,6 +6,7 @@
 class UParticleModuleColorBase : public UParticleModule
 {
     DECLARE_CLASS(UParticleModuleColorBase, UParticleModule)
+    
 public:
     UParticleModuleColorBase();
 
@@ -15,8 +16,9 @@ public:
     // Initial Alpha : When particle is spawn
     UPROPERTY_WITH_FLAGS(EditAnywhere, FDistributionFloat, StartAlpha)
 
-public:
     virtual void Spawn(FParticleEmitterInstance* Owner, int32 Offset, float SpawnTime, FBaseParticle* ParticleBase) override;
 
     virtual void DisplayProperty() override;
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };

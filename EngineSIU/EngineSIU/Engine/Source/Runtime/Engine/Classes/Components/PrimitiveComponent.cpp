@@ -492,6 +492,11 @@ const TArray<FOverlapInfo>& UPrimitiveComponent::GetOverlapInfos() const
 
 void UPrimitiveComponent::CreatePhysXGameObject()
 {
+    if (!bSimulate)
+    {
+        return;
+    }
+    
     BodyInstance = new FBodyInstance(this);
     
     FVector Location = GetComponentLocation();

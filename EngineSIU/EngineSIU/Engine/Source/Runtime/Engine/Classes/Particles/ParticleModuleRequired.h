@@ -3,7 +3,7 @@
 #include "ParticleModule.h"
 #include "Components/Material/Material.h"
 
-enum EParticleSortMode : int
+enum class EParticleSortMode : uint8
 {
     PSORTMODE_None,
     PSORTMODE_ViewProjDepth,
@@ -24,8 +24,6 @@ struct FParticleRequiredModule
     uint8 bCutoutTextureIsValid : 1;
     uint8 bUseVelocityForMotionBlur : 1;
 };
-
-struct FParticleRequiredModule;
 
 class UParticleModuleRequired : public UParticleModule
 {
@@ -92,4 +90,6 @@ public:
     ID3D11ShaderResourceView* CachedBoundingGeometrySRV = nullptr;
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bUseVelocityForMotionBlur)
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };

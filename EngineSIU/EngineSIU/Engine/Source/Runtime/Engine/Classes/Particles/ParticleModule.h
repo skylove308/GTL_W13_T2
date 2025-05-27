@@ -36,7 +36,7 @@ public:
     UParticleModule() = default;
     virtual ~UParticleModule() override = default;
 
-    virtual void DisplayProperty() override {};
+    virtual void DisplayProperty() override {}
 
     FName ModuleName;
     
@@ -81,4 +81,6 @@ public:
 
     virtual int32 GetInstancePayloadSize() const;
     void SetInstancePayloadOffset(int32 Size) { InstancePayloadOffset = Size; }
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };

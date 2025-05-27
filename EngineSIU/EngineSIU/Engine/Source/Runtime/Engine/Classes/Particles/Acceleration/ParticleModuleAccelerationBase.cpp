@@ -8,3 +8,10 @@ void UParticleModuleAccelerationBase::DisplayProperty()
         Property->DisplayInImGui(this);
     }
 }
+
+void UParticleModuleAccelerationBase::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    Ar << bInWorldSpace << bApplyOwnerScale;
+}

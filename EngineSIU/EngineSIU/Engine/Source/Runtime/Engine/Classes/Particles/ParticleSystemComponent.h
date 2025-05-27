@@ -48,13 +48,14 @@ public:
     FParticleDynamicData* GetParticleDynamicData() const { return ParticleDynamicData; }
     
     void ReBuildInstancesMemoryLayout();
+    
 public:
     float AccumTickTime;
     
 private:
     TArray<FParticleEmitterInstance*> EmitterInstances;
 
-    UPROPERTY_WITH_FLAGS(EditAnywhere,UParticleSystem*, Template)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, UParticleSystem*, Template)
 
     TArray<FDynamicEmitterDataBase*> EmitterRenderData;
 

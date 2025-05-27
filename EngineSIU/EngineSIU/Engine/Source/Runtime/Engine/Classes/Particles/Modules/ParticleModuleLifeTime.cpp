@@ -39,3 +39,10 @@ void UParticleModuleLifeTime::DisplayProperty()
         ImGui::PopID();
     }
 }
+
+void UParticleModuleLifeTime::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    Ar << LifeSpan;
+}

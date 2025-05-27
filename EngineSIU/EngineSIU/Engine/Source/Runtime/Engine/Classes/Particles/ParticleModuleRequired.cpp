@@ -1,6 +1,8 @@
 #include "ParticleModuleRequired.h"
 
 #include "Engine/AssetManager.h"
+#include "Engine/FObjLoader.h"
+#include "UObject/Casts.h"
 
 UParticleModuleRequired::UParticleModuleRequired()
 {
@@ -121,4 +123,55 @@ void UParticleModuleRequired::SetupCutoutGeometryData(FParticleRequiredModule* O
 void UParticleModuleRequired::SetupMotionBlurFlag(FParticleRequiredModule* OutData) const
 {
     OutData->bUseVelocityForMotionBlur = bUseVelocityForMotionBlur;
+}
+
+void UParticleModuleRequired::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    FName MaterialKey = NAME_None;
+    uint8 SortMode_uint8 = static_cast<uint8>(SortMode);
+    if (Ar.IsSaving() && MaterialInterface)
+    {
+        MaterialKey = UAssetManager::Get().GetAssetKeyByObject(EAssetType::Material, MaterialInterface);
+
+        // 현재는 머티리얼이 두 곳에 저장되어있으므로 다시 검사
+        if (MaterialKey == NAME_None)
+        {
+            TMap<FString, UMaterial*>& MaterialMap = FObjManager::GetMaterials();
+            for (const auto& [Key, Material] : MaterialMap)
+            {
+                if (Material == MaterialInterface)
+                {
+                    MaterialKey = FName(Key);
+                    break;
+                }
+            }
+        }
+    }
+
+    Ar << MaterialKey << SortMode_uint8;
+
+    if (Ar.IsLoading())
+    {
+        SortMode = static_cast<EParticleSortMode>(SortMode_uint8);
+        
+        MaterialInterface = Cast<UMaterial>(UAssetManager::Get().GetAsset(EAssetType::Material, MaterialKey));
+        // 현재는 머티리얼이 두 곳에 저장되어있으므로 다시 검사
+        if (!MaterialInterface)
+        {
+            MaterialInterface = FObjManager::GetMaterial(MaterialKey.ToString());
+        }
+    }
+
+    Ar << RandomImageTime << SubImagesHorizontal << SubImagesVertical << bSubUVRandomMode
+       << bUseMaxDrawCount << MaxDrawCount
+       << EmitterDuration << EmitterDurationLow << bEmitterDurationUseRange << bDurationRecalcEachLoop
+       << Delay << DelayLow << bDelayFirstOnly
+       << bUseLocalSpace << EmitterVelocityScale << InheritVelocityScale
+       << EmitterOrigin
+       << bKillOnDeactivate << bKillOnCompleted
+       << bUseCutoutMask << AlphaThreshold
+       // << CachedBoundingGeometry // not used
+       << bUseVelocityForMotionBlur;
 }

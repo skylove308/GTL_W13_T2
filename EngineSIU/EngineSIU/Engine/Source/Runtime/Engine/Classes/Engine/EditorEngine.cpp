@@ -19,6 +19,7 @@
 #include "Physics/PhysicsManager.h"
 #include "SkeletalMesh.h"
 #include "PhysicsEngine/PhysicsAsset.h"
+#include "Particles/ParticleSystem.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -82,7 +83,12 @@ void UEditorEngine::Tick(float DeltaTime)
                 {
                     for (AActor* Actor : CachedActors)
                     {
-                        if (Actor && Actor->IsActorTickInEditor())
+                        if (!Actor)
+                        {
+                            continue;
+                        }
+                        
+                        if (Actor->IsActorTickInEditor())
                         {
                             Actor->Tick(DeltaTime);
 
@@ -97,8 +103,11 @@ void UEditorEngine::Tick(float DeltaTime)
                             for (auto* Comp : Actor->GetComponents())
                             {
                                 Comp->EndPhysicsTickComponent(DeltaTime);
-
                             }
+                        }
+                        else if (auto PSC = Actor->GetComponentByClass<UParticleSystemComponent>())
+                        {
+                            PSC->TickComponent(DeltaTime);
                         }
                     }
                 }
@@ -311,11 +320,23 @@ void UEditorEngine::StartSkeletalMeshViewer(FName SkeletalMeshName, UAnimationAs
     }
 }
 
-void UEditorEngine::StartParticleViewer(FName ParticleName, UParticleSystem* ParticleSystem)
+void UEditorEngine::StartParticleViewer(FName ParticleSystemAssetName)
 {
-    if (ParticleName == "")
+    // Set Particle System Asset
+    UObject* Object = UAssetManager::Get().GetAsset(EAssetType::ParticleSystem, ParticleSystemAssetName.ToString());
+    UParticleSystem* ParticleSystemAsset = Cast<UParticleSystem>(Object);
+    if (!ParticleSystemAsset)
     {
-        return;
+        ParticleSystemAsset = FObjectFactory::ConstructObject<UParticleSystem>(nullptr);
+        
+        FAssetInfo Info;
+        Info.AssetName = ParticleSystemAsset->GetName();
+        Info.PackagePath = TEXT("Contents/ParticleSystem");
+        Info.AssetType = EAssetType::ParticleSystem;
+        Info.AssetObject = ParticleSystemAsset;
+        UAssetManager::Get().AddAssetInfo(Info);
+
+        UAssetManager::Get().AddAsset(Info.GetFullPath(), ParticleSystemAsset);
     }
 
     ClearActorSelection();
@@ -345,7 +366,7 @@ void UEditorEngine::StartParticleViewer(FName ParticleName, UParticleSystem* Par
     ParticleActor->SetActorTickInEditor(true);
     
     UParticleSystemComponent* ParticleSystemComponent = ParticleActor->AddComponent<UParticleSystemComponent>();
-    ParticleSystemComponent->SetParticleSystem(ParticleSystem);
+    ParticleSystemComponent->SetParticleSystem(ParticleSystemAsset);
     
     ParticleActor->SetRootComponent(ParticleSystemComponent);
     ParticleActor->SetActorLabel(TEXT("OBJ_PARTICLE"));
@@ -356,7 +377,7 @@ void UEditorEngine::StartParticleViewer(FName ParticleName, UParticleSystem* Par
     auto ParticlePanel = std::dynamic_pointer_cast<ParticleViewerPanel>(EditorPanel);
     ParticleViewerPanel* ParticleViewerPanel = ParticlePanel.get();
     ParticleViewerPanel->SetParticleSystemComponent(ParticleSystemComponent);
-    ParticleViewerPanel->SetParticleSystem(ParticleSystem);
+    ParticleViewerPanel->SetParticleSystem(ParticleSystemAsset);
 
     // ParticleActor 강제 설정
     Cast<UEditorEngine>(GEngine)->SelectActor(ParticleActor);
