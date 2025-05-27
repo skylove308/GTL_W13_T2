@@ -7,6 +7,7 @@
 #include "Engine/Engine.h"
 #include "PhysicsManager.h"
 #include "ConstraintInstance.h"
+#include "Container/ArrayHelper.h"
 
 void UBodySetupCore::SerializeAsset(FArchive& Ar)
 {
@@ -63,8 +64,8 @@ void UPhysicsAsset::SerializeAsset(FArchive& Ar)
         }
     }
 
-    BodySetups.SerializePtrAsset(Ar);
-    ConstraintInstances.SerializePtrAsset(Ar);
+    FArrayHelper::SerializePtrAsset(Ar, BodySetups);
+    FArrayHelper::SerializePtrAsset(Ar, ConstraintInstances);
 }
 
 FArchive& operator<<(FArchive& Ar, AggregateGeomAttributes& Attributes)

@@ -20,23 +20,30 @@ enum class EGeomType : uint8
     MAX,
 };
 
-struct AggregateGeomAttributes
-{
-    DECLARE_STRUCT(AggregateGeomAttributes)
-
-    UPROPERTY_WITH_FLAGS(EditAnywhere, EGeomType, GeomType)
-    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Offset)
-    UPROPERTY_WITH_FLAGS(EditAnywhere, FRotator, Rotation)
-    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Extent)
-
-    friend FArchive& operator<<(FArchive& Ar, AggregateGeomAttributes& Attributes);
-};
-
 struct FKAggregateGeom
 {
     TArray<physx::PxShape*> SphereElems;
     TArray<physx::PxShape*> BoxElems;
     TArray<physx::PxShape*> CapsuleElems;
+};
+
+enum class ERigidBodyType {
+    STATIC,
+    DYNAMIC, 
+    KINEMATIC
+};
+
+struct AggregateGeomAttributes
+{
+    DECLARE_STRUCT(AggregateGeomAttributes)
+    AggregateGeomAttributes() = default;
+
+    UPROPERTY_WITH_FLAGS(EditAnywhere, EGeomType, GeomType, = EGeomType::EBox)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Offset)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FRotator, Rotation)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Extent, = FVector(1,1,1))
+
+    friend FArchive& operator<<(FArchive& Ar, AggregateGeomAttributes& Attributes);
 };
 
 class UBodySetupCore : public UObject

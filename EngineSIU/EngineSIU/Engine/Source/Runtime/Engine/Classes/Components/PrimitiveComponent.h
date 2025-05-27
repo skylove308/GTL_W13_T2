@@ -2,6 +2,7 @@
 #include "Components/SceneComponent.h"
 #include "Engine/OverlapInfo.h"
 #include "PhysicsEngine/BodyInstance.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 
 class UBodySetup;
 DECLARE_MULTICAST_DELEGATE_FiveParams(
@@ -50,6 +51,10 @@ public:
     FComponentEndOverlapSignature OnComponentEndOverlap;
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bSimulate, = false)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bApplyGravity, = false)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, ERigidBodyType, RigidBodyType, = ERigidBodyType::DYNAMIC)
+
+    UPROPERTY_WITH_FLAGS(EditAnywhere, TArray<AggregateGeomAttributes>, GeomAttributes)
 
     /** 
      * Begin tracking an overlap interaction with the component specified.
