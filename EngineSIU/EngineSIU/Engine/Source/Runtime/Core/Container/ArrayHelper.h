@@ -7,7 +7,7 @@
 struct FArrayHelper
 {
     template <typename T, typename AllocatorType>
-    static void SerializePtrAsset(FArchive& Ar, TArray<T, AllocatorType>& Array)
+    static void SerializePtrAsset(FArchive& Ar, TArray<T, AllocatorType>& Array, UObject* Outer = nullptr)
     {
         static_assert(std::is_pointer_v<T>, "T must be a pointer type for SerializePtrAsset.");
     
@@ -47,7 +47,7 @@ struct FArrayHelper
             {
                 if constexpr (bIsUObject)
                 {
-                    ActualClassName = PointerToType::StaticClass()->GetFName();
+                    ActualClassName = Array.ContainerPrivate[Index]->GetClass()->GetFName();
                 }
             }
             
@@ -58,7 +58,7 @@ struct FArrayHelper
                 if constexpr (bIsUObject)
                 {
                     UClass* ActualClass = UClass::FindClass(ActualClassName);
-                    Array.ContainerPrivate[Index] = Cast<PointerToType>(FObjectFactory::ConstructObject(ActualClass, nullptr));
+                    Array.ContainerPrivate[Index] = Cast<PointerToType>(FObjectFactory::ConstructObject(ActualClass, Outer));
                 }
                 else
                 {
