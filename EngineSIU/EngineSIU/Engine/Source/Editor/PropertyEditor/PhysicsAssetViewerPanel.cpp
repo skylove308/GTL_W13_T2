@@ -113,14 +113,15 @@ void PhysicsAssetViewerPanel::Render()
     ImGui::PopStyleVar();
 
     ImGui::Separator();
-    ImGui::Text("Current Bodies:");
-
+    ImGui::Text("Current Constraints:");
+   
     if (RefSkeletalMeshComponent)
     {
-        for (int32 i = 0; i < RefSkeletalMeshComponent->GetConstraints().Num(); ++i)
+        TArray<FConstraintInstance*> Constraints = RefSkeletalMeshComponent->GetSkeletalMeshAsset()->GetPhysicsAsset()->ConstraintInstances;
+        for (int32 i = 0; i < Constraints.Num(); ++i)
         {
-            FConstraintInstance* Constraint = RefSkeletalMeshComponent->GetConstraints()[i];
-            ImGui::Text("%d: %s", i, *Constraint->JointName);
+            ImGui::Text("%s ", *Constraints[i]->JointName);
+            ImGui::SameLine();
             if (ImGui::SmallButton(("Remove##" + FString::FromInt(i)).operator*()))
             {
                 RemoveConstraint(i);
@@ -221,6 +222,16 @@ void PhysicsAssetViewerPanel::AddConstraint(const UBodySetup* Body1, const UBody
 
 void PhysicsAssetViewerPanel::RemoveConstraint(int32 ConstraintIndex)
 {
+    UPhysicsAsset* PhysicsAsset = RefSkeletalMeshComponent->GetSkeletalMeshAsset()->GetPhysicsAsset();
+    if (PhysicsAsset && ConstraintIndex >= 0 && ConstraintIndex < PhysicsAsset->ConstraintInstances.Num())
+    {
+        FConstraintInstance* ConstraintToRemove = PhysicsAsset->ConstraintInstances[ConstraintIndex];
+        if (ConstraintToRemove)
+        {
+            delete ConstraintToRemove;
+            PhysicsAsset->ConstraintInstances.RemoveAt(ConstraintIndex);
+        }
+    }
 }
  
 void PhysicsAssetViewerPanel::LoadBoneIcon()
