@@ -113,17 +113,16 @@ void PhysicsAssetViewerPanel::Render()
     ImGui::PopStyleVar();
 
     ImGui::Separator();
-    ImGui::Text("Current Bodies:");
+    ImGui::Text("Current Constraint:");
     if (RefSkeletalMeshComponent)
     {
-        for (int32 i = 0; i < RefSkeletalMeshComponent->GetBodies().Num(); ++i)
+        for (int32 i = 0; i < RefSkeletalMeshComponent->GetConstraints().Num(); ++i)
         {
-            FBodyInstance* BodyInstance = RefSkeletalMeshComponent->GetBodies()[i];
-            ImGui::Text("%d: %s", i, *BodyInstance->BodyInstanceName.ToString());
-            auto Temp = BodyInstance->BodyInstanceName.ToString();
+            FConstraintInstance* Constraint = RefSkeletalMeshComponent->GetConstraints()[i];
+            ImGui::Text("%d: %s", i, *Constraint->JointName);
             if (ImGui::SmallButton(("Remove##" + FString::FromInt(i)).operator*()))
             {
-                RemoveBodyInstance(i);
+                RemoveConstraint(i);
             }
         }
     }
@@ -184,8 +183,8 @@ void PhysicsAssetViewerPanel::AddBodyInstance(int32 BoneIndex, const FName& Bone
 
     TArray<UBodySetup*> BodySetups;
     UBodySetup* BodySetup = FObjectFactory::ConstructObject<UBodySetup>(nullptr);
-    PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(BonePos, Rotation, HalfScale);
-    BodySetup->AggGeom.CapsuleElems.Add(PxBox);
+    PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(BonePos, Rotation, HalfScale);
+    BodySetup->AggGeom.CapsuleElems.Add(PxCapsule);
     BodySetups.Add(BodySetup);
 
     GameObject* obj = GEngine->PhysicsManager->CreateGameObject(BonePos, NewBodyInstance, BodySetups);
@@ -222,7 +221,7 @@ void PhysicsAssetViewerPanel::RemoveBodyInstance(int32 BodyIndex)
 void PhysicsAssetViewerPanel::AddConstraint(const FBodyInstance* BodyInstance1, const FBodyInstance* BodyInstance2)
 {
     FConstraintInstance* NewConstraint = new FConstraintInstance();
-    NewConstraint->JointName = BodyInstance1->BodyInstanceName.ToString() + ":" + BodyInstance2->BodyInstanceName.ToString();
+    NewConstraint->JointName = GetCleanBoneName(BodyInstance1->BodyInstanceName.ToString()) + ":" + GetCleanBoneName(BodyInstance2->BodyInstanceName.ToString());
     NewConstraint->ConstraintBone1 = BodyInstance1->BodyInstanceName.ToString();
     NewConstraint->ConstraintBone2 = BodyInstance2->BodyInstanceName.ToString();
 
