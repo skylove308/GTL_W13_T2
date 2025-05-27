@@ -211,75 +211,13 @@ void PhysicsAssetViewerPanel::Render()
             {
                 FConstraintSetup* Constraint = PhysicsAsset->ConstraintSetups[SelectedConstraintIndex];
 
-                ImGui::Text("Constraint Name: %s", *Constraint->JointName);
-                ImGui::Text("Bone 1 Name: %s", *Constraint->ConstraintBone1);
-                ImGui::Text("Bone 2 Name: %s", *Constraint->ConstraintBone2);
-
-                // Linear Limit
-                static constexpr const char* MotionTypes[] = { "Free", "Limited", "Locked" };
-                int XMotion = static_cast<int>(Constraint->LinearLimit.XMotion);
-
-                if (ImGui::Combo("##LinearConstraintX", &XMotion, MotionTypes, IM_ARRAYSIZE(MotionTypes)))
+                for (const auto& Property : Constraint->StaticStruct()->GetProperties())
                 {
-                    Constraint->LinearLimit.XMotion = static_cast<ELinearConstraintMotion>(XMotion);
+                    ImGui::PushID(Property);
+                    void* DataPtr = reinterpret_cast<std::byte*>(Constraint) + Property->Offset;
+                    Property->DisplayRawDataInImGui(Property->Name, DataPtr, PhysicsAsset);
+                    ImGui::PopID();
                 }
-
-                int YMotion = static_cast<int>(Constraint->LinearLimit.YMotion);
-                if (ImGui::Combo("##LinearConstraintY", &YMotion, MotionTypes, IM_ARRAYSIZE(MotionTypes)))
-                {
-                    Constraint->LinearLimit.YMotion = static_cast<ELinearConstraintMotion>(YMotion);
-                }
-
-                int ZMotion = static_cast<int>(Constraint->LinearLimit.ZMotion);
-                if (ImGui::Combo("##LinearConstraintZ", &ZMotion, MotionTypes, IM_ARRAYSIZE(MotionTypes)))
-                {
-                    Constraint->LinearLimit.ZMotion = static_cast<ELinearConstraintMotion>(ZMotion);
-                }
-
-                // Cone Limit
-                float Swing1LimitDegrees = Constraint->ConeLimit.Swing1LimitDegrees;
-                if (ImGui::SliderFloat("Swing1LimitDegrees", &Swing1LimitDegrees, 0.0f, 180.0f, "%.1f"))
-                {
-                    Constraint->ConeLimit.Swing1LimitDegrees = Swing1LimitDegrees;
-                }
-
-                float Swing2LimitDegrees = Constraint->ConeLimit.Swing2LimitDegrees;
-                if (ImGui::SliderFloat("Swing2LimitDegrees", &Swing2LimitDegrees, 0.0f, 180.0f, "%.1f"))
-                {
-                    Constraint->ConeLimit.Swing2LimitDegrees = Swing2LimitDegrees;
-                }
-
-                static constexpr const char* AngularMotionTypes[] = { "Free", "Limited", "Locked" };
-                int Swing1Motion = static_cast<int>(Constraint->ConeLimit.Swing1Motion);
-                if( ImGui::Combo("##Swing1Motion", &Swing1Motion, AngularMotionTypes, IM_ARRAYSIZE(AngularMotionTypes)))
-                {
-                    Constraint->ConeLimit.Swing1Motion = static_cast<EAngularConstraintMotion>(Swing1Motion);
-                }
-
-                int Swing2Motion = static_cast<int>(Constraint->ConeLimit.Swing2Motion);
-                if (ImGui::Combo("##Swing2Motion", &Swing2Motion, AngularMotionTypes, IM_ARRAYSIZE(AngularMotionTypes)))
-                {
-                    Constraint->ConeLimit.Swing2Motion = static_cast<EAngularConstraintMotion>(Swing2Motion);
-                }
-
-                // Twist Limit
-                float TwistLimitDegrees = Constraint->TwistLimit.TwistLimitDegrees;
-                if (ImGui::SliderFloat("TwistLimitDegrees", &TwistLimitDegrees, 0.0f, 180.0f, "%.1f"))
-                {
-                    Constraint->TwistLimit.TwistLimitDegrees = TwistLimitDegrees;
-                }
-
-                int TwistMotion = static_cast<int>(Constraint->TwistLimit.TwistMotion);
-                if (ImGui::Combo("##TwistMotion", &TwistMotion, AngularMotionTypes, IM_ARRAYSIZE(AngularMotionTypes)))
-                {
-                    Constraint->TwistLimit.TwistMotion = static_cast<EAngularConstraintMotion>(TwistMotion);
-                }
-
-
-                //if (ImGui::Checkbox("Looping", &bLooping))
-                //{
-                //    SkeletalMeshComp->SetLooping(bLooping);
-                //}
             }
         }
         else
