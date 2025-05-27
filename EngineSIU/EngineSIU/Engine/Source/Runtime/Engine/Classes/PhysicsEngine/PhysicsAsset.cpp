@@ -188,17 +188,17 @@ USkeletalMesh* UPhysicsAsset::GetPreviewMesh() const
 
 void UPhysicsAsset::SerializeAsset(FArchive& Ar)
 {
-    FName SkeletalMeshName = NAME_None;
+    FName PreviewMeshName = NAME_None;
     if (Ar.IsSaving())
     {
-        SkeletalMeshName = UAssetManager::Get().GetAssetKeyByObject(EAssetType::SkeletalMesh, PreviewSkeletalMesh);
+        PreviewMeshName = UAssetManager::Get().GetAssetKeyByObject(EAssetType::SkeletalMesh, PreviewSkeletalMesh);
     }
 
-    Ar << SkeletalMeshName;
+    Ar << PreviewMeshName;
 
     if (Ar.IsLoading())
     {
-        if (UObject* Asset = UAssetManager::Get().GetAsset(EAssetType::SkeletalMesh, SkeletalMeshName))
+        if (UObject* Asset = UAssetManager::Get().GetAsset(EAssetType::SkeletalMesh, PreviewMeshName))
         {
             PreviewSkeletalMesh = Cast<USkeletalMesh>(Asset);
         }

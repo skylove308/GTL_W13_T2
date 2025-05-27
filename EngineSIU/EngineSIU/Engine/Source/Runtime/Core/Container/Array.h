@@ -686,7 +686,7 @@ typename TArray<T, AllocatorType>::ElementType TArray<T, AllocatorType>::Pop()
 template <typename T, typename AllocatorType>
 void TArray<T, AllocatorType>::SerializePtrAsset(FArchive& Ar)
 {
-    SizeType ArraySize = Num();
+    uint32 ArraySize = static_cast<uint32>(Num());
     Ar << ArraySize;
 
     if (Ar.IsLoading())

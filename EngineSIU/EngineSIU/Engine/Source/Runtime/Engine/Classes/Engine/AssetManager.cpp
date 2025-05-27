@@ -51,14 +51,18 @@ void UAssetManager::InitAssetManager()
 
 void UAssetManager::ReleaseAssetManager()
 {
-    for (const auto& [Key, AssetObject] : AssetMap[EAssetType::PhysicsAsset])
+    for (auto& [Key, AssetObject] : AssetMap[EAssetType::PhysicsAsset])
     {
         const FAssetInfo& Info = AssetRegistry->PathNameToAssetInfo[Key];
         if (Info.AssetObject)
         {
-            SavePhysicsAsset(Info.GetFullPath(), Cast<UPhysicsAsset>(AssetObject));
+            if (UPhysicsAsset* PhysicsAsset = Cast<UPhysicsAsset>(Info.AssetObject))
+            {
+                SavePhysicsAsset(Info.GetFullPath(), PhysicsAsset);
+            }
         }
     }
+    
 }
 
 const TMap<FName, FAssetInfo>& UAssetManager::GetAssetRegistry()
@@ -144,7 +148,7 @@ const FName& UAssetManager::GetAssetKeyByObject(EAssetType AssetType, const UObj
 
 void UAssetManager::AddAssetInfo(const FAssetInfo& Info)
 {
-    AssetRegistry->PathNameToAssetInfo.Add(Info.AssetName, Info);
+    AssetRegistry->PathNameToAssetInfo.Add(Info.GetFullPath(), Info);
 }
 
 void UAssetManager::AddAsset(const FName& Key, UObject* AssetObject)
@@ -164,7 +168,7 @@ bool UAssetManager::SavePhysicsAsset(const FString& FilePath, UPhysicsAsset* Phy
         return false;
     }
     
-    std::filesystem::path Path = FilePath.ToWideString();
+    std::filesystem::path Path = (FilePath + ".physicsasset").ToWideString();
 
     TArray<uint8> SaveData;
     FMemoryWriter Writer(SaveData);
@@ -175,7 +179,15 @@ bool UAssetManager::SavePhysicsAsset(const FString& FilePath, UPhysicsAsset* Phy
     std::ofstream OutputStream{ Path, std::ios::binary | std::ios::trunc };
     if (!OutputStream.is_open())
     {
-        return false;
+        std::filesystem::path ParentPath = Path.parent_path();
+        try
+        {
+            std::filesystem::create_directory(ParentPath);
+        }
+        catch (const std::filesystem::filesystem_error& e)
+        {
+            return false;
+        }
     }
 
     if (SaveData.Num() > 0)
@@ -286,8 +298,15 @@ void UAssetManager::LoadContentFiles()
 
     for (const auto& Entry : PhysicsAssetEntries)
     {
+        FString FileName = Entry.path().filename().generic_string();
+        int32 DotIdx = FileName.FindChar('.', ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+        if (DotIdx != INDEX_NONE)
+        {
+            FileName = FileName.Left(DotIdx);
+        }
+        
         FAssetInfo AssetInfo = {};
-        AssetInfo.AssetName = FName(Entry.path().filename().generic_string());
+        AssetInfo.AssetName = FName(FileName);
         AssetInfo.PackagePath = FName(Entry.path().parent_path().generic_string());
         AssetInfo.SourceFilePath = Entry.path().generic_string();
         AssetInfo.AssetType = EAssetType::PhysicsAsset;
@@ -580,12 +599,29 @@ void UAssetManager::HandlePhysicsAsset(FAssetInfo& AssetInfo)
 
     FMemoryReader Reader(LoadData);
     
+    if (!SerializeVersion(Reader))
+    {
+        return;
+    }
+    
     UPhysicsAsset* PhysicsAsset = FObjectFactory::ConstructObject<UPhysicsAsset>(nullptr, AssetInfo.AssetName);
     PhysicsAsset->SerializeAsset(Reader);
     
     AssetInfo.AssetObject = PhysicsAsset;
     AddAsset(AssetInfo.GetFullPath(), PhysicsAsset);
     AddAssetInfo(AssetInfo);
+
+    // Setup SkeletalMesh
+    /**
+     * TODO:
+     * 현재 로직의 한계
+     *   - 여러 피직스 에셋이 같은 스켈레탈 메시를 프리뷰 메시로 가지고있을 때, 마지막으로 읽은 피직스 에셋으로 덮어 씌우게 됨.
+     *     UUID가 높은 피직스 에셋이 나중에 생성된 에셋이므로, 최신 정보를 가지고있을 확률이 조금 더 높긴 함.
+     */
+    if (USkeletalMesh* PreviewMesh = PhysicsAsset->GetPreviewMesh())
+    {
+        PreviewMesh->SetPhysicsAsset(PhysicsAsset);
+    }
 }
 
 bool UAssetManager::SerializeVersion(FArchive& Ar)

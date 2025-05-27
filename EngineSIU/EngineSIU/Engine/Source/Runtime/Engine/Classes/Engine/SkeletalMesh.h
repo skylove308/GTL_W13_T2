@@ -26,6 +26,8 @@ public:
 
     UPhysicsAsset* GetPhysicsAsset() const { return PhysicsAsset; }
 
+    void SetPhysicsAsset(UPhysicsAsset* InPhysicsAsset) { PhysicsAsset = InPhysicsAsset; };
+    
     virtual FReferenceSkeleton& GetRefSkeleton();
 
 protected:

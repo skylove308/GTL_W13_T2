@@ -37,8 +37,7 @@ public:
     void StartSkeletalMeshViewer(FName SkeletalMeshName, UAnimationAsset* AnimAsset);
     void StartParticleViewer(FName ParticleName, UParticleSystem* ParticleSystem);
 
-    void StartPhysicsAssetViewer(FName PhysicsAssetName);
-    void StartPhysicsAssetViewer(FName PhysicsAssetName, UPhysicsAssetViewerWorld* PhysicsAsset);
+    void StartPhysicsAssetViewer(FName PreviewMeshKey, FName PhysicsAssetName);
 
     void BindEssentialObjects();
 
