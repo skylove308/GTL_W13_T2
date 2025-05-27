@@ -31,6 +31,8 @@ public:
         DeltaTime
     );
 
+    virtual void SerializeAsset(FArchive& Ar) override;
+
 private:
     FFullSubUVPayload FullSubUVPayload;
 };

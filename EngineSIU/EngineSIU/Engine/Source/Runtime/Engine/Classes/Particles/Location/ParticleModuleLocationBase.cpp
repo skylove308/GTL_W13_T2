@@ -8,3 +8,10 @@ void UParticleModuleLocationBase::DisplayProperty()
         Property->DisplayInImGui(this);
     }
 }
+
+void UParticleModuleLocationBase::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    Ar << bInWorldSpace << bApplyEmitterLocation;
+}

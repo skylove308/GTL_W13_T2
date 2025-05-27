@@ -4,15 +4,16 @@
 #include "ParticleLODLevel.h"
 #include "ParticleModule.h"
 #include "ParticleModuleRequired.h"
+#include "Container/ArrayHelper.h"
 #include "Spawn/ParticleModuleSpawn.h"
 
 UParticleEmitter::UParticleEmitter()
 {
-    UParticleLODLevel* NewParticleLODLevel = new UParticleLODLevel(); // LOD 하나만 쓰기 때문에 일단 이렇게 생성
+    UParticleLODLevel* NewParticleLODLevel = FObjectFactory::ConstructObject<UParticleLODLevel>(this); // LOD 하나만 쓰기 때문에 일단 이렇게 생성
     LODLevels.Add(NewParticleLODLevel);
 }
 
-void UParticleEmitter::CacheEmitterModuleInfo()
+void UParticleEmitter::CacheEmitterModuleInfo() // Not used
 {
     // TODO: 언리얼 코드 참고
     
@@ -51,4 +52,18 @@ UParticleLODLevel* UParticleEmitter::GetLODLevel(int32 LODIndex) const
         return LODLevels[LODIndex];
     }
     return nullptr;
+}
+
+void UParticleEmitter::SerializeAsset(FArchive& Ar)
+{
+    uint8 Type = static_cast<uint8>(EmitterType);
+
+    Ar << PeakActiveParticles << ParticleSize << Type;
+
+    if (Ar.IsLoading())
+    {
+        EmitterType = static_cast<EDynamicEmitterType>(Type);
+    }
+
+    FArrayHelper::SerializePtrAsset(Ar, LODLevels, this);
 }

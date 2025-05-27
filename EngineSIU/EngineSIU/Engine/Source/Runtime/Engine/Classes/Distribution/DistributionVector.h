@@ -1,4 +1,6 @@
 #pragma once
+#include <algorithm>
+
 #include "Math/Vector.h"
 #include "UObject/ObjectMacros.h"
 
@@ -41,9 +43,9 @@ public:
 
     void UpdateDistributionParam()
     {
-        if (MinValue.X > MaxValue.X) MaxValue.X = MinValue.X;
-        if (MinValue.Y > MaxValue.Y) MaxValue.Y = MinValue.Y;
-        if (MinValue.Z > MaxValue.Z) MaxValue.Z = MinValue.Z;
+        MaxValue.X = FMath::Max(MinValue.X, MaxValue.X);
+        MaxValue.Y = FMath::Max(MinValue.Y, MaxValue.Y);
+        MaxValue.Z = FMath::Max(MinValue.Z, MaxValue.Z);
 
         DistX = std::uniform_real_distribution<float>(MinValue.X, MaxValue.X);
         DistY = std::uniform_real_distribution<float>(MinValue.Y, MaxValue.Y);
@@ -62,10 +64,18 @@ public:
     {
         UpdateDistributionParam();
 
-        return FVector(
-            DistX(Gen),
-            DistY(Gen),
-            DistZ(Gen)
-        );
+        return FVector(DistX(Gen), DistY(Gen), DistZ(Gen));
+    }
+
+    friend FArchive& operator<<(FArchive& Ar, FDistributionVector& DV)
+    {
+        Ar << DV.MinValue << DV.MaxValue;
+
+        if (Ar.IsLoading())
+        {
+            DV.UpdateDistributionParam();
+        }
+
+        return Ar;
     }
 };

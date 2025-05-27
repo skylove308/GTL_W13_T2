@@ -6,23 +6,6 @@
 class UParticleModule;
 class UParticleLODLevel;
 
-enum class EParticleBurstMethod : uint8
-{
-    EPBM_Instant,
-    EPBM_Interpolated,
-    EPBM_MAX,
-};
-
-enum EParticleSubUVInterpMethod : int
-{
-    PSUVIM_None,
-    PSUVIM_Linear,
-    PSUVIM_Linear_Blend,
-    PSUVIM_Random,
-    PSUVIM_Random_Blend,
-    PSUVIM_MAX,
-};
-
 class UParticleEmitter : public UObject
 {
     DECLARE_CLASS(UParticleEmitter, UObject)
@@ -36,14 +19,16 @@ public:
     virtual void DisplayProperty() override;
 
     TArray<UParticleLODLevel*> GetLODLevels() const { return LODLevels; }
-    TMap<UParticleModule*, uint32> ModuleOffsetMap;
+    TMap<UParticleModule*, uint32> ModuleOffsetMap; // Not used
     UParticleLODLevel* GetLODLevel(int32 LODIndex) const;
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 
 public:
     UPROPERTY_WITH_FLAGS(EditAnywhere, FName, EmitterName, = "Default")
     int32 PeakActiveParticles = 0;
 
-    // Below is information udpated by calling CacheEmitterModuleInfo
+    // Below is information updated by calling CacheEmitterModuleInfo
     
     int32 ParticleSize;
 

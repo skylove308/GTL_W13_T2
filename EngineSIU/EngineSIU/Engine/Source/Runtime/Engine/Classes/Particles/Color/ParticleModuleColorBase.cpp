@@ -30,3 +30,10 @@ void UParticleModuleColorBase::DisplayProperty()
         ImGui::PopID();
     }
 }
+
+void UParticleModuleColorBase::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    Ar << StartColor << StartAlpha;
+}

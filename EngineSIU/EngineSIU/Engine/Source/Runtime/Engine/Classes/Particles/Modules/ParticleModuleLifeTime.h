@@ -20,4 +20,6 @@ public:
     virtual void Spawn(FParticleEmitterInstance* Owner, int32 Offset, float SpawnTime, FBaseParticle* ParticleBase) override;
 
     virtual void DisplayProperty() override;
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };

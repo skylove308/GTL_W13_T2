@@ -114,3 +114,10 @@ int UParticleModuleSubUV::DetermineImageIndex(
     SubUVPayload.ImageIndex = ImageIndex;
     return ImageIndex;
 }
+
+void UParticleModuleSubUV::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    Ar << SubImageIndex;
+}

@@ -62,7 +62,18 @@ void UAssetManager::ReleaseAssetManager()
             }
         }
     }
-    
+
+    for (auto& [Key, AssetObject] : AssetMap[EAssetType::ParticleSystem])
+    {
+        const FAssetInfo& Info = AssetRegistry->PathNameToAssetInfo[Key];
+        if (Info.AssetObject)
+        {
+            if (UParticleSystem* ParticleSystemAsset = Cast<UParticleSystem>(Info.AssetObject))
+            {
+                SaveParticleSystemAsset(Info.GetFullPath(), ParticleSystemAsset);
+            }
+        }
+    }
 }
 
 const TMap<FName, FAssetInfo>& UAssetManager::GetAssetRegistry()
@@ -136,11 +147,14 @@ void UAssetManager::GetAssetKeys(EAssetType AssetType, TArray<FName>& OutKeys) c
 
 const FName& UAssetManager::GetAssetKeyByObject(EAssetType AssetType, const UObject* AssetObject) const
 {
-    for (const auto& [Key, Object] : AssetMap[AssetType])
+    if (AssetObject)
     {
-        if (Object == AssetObject)
+        for (const auto& [Key, Object] : AssetMap[AssetType])
         {
-            return Key;
+            if (Object == AssetObject)
+            {
+                return Key;
+            }
         }
     }
     return NAME_None;
@@ -183,6 +197,51 @@ bool UAssetManager::SavePhysicsAsset(const FString& FilePath, UPhysicsAsset* Phy
         try
         {
             std::filesystem::create_directory(ParentPath);
+            OutputStream = std::ofstream{ Path, std::ios::binary | std::ios::trunc };
+        }
+        catch (const std::filesystem::filesystem_error& e)
+        {
+            return false;
+        }
+    }
+
+    if (SaveData.Num() > 0)
+    {
+        OutputStream.write(reinterpret_cast<const char*>(SaveData.GetData()), SaveData.Num());
+
+        if (OutputStream.fail())
+        {
+            return false;
+        }
+    }
+
+    OutputStream.close();
+    return true;
+}
+
+bool UAssetManager::SaveParticleSystemAsset(const FString& FilePath, UParticleSystem* ParticleSystemAsset)
+{
+    if (!ParticleSystemAsset)
+    {
+        return false;
+    }
+    
+    std::filesystem::path Path = (FilePath + ".particlesystem").ToWideString();
+
+    TArray<uint8> SaveData;
+    FMemoryWriter Writer(SaveData);
+
+    SerializeVersion(Writer);
+    ParticleSystemAsset->SerializeAsset(Writer);
+
+    std::ofstream OutputStream{ Path, std::ios::binary | std::ios::trunc };
+    if (!OutputStream.is_open())
+    {
+        std::filesystem::path ParentPath = Path.parent_path();
+        try
+        {
+            std::filesystem::create_directory(ParentPath);
+            OutputStream = std::ofstream{ Path, std::ios::binary | std::ios::trunc };
         }
         catch (const std::filesystem::filesystem_error& e)
         {
@@ -247,6 +306,7 @@ void UAssetManager::LoadContentFiles()
     TArray<std::filesystem::directory_entry> ObjEntries;
     TArray<std::filesystem::directory_entry> FbxEntries;
     TArray<std::filesystem::directory_entry> PhysicsAssetEntries;
+    TArray<std::filesystem::directory_entry> ParticleSystemEntries;
 
     for (const auto& Entry : std::filesystem::recursive_directory_iterator(BasePathName))
     {
@@ -266,6 +326,10 @@ void UAssetManager::LoadContentFiles()
         else if (Entry.path().extension() == ".physicsasset")
         {
             PhysicsAssetEntries.Add(Entry);
+        }
+        else if (Entry.path().extension() == ".particlesystem")
+        {
+            ParticleSystemEntries.Add(Entry);
         }
     }
 
@@ -313,6 +377,25 @@ void UAssetManager::LoadContentFiles()
         AssetInfo.Size = static_cast<uint32>(std::filesystem::file_size(Entry.path()));
 
         HandlePhysicsAsset(AssetInfo);
+    }
+
+    for (const auto& Entry : ParticleSystemEntries)
+    {
+        FString FileName = Entry.path().filename().generic_string();
+        int32 DotIdx = FileName.FindChar('.', ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+        if (DotIdx != INDEX_NONE)
+        {
+            FileName = FileName.Left(DotIdx);
+        }
+        
+        FAssetInfo AssetInfo = {};
+        AssetInfo.AssetName = FName(FileName);
+        AssetInfo.PackagePath = FName(Entry.path().parent_path().generic_string());
+        AssetInfo.SourceFilePath = Entry.path().generic_string();
+        AssetInfo.AssetType = EAssetType::ParticleSystem;
+        AssetInfo.Size = static_cast<uint32>(std::filesystem::file_size(Entry.path()));
+
+        HandleParticleSystemAsset(AssetInfo);
     }
 }
 
@@ -622,6 +705,57 @@ void UAssetManager::HandlePhysicsAsset(FAssetInfo& AssetInfo)
     {
         PreviewMesh->SetPhysicsAsset(PhysicsAsset);
     }
+}
+
+void UAssetManager::HandleParticleSystemAsset(FAssetInfo& AssetInfo)
+{
+    TArray<uint8> LoadData;
+    {
+        std::ifstream InputStream{ *AssetInfo.SourceFilePath, std::ios::binary | std::ios::ate };
+        if (!InputStream.is_open())
+        {
+            return;
+        }
+
+        const std::streamsize FileSize = InputStream.tellg();
+        if (FileSize < 0)
+        {
+            // Error getting size
+            InputStream.close();
+            return;
+        }
+        if (FileSize == 0)
+        {
+            // Empty file is valid
+            InputStream.close();
+            return; // Buffer remains empty
+        }
+
+        InputStream.seekg(0, std::ios::beg);
+
+        LoadData.SetNum(static_cast<int32>(FileSize));
+        InputStream.read(reinterpret_cast<char*>(LoadData.GetData()), FileSize);
+
+        if (InputStream.fail() || InputStream.gcount() != FileSize)
+        {
+            return;
+        }
+        InputStream.close();
+    }
+
+    FMemoryReader Reader(LoadData);
+    
+    if (!SerializeVersion(Reader))
+    {
+        return;
+    }
+    
+    UParticleSystem* ParticleSystemAsset = FObjectFactory::ConstructObject<UParticleSystem>(nullptr, AssetInfo.AssetName);
+    ParticleSystemAsset->SerializeAsset(Reader);
+    
+    AssetInfo.AssetObject = ParticleSystemAsset;
+    AddAsset(AssetInfo.GetFullPath(), ParticleSystemAsset);
+    AddAssetInfo(AssetInfo);
 }
 
 bool UAssetManager::SerializeVersion(FArchive& Ar)

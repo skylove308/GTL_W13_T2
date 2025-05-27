@@ -12,5 +12,7 @@ public:
     virtual void FinalUpdate(FParticleEmitterInstance* Owner, int32 Offset, float DeltaTime) override;
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Acceleration)
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };
 

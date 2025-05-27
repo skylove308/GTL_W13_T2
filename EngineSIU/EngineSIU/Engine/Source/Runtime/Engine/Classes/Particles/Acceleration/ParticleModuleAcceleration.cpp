@@ -31,3 +31,10 @@ void UParticleModuleAcceleration::FinalUpdate(FParticleEmitterInstance* Owner, i
 
     END_UPDATE_LOOP
 }
+
+void UParticleModuleAcceleration::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    Ar << Acceleration;
+}

@@ -107,6 +107,8 @@ public:
 
     bool SavePhysicsAsset(const FString& FilePath, UPhysicsAsset* PhysicsAsset);
 
+    bool SaveParticleSystemAsset(const FString& FilePath, UParticleSystem* ParticleSystemAsset);
+
 private:
     inline static TMap<EAssetType, TMap<FName, UObject*>> AssetMap;
     
@@ -126,6 +128,8 @@ private:
     bool SaveFbxBinary(const FString& FilePath, FAssetLoadResult& Result, const FString& BaseName, const FString& FolderPath);
 
     void HandlePhysicsAsset(FAssetInfo& AssetInfo);
+
+    void HandleParticleSystemAsset(FAssetInfo& AssetInfo);
     
     static constexpr uint32 Version = 1;
 

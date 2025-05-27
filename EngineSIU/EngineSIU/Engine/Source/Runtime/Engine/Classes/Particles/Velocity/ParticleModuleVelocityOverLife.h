@@ -26,5 +26,7 @@ public:
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, StartVelocity)
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, EndVelocity)
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };
 

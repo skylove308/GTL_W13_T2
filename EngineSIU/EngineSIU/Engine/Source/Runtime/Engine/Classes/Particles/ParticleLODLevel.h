@@ -30,6 +30,8 @@ public:
     void AddModule(UParticleModule* NewModule) { Modules.Add(NewModule); }
     void DeleteModule(UParticleModule* DeleteModule) { Modules.Remove(DeleteModule); }
 
+    virtual void SerializeAsset(FArchive& Ar) override;
+
 private:
     TArray<UParticleModule*> Modules;
 };
