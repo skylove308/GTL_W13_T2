@@ -6,7 +6,7 @@
 class USkeletalMesh;
 class FReferenceSkeleton;
 class USkeletalMeshComponent;
-struct FBodyInstance;
+class UBodySetup;
 
 class PhysicsAssetViewerPanel : public UEditorPanel
 {
@@ -23,10 +23,10 @@ public:
 
     void ClearRefSkeletalMeshComponent();
 
-    void AddBodyInstance(int32 BoneIndex, const FName& BoneName);
-    void RemoveBodyInstance(int32 BodyIndex);
+    void AddBody(int32 BoneIndex, const FName& BoneName);
+    void RemoveBody(const FName& BoneName);
 
-    void AddConstraint(const FBodyInstance* BodyInstance1, const FBodyInstance* BodyInstance2);
+    void AddConstraint(const UBodySetup* Body1, const UBodySetup* Body2);
     void RemoveConstraint(int32 ConstraintIndex);
 
 private:

@@ -486,7 +486,7 @@ const TArray<FOverlapInfo>& UPrimitiveComponent::GetOverlapInfos() const
     return OverlappingComponents;
 }
 
-GameObject* UPrimitiveComponent::CreatePhysXGameObject()
+void UPrimitiveComponent::CreatePhysXGameObject()
 {
     BodyInstance = new FBodyInstance(this);
     
@@ -498,8 +498,6 @@ GameObject* UPrimitiveComponent::CreatePhysXGameObject()
     
     GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance,  BodySetups);
     BodyInstance->BIGameObject = obj;
-
-    return obj;
 }
 
 void UPrimitiveComponent::BeginPlay()
