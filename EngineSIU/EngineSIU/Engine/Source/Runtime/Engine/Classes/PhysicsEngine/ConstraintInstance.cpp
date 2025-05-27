@@ -8,10 +8,8 @@ void FConstraintInstanceBase::SerializeAsset(FArchive& Ar)
 {
 }
 
-void FConstraintInstance::SerializeAsset(FArchive& Ar)
+void FConstraintSetup::SerializeAsset(FArchive& Ar)
 {
-    FConstraintInstanceBase::SerializeAsset(Ar);
-    
     Ar << JointName
         << ConstraintBone1
         << ConstraintBone2

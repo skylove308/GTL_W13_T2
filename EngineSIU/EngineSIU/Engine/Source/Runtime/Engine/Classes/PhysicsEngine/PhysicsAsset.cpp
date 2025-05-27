@@ -1,4 +1,4 @@
-﻿
+
 #include "PhysicsAsset.h"
 
 #include "Engine/AssetManager.h"
@@ -65,7 +65,7 @@ void UPhysicsAsset::SerializeAsset(FArchive& Ar)
     }
 
     FArrayHelper::SerializePtrAsset(Ar, BodySetups);
-    FArrayHelper::SerializePtrAsset(Ar, ConstraintInstances);
+    FArrayHelper::SerializePtrAsset(Ar, ConstraintSetups);
 }
 
 FArchive& operator<<(FArchive& Ar, AggregateGeomAttributes& Attributes)

@@ -10,7 +10,7 @@
 #include "UObject/ObjectMacros.h"
 
 class USkeletalMesh;
-struct FConstraintInstance;
+struct FConstraintSetup;
 
 enum class EGeomType : uint8
 {
@@ -93,7 +93,7 @@ public:
      * FConstraintInstance의 멤버 변수와 겹치기 때문에 사실상 같은 정보로 판단하여
      * FConstraintInstance를 사용.
      */
-    TArray<FConstraintInstance*> ConstraintInstances;
+    TArray<FConstraintSetup*> ConstraintSetups;
 
     virtual bool SetPreviewMesh(USkeletalMesh* PreviewMesh);
     virtual USkeletalMesh* GetPreviewMesh() const;
