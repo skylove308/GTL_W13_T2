@@ -87,6 +87,17 @@ GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* 
     return Obj;
 }
 
+void FPhysicsManager::DestroyGameObject(GameObject* GameObject) const
+{
+    if (GameObject && GameObject->rigidBody)
+    {
+        CurrentScene->removeActor(*GameObject->rigidBody);
+        GameObject->rigidBody->release();
+        GameObject->rigidBody = nullptr;
+    }
+    delete GameObject;
+}
+
 PxShape* FPhysicsManager::CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
 {
     PxShape* Result = Physics->createShape(PxBoxGeometry(HalfExtents), *Material);

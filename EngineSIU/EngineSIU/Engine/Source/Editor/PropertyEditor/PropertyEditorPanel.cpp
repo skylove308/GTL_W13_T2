@@ -773,8 +773,7 @@ void PropertyEditorPanel::RenderForPhysicsAsset(USkeletalMeshComponent* Skeletal
             }
             if (SkeletalMeshComp->GetSkeletalMeshAsset())
             {
-                Engine->StartPhysicsAssetViewer(FName(SkeletalMeshComp->GetSkeletalMeshAsset()->GetRenderData()->ObjectName));
-                // Engine->StartPhysicsAssetViewer(FName(SkeletalMeshComp->GetSkeletalMeshAsset()->GetRenderData()->ObjectName), SkeletalMeshComp->GetAnimation());
+                Engine->StartPhysicsAssetViewer(FName(SkeletalMeshComp->GetSkeletalMeshAsset()->GetRenderData()->ObjectName), SkeletalMeshComp->GetSkeletalMeshAsset()->GetPhysicsAsset());
             }
         }
         ImGui::TreePop();

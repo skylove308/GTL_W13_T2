@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <extensions/PxJoint.h>
 
 #include "Container/String.h"
@@ -107,5 +107,5 @@ struct FConstraintInstance {
     uint8 bAngularVelocityDrive:1;              // 각속도 모터
     
     // PhysX 제약 객체
-    physx::PxJoint* ConstraintData;             // PhysX 조인트 참조
+    physx::PxJoint* ConstraintData = nullptr;             // PhysX 조인트 참조
 };

@@ -2,22 +2,16 @@
 
 #include "SkeletalMeshViewerPanel.h"
 #include "Engine/EditorEngine.h"
-#include <ReferenceSkeleton.h>
-
-// #include "Animation/AnimSequence.h"
-// #include "Animation/AnimSingleNodeInstance.h"
-// #include "Animation/AnimData/AnimDataModel.h"
+#include "ReferenceSkeleton.h"
 #include "Engine/Classes/Engine/SkeletalMesh.h"
-// #include "Engine/Classes/Animation/Skeleton.h"
 #include "Engine/Classes/Engine/FbxLoader.h"
-// #include "ThirdParty/ImGui/include/ImGui/imgui_neo_sequencer.h"
 #include "Engine/Classes/Components/SkeletalMeshComponent.h"
-// #include "Engine/Classes/Animation/AnimTypes.h"
 #include "UnrealEd/ImGuiWidget.h"
-// #include "Contents/AnimInstance/MyAnimInstance.h"
-// #include "Animation/AnimSoundNotify.h"
-// #include "SoundManager.h"
-
+#include "PhysicsEngine/BodyInstance.h"
+#include "PhysicsEngine/ConstraintInstance.h"
+#include "PhysicsEngine/PhysicsAsset.h"
+#include "Physics/PhysicsManager.h"
+#include <PxPhysicsAPI.h>
 
 PhysicsAssetViewerPanel::PhysicsAssetViewerPanel()
 {
@@ -56,88 +50,84 @@ void PhysicsAssetViewerPanel::Render()
 
     constexpr ImGuiWindowFlags PanelFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar;
 
+    if (Engine->ActiveWorld && Engine->ActiveWorld->WorldType == EWorldType::PhysicsAssetViewer) {
 
-    if (Engine->ActiveWorld) {
-        if (Engine->ActiveWorld->WorldType == EWorldType::PhysicsAssetViewer) {
-
-            if (CopiedRefSkeleton == nullptr) {
-                CopyRefSkeleton(); // 선택된 액터/컴포넌트로부터 스켈레톤 정보 복사
-            }
-
-            // CopiedRefSkeleton이 여전히 null이면 렌더링하지 않음
-            if (CopiedRefSkeleton == nullptr || CopiedRefSkeleton->RawRefBoneInfo.IsEmpty()) {
-                ImGui::Begin("Bone Hierarchy", nullptr, PanelFlags); // 창은 표시하되 내용은 비움
-                ImGui::Text("No skeleton selected or skeleton has no bones.");
-                ImGui::End();
-                return;
-            }
-
-            ImGui::Begin("Bone Hierarchy", nullptr, PanelFlags); // 창 이름 변경
-
-            // 검색 필터 추가 (선택 사항)
-            // static char BoneSearchText[128] = "";
-            // ImGui::InputText("Search", BoneSearchText, IM_ARRAYSIZE(BoneSearchText));
-            // FString SearchFilter(BoneSearchText);
-
-            // 루트 본부터 시작하여 트리 렌더링
-            for (int32 i = 0; i < CopiedRefSkeleton->RawRefBoneInfo.Num(); ++i)
-            {
-                if (CopiedRefSkeleton->RawRefBoneInfo[i].ParentIndex == INDEX_NONE) // 루트 본인 경우
-                {
-                    // RenderBoneTree 호출 시 Engine 포인터 전달
-                    RenderBoneTree(*CopiedRefSkeleton, i, Engine /*, SearchFilter */);
-                }
-            }
-            ImGui::End();
+        if (CopiedRefSkeleton == nullptr) {
+            CopyRefSkeleton(); // 선택된 액터/컴포넌트로부터 스켈레톤 정보 복사
         }
 
-        // RenderAnimationPanel(PanelPosX, PanelPosY, PanelWidth, PanelHeight);
+        // CopiedRefSkeleton이 여전히 null이면 렌더링하지 않음
+        if (CopiedRefSkeleton == nullptr || CopiedRefSkeleton->RawRefBoneInfo.IsEmpty()) {
+            ImGui::Begin("Bone Hierarchy", nullptr, PanelFlags); // 창은 표시하되 내용은 비움
+            ImGui::Text("No skeleton selected or skeleton has no bones.");
+            ImGui::End();
+            return;
+        }
 
-        //if (CopiedRefSkeleton) {
-        //    RenderAnimationSequence(*CopiedRefSkeleton, Engine);
-        //}
+        ImGui::Begin("Bone Hierarchy", nullptr, PanelFlags); // 창 이름 변경
 
-        float ExitPanelWidth = (Width) * 0.2f - 6.0f;
-        float ExitPanelHeight = 30.0f;
+        // 검색 필터 추가 (선택 사항)
+        // static char BoneSearchText[128] = "";
+        // ImGui::InputText("Search", BoneSearchText, IM_ARRAYSIZE(BoneSearchText));
+        // FString SearchFilter(BoneSearchText);
 
-        const float margin = 10.0f;
-
-        float ExitPanelPosX = Width - ExitPanelWidth;
-        float ExitPanelPosY = Height - ExitPanelHeight - 10;
-
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-
-        ImGui::SetNextWindowSize(ImVec2(ExitPanelWidth, ExitPanelHeight), ImGuiCond_Always);
-        ImGui::SetNextWindowPos(ImVec2(ExitPanelPosX, ExitPanelPosY), ImGuiCond_Always);
-
-        constexpr ImGuiWindowFlags ExitPanelFlags =
-            ImGuiWindowFlags_NoResize
-            | ImGuiWindowFlags_NoMove
-            | ImGuiWindowFlags_NoTitleBar
-            | ImGuiWindowFlags_NoBackground
-            | ImGuiWindowFlags_NoScrollbar;
-
-        ImGui::Begin("Exit Viewer", nullptr, ExitPanelFlags);
-        if (ImGui::Button("Exit Viewer", ImVec2(ExitPanelWidth, ExitPanelHeight))) {
-            ClearRefSkeletalMeshComponent();
-            UEditorEngine* EdEngine = Cast<UEditorEngine>(GEngine);
-            EdEngine->EndSkeletalMeshViewer();
+        // 루트 본부터 시작하여 트리 렌더링
+        for (int32 i = 0; i < CopiedRefSkeleton->RawRefBoneInfo.Num(); ++i)
+        {
+            if (CopiedRefSkeleton->RawRefBoneInfo[i].ParentIndex == INDEX_NONE) // 루트 본인 경우
+            {
+                // RenderBoneTree 호출 시 Engine 포인터 전달
+                RenderBoneTree(*CopiedRefSkeleton, i, Engine /*, SearchFilter */);
+            }
         }
         ImGui::End();
-        ImGui::PopStyleVar();
     }
 
+    float ExitPanelWidth = (Width) * 0.2f - 6.0f;
+    float ExitPanelHeight = 30.0f;
+
+    const float margin = 10.0f;
+
+    float ExitPanelPosX = Width - ExitPanelWidth;
+    float ExitPanelPosY = Height - ExitPanelHeight - 10;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+
+    ImGui::SetNextWindowSize(ImVec2(ExitPanelWidth, ExitPanelHeight), ImGuiCond_Always);
+    ImGui::SetNextWindowPos(ImVec2(ExitPanelPosX, ExitPanelPosY), ImGuiCond_Always);
+
+    constexpr ImGuiWindowFlags ExitPanelFlags =
+        ImGuiWindowFlags_NoResize
+        | ImGuiWindowFlags_NoMove
+        | ImGuiWindowFlags_NoTitleBar
+        | ImGuiWindowFlags_NoBackground
+        | ImGuiWindowFlags_NoScrollbar;
+
+    ImGui::Begin("Exit Viewer", nullptr, ExitPanelFlags);
+    if (ImGui::Button("Exit Viewer", ImVec2(ExitPanelWidth, ExitPanelHeight))) {
+        ClearRefSkeletalMeshComponent();
+        UEditorEngine* EdEngine = Cast<UEditorEngine>(GEngine);
+        EdEngine->EndPhysicsAssetViewer();
+    }
+    ImGui::End();
+    ImGui::PopStyleVar();
+
     ImGui::Separator();
-    ImGui::Text("Current Constraints:");
-    for (int32 i = 0; i < Constraints.Num(); ++i)
+    ImGui::Text("Current Bodies:");
+    if (RefSkeletalMeshComponent)
     {
-        auto& C = Constraints[i];
-        ImGui::Text("%d: %s - %s", i, *C.ConstraintBone1, *C.ConstraintBone2);
-        if (ImGui::SmallButton(("Remove##" + FString::FromInt(i)).operator*()))
+        for (int32 i = 0; i < RefSkeletalMeshComponent->GetBodies().Num(); ++i)
         {
-            RemoveConstraint(i);
+            FBodyInstance* BodyInstance = RefSkeletalMeshComponent->GetBodies()[i];
+            ImGui::Text("%d: %s", i, *BodyInstance->BodyInstanceName.ToString());
+            auto Temp = BodyInstance->BodyInstanceName.ToString();
+            if (ImGui::SmallButton(("Remove##" + FString::FromInt(i)).operator*()))
+            {
+                RemoveBodyInstance(i);
+            }
         }
     }
+
 }
 
 void PhysicsAssetViewerPanel::OnResize(HWND hWnd)
@@ -182,28 +172,93 @@ void PhysicsAssetViewerPanel::ClearRefSkeletalMeshComponent()
     //}
 }
 
-void PhysicsAssetViewerPanel::AddConstraint(const FString& BoneName1, const FString& BoneName2)
+void PhysicsAssetViewerPanel::AddBodyInstance(int32 BoneIndex, const FName& BoneName)
 {
-    // 1) 빈 FConstraintInstance 상자 하나를 배열에 추가
-    int32 NewIndex = Constraints.AddDefaulted();
+    // 새 본 인스턴스 생성
+    FBodyInstance* NewBodyInstance = new FBodyInstance(RefSkeletalMeshComponent);
+    NewBodyInstance->BodyInstanceName = BoneName;
+    
+    physx::PxVec3 BonePos = physx::PxVec3(CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().X, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().Y, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().Z);
+    physx::PxVec3 Rotation = physx::PxVec3(CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().X, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().Y, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().Z);
+    physx::PxVec3 HalfScale = physx::PxVec3(0.5f, 0.5f, 0.5f); // 예시로 0.5로 설정, 실제 스케일은 필요에 따라 조정
 
-    Constraints[NewIndex].ConstraintBone1 = BoneName1;
-    Constraints[NewIndex].ConstraintBone2 = BoneName2;
+    TArray<UBodySetup*> BodySetups;
+    UBodySetup* BodySetup = FObjectFactory::ConstructObject<UBodySetup>(nullptr);
+    PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(BonePos, Rotation, HalfScale);
+    BodySetup->AggGeom.CapsuleElems.Add(PxBox);
+    BodySetups.Add(BodySetup);
+
+    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(BonePos, NewBodyInstance, BodySetups);
+
+    NewBodyInstance->SetGameObject(obj);
+    NewBodyInstance->BoneIndex = BoneIndex;
+    RefSkeletalMeshComponent->AddBodyInstance(NewBodyInstance);
+}
+
+void PhysicsAssetViewerPanel::RemoveBodyInstance(int32 BodyIndex)
+{
+    if(RefSkeletalMeshComponent && BodyIndex >= 0)
+    {
+        for(int32 i = 0; i < RefSkeletalMeshComponent->GetBodies().Num(); ++i)
+        {
+            if (RefSkeletalMeshComponent->GetBodies()[i]->BoneIndex == BodyIndex)
+            {
+                FBodyInstance* BodyInstance = RefSkeletalMeshComponent->GetBodies()[i];
+
+                if (BodyInstance->BIGameObject)
+                {
+                    GEngine->PhysicsManager->DestroyGameObject(BodyInstance->BIGameObject);
+                }
+
+                RefSkeletalMeshComponent->RemoveBodyInstance(BodyInstance);
+                delete BodyInstance;
+
+                break;
+            }
+        }
+    }
+}
+
+void PhysicsAssetViewerPanel::AddConstraint(const FBodyInstance* BodyInstance1, const FBodyInstance* BodyInstance2)
+{
+    FConstraintInstance* NewConstraint = new FConstraintInstance();
+    NewConstraint->JointName = BodyInstance1->BodyInstanceName.ToString() + ":" + BodyInstance2->BodyInstanceName.ToString();
+    NewConstraint->ConstraintBone1 = BodyInstance1->BodyInstanceName.ToString();
+    NewConstraint->ConstraintBone2 = BodyInstance2->BodyInstanceName.ToString();
+
+    PxTransform GlobalPose1 = BodyInstance1->BIGameObject->rigidBody->getGlobalPose();
+    PxTransform GlobalPose2 = BodyInstance2->BIGameObject->rigidBody->getGlobalPose();
+    PxTransform LocalFrameParent = GlobalPose2.getInverse() * GlobalPose1;
+    PxTransform LocalFrameChild = PxTransform(PxVec3(0));
+
+    // PhysX D6 Joint 생성
+    physx::PxD6Joint* Joint = physx::PxD6JointCreate(*GEngine->PhysicsManager->GetPhysics(), BodyInstance1->BIGameObject->rigidBody, LocalFrameParent, BodyInstance2->BIGameObject->rigidBody, LocalFrameChild);
+
+    if (Joint)
+    {
+        // 각도 제한 설정
+        Joint->setMotion(physx::PxD6Axis::eTWIST, physx::PxD6Motion::eLIMITED);
+        Joint->setMotion(physx::PxD6Axis::eSWING1, physx::PxD6Motion::eLIMITED);
+        Joint->setMotion(physx::PxD6Axis::eSWING2, physx::PxD6Motion::eLIMITED);
+        Joint->setTwistLimit(physx::PxJointAngularLimitPair(-physx::PxPi / 4, physx::PxPi / 4));
+        Joint->setSwingLimit(physx::PxJointLimitCone(physx::PxPi / 6, physx::PxPi / 6));
+    }
+
+    NewConstraint->ConstraintData = Joint;
+
+    // 추가된 제약 조건을 Constraints 배열에 저장
+    RefSkeletalMeshComponent->AddConstraintInstance(NewConstraint);
 }
 
 void PhysicsAssetViewerPanel::RemoveConstraint(int32 ConstraintIndex)
 {
-    if (Constraints.IsValidIndex(ConstraintIndex))
-    {
-        Constraints.RemoveAt(ConstraintIndex);
-    }
 }
-
+ 
 void PhysicsAssetViewerPanel::LoadBoneIcon()
 {
     BoneIconSRV = FEngineLoop::ResourceManager.GetTexture(L"Assets/Viewer/Bone_16x.PNG")->TextureSRV;
     NonWeightBoneIconSRV = FEngineLoop::ResourceManager.GetTexture(L"Assets/Viewer/BoneNonWeighted_16x.PNG")->TextureSRV;
-
+    BodyInstanceIconSRV = FEngineLoop::ResourceManager.GetTexture(L"Assets/Viewer/GroupActor_16x.PNG")->TextureSRV;
 }
 
 void PhysicsAssetViewerPanel::CopyRefSkeleton()
@@ -236,24 +291,6 @@ void PhysicsAssetViewerPanel::RenderBoneTree(const FReferenceSkeleton& RefSkelet
             RefSkeleton.RawRefBoneInfo[ParentIndex].Name.ToString()
         );
     }
-    // 검색 필터 적용 (선택 사항)
-    // if (!SearchFilter.IsEmpty() && !ShortBoneName.Contains(SearchFilter))
-    // {
-    //    // 자식도 검색해야 하므로, 현재 노드가 필터에 맞지 않아도 자식은 재귀 호출
-    //    bool bChildMatchesFilter = false;
-    //    for (int32 i = 0; i < RefSkeleton.RawRefBoneInfo.Num(); ++i)
-    //    {
-    //        if (RefSkeleton.RawRefBoneInfo[i].ParentIndex == BoneIndex)
-    //        {
-    //            // 자식 중 하나라도 필터에 맞으면 현재 노드도 표시해야 할 수 있음 (복잡해짐)
-    //            // 간단하게는 현재 노드가 안 맞으면 그냥 건너뛰도록 할 수 있음
-    //        }
-    //    }
-    //    // 간단한 필터링: 현재 노드가 안 맞으면 그냥 숨김 (자식도 안 나옴)
-    //    // if (!ShortBoneName.Contains(SearchFilter)) return;
-    // }
-
-    // ================================
 
     // ImGui TreeNodeEx 로 본 이름 그리기…
     // 1) ImGui ID 충돌 방지
@@ -288,16 +325,55 @@ void PhysicsAssetViewerPanel::RenderBoneTree(const FReferenceSkeleton& RefSkelet
 
     if (ImGui::BeginPopupContextItem("BonePopup"))
     {
-        if (ImGui::MenuItem("Add Constraint"))
+        if (ImGui::MenuItem("Add BodyInstance"))
         {
-            // 예: 이 본을 Bone1으로, 부모 본을 Bone2로 지정
-            AddConstraint(ShortBoneName, ParentBoneName);
+            AddBodyInstance(BoneIndex, BoneInfo.Name);
         }
         ImGui::EndPopup();
     }
 
     if (bNodeOpen) // 노드가 열려있다면
     {
+        if(RefSkeletalMeshComponent && RefSkeletalMeshComponent->GetBodies().Num() > 0)
+        {
+            // 본에 해당하는 BodyInstance가 있는지 확인
+            for (int32 i = 0; i < RefSkeletalMeshComponent->GetBodies().Num(); ++i)
+            {
+                FBodyInstance* BodyInstance = RefSkeletalMeshComponent->GetBodies()[i];
+                if (BodyInstance && BodyInstance->BoneIndex == BoneIndex)
+                {
+                    ImGui::Image((ImTextureID)BodyInstanceIconSRV, ImVec2(16, 16));
+                    ImGui::SameLine();
+                    ImGui::TreeNodeEx(*ShortBoneName, ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen);
+                    if (ImGui::BeginPopupContextItem("BodyInstPopup"))
+                    {
+                        if (ImGui::BeginMenu("Add Constraint"))
+                        {
+                            // 생성된 BodyInstance 리스트를 순회
+                            TArray<FBodyInstance*>& Instances = RefSkeletalMeshComponent->GetBodies();
+                            for (int i = 0; i < Instances.Num(); ++i)
+                            {
+                                char buf[32];
+                                sprintf(buf, "%s", *GetCleanBoneName(Instances[i]->BodyInstanceName.ToString()));
+
+                                if (ImGui::MenuItem(buf))
+                                {
+                                    // 선택되면 즉시 Constraint 추가
+                                    AddConstraint(BodyInstance, Instances[i]);
+                                }
+                            }
+                            ImGui::EndMenu();
+                        }
+                        if (ImGui::MenuItem("Remove BodyInstance"))
+                        {
+                            RemoveBodyInstance(BoneIndex);
+                        }
+                        ImGui::EndPopup();
+                    }
+                }
+            }
+        }
+
         // 자식 본들 재귀적으로 처리
         for (int32 i = 0; i < RefSkeleton.RawRefBoneInfo.Num(); ++i)
         {
@@ -306,20 +382,10 @@ void PhysicsAssetViewerPanel::RenderBoneTree(const FReferenceSkeleton& RefSkelet
                 RenderBoneTree(RefSkeleton, i, Engine /*, SearchFilter */); // 재귀 호출 시 Engine 전달
             }
         }
+
         ImGui::TreePop(); // 트리 노드 닫기
     }
     ImGui::PopID(); // ID 스택 복원
-    // if (Engine->SkeletalMeshViewerWorld->SelectBoneIndex == BoneIndex) // 가상의 함수 호출
-    // {
-    //     NodeFlags |= ImGuiTreeNodeFlags_Selected; // 선택된 경우 Selected 플래그 추가
-    // }
-
-    // --- 클릭 이벤트 처리 ---
-    //if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) // 왼쪽 마우스 버튼 클릭 시
-    //{
-    //    // 엔진에 선택된 본 인덱스 설정 (가상의 함수 호출)
-    //    Engine->SkeletalMeshViewerWorld->SelectBoneIndex = (BoneIndex);
-    //}
 }
 
 // void PhysicsAssetViewerPanel::RenderAnimationSequence(const FReferenceSkeleton& RefSkeleton, UEditorEngine* Engine)

@@ -14,6 +14,7 @@ class UParticleViewerWorld;
 class UParticleSystem;
 class AActor;
 class USceneComponent;
+class UPhysicsAsset;
 
 class UEditorEngine : public UEngine
 {
@@ -36,15 +37,14 @@ public:
     void StartPIE();
     void StartSkeletalMeshViewer(FName SkeletalMeshName, UAnimationAsset* AnimAsset);
     void StartParticleViewer(FName ParticleName, UParticleSystem* ParticleSystem);
-
-    void StartPhysicsAssetViewer(FName PhysicsAssetName);
-    void StartPhysicsAssetViewer(FName PhysicsAssetName, UPhysicsAssetViewerWorld* PhysicsAsset);
+    void StartPhysicsAssetViewer(FName PhysicsAssetName, UPhysicsAsset* PhysicsAsset);
 
     void BindEssentialObjects();
 
     void EndPIE();
     void EndSkeletalMeshViewer();
     void EndParticleViewer();
+    void EndPhysicsAssetViewer();
 
     void SetPhysXScene(UWorld* World);
 
