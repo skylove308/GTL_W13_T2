@@ -197,6 +197,7 @@ bool UAssetManager::SavePhysicsAsset(const FString& FilePath, UPhysicsAsset* Phy
         try
         {
             std::filesystem::create_directory(ParentPath);
+            OutputStream = std::ofstream{ Path, std::ios::binary | std::ios::trunc };
         }
         catch (const std::filesystem::filesystem_error& e)
         {
@@ -240,6 +241,7 @@ bool UAssetManager::SaveParticleSystemAsset(const FString& FilePath, UParticleSy
         try
         {
             std::filesystem::create_directory(ParentPath);
+            OutputStream = std::ofstream{ Path, std::ios::binary | std::ios::trunc };
         }
         catch (const std::filesystem::filesystem_error& e)
         {
