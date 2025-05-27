@@ -108,7 +108,7 @@ public:
     /** Returns list of components this component is overlapping. */
     const TArray<FOverlapInfo>& GetOverlapInfos() const;
 
-    virtual GameObject* CreatePhysXGameObject();
+    virtual void CreatePhysXGameObject();
 
     virtual void BeginPlay() override;
 protected:

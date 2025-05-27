@@ -389,16 +389,16 @@ void USkeletalMeshComponent::InitAnim()
     }
 }
 
-GameObject* USkeletalMeshComponent::CreatePhysXGameObject()
+void USkeletalMeshComponent::CreatePhysXGameObject()
 {
-    BodyInstance = new FBodyInstance(this);
-    
-    FVector Location = GetComponentLocation();
-    PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
-    
-    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance, SkeletalMeshAsset->GetPhysicsAsset()->BodySetups);
-
-    return obj;
+    Super::CreatePhysXGameObject();
+    for (int i = 0; i < Bodies.Num(); i++)
+    {
+        FReferenceSkeleton CopiedRefSkeleton = SkeletalMeshAsset->GetSkeleton()->GetReferenceSkeleton();
+        physx::PxVec3 BonePos = physx::PxVec3(CopiedRefSkeleton.RawRefBonePose[i].GetTranslation().X, CopiedRefSkeleton.RawRefBonePose[i].GetTranslation().Y, CopiedRefSkeleton.RawRefBonePose[i].GetTranslation().Z);
+        GameObject* obj = GEngine->PhysicsManager->CreateGameObject(BonePos, Bodies[i], SkeletalMeshAsset->GetPhysicsAsset()->BodySetups);
+        Bodies[i]->SetGameObject(obj);
+    }
 }
 
 void USkeletalMeshComponent::AddBodyInstance(FBodyInstance* BodyInstance)

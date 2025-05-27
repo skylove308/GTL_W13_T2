@@ -177,21 +177,18 @@ void PhysicsAssetViewerPanel::AddBodyInstance(int32 BoneIndex, const FName& Bone
     // 새 본 인스턴스 생성
     FBodyInstance* NewBodyInstance = new FBodyInstance(RefSkeletalMeshComponent);
     NewBodyInstance->BodyInstanceName = BoneName;
+    NewBodyInstance->BoneIndex = BoneIndex;
     
     physx::PxVec3 BonePos = physx::PxVec3(CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().X, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().Y, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().Z);
     physx::PxVec3 Rotation = physx::PxVec3(CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().X, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().Y, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().Z);
     physx::PxVec3 HalfScale = physx::PxVec3(0.5f, 0.5f, 0.5f); // 예시로 0.5로 설정, 실제 스케일은 필요에 따라 조정
 
-    TArray<UBodySetup*> BodySetups;
     UBodySetup* BodySetup = FObjectFactory::ConstructObject<UBodySetup>(nullptr);
-    PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(BonePos, Rotation, HalfScale);
-    BodySetup->AggGeom.CapsuleElems.Add(PxBox);
-    BodySetups.Add(BodySetup);
+    PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(BonePos, Rotation, HalfScale);
+    BodySetup->AggGeom.CapsuleElems.Add(PxCapsule);
+    BodySetup->SetBoneName(BoneName);
+    RefSkeletalMeshComponent->GetSkeletalMeshAsset()->GetPhysicsAsset()->BodySetups.Add(BodySetup);
 
-    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(BonePos, NewBodyInstance, BodySetups);
-
-    NewBodyInstance->SetGameObject(obj);
-    NewBodyInstance->BoneIndex = BoneIndex;
     RefSkeletalMeshComponent->AddBodyInstance(NewBodyInstance);
 }
 
