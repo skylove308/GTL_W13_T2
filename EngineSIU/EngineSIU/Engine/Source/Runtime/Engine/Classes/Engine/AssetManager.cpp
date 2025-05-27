@@ -16,6 +16,7 @@
 #include "Particles/ParticleSystem.h"
 #include "Serialization/MemoryArchive.h"
 #include "UObject/ObjectFactory.h"
+#include "Classes/PhysicsEngine/PhysicsAsset.h"
 
 bool UAssetManager::IsInitialized()
 {
@@ -46,6 +47,22 @@ void UAssetManager::InitAssetManager()
     AssetRegistry = std::make_unique<FAssetRegistry>();
 
     LoadContentFiles();
+}
+
+void UAssetManager::ReleaseAssetManager()
+{
+    for (auto& [Key, AssetObject] : AssetMap[EAssetType::PhysicsAsset])
+    {
+        const FAssetInfo& Info = AssetRegistry->PathNameToAssetInfo[Key];
+        if (Info.AssetObject)
+        {
+            if (UPhysicsAsset* PhysicsAsset = Cast<UPhysicsAsset>(Info.AssetObject))
+            {
+                SavePhysicsAsset(Info.GetFullPath(), PhysicsAsset);
+            }
+        }
+    }
+    
 }
 
 const TMap<FName, FAssetInfo>& UAssetManager::GetAssetRegistry()
@@ -97,64 +114,139 @@ UParticleSystem* UAssetManager::GetParticleSystem(const FName& Name) const
     return Cast<UParticleSystem>(GetAsset(EAssetType::ParticleSystem, Name));
 }
 
-void UAssetManager::GetMaterialKeys(TSet<FName>& OutKeys) const
+void UAssetManager::GetAssetKeys(EAssetType AssetType, TSet<FName>& OutKeys) const
 {
     OutKeys.Empty();
 
-    for (const auto& Material : AssetMap[EAssetType::Material])
+    for (const auto& Material : AssetMap[AssetType])
     {
         OutKeys.Add(Material.Key);
     }
 }
 
-void UAssetManager::GetMaterialKeys(TArray<FName>& OutKeys) const
+void UAssetManager::GetAssetKeys(EAssetType AssetType, TArray<FName>& OutKeys) const
 {
     OutKeys.Empty();
 
-    for (const auto& Material : AssetMap[EAssetType::Material])
+    for (const auto& Material : AssetMap[AssetType])
     {
         OutKeys.Add(Material.Key);
     }
+}
+
+const FName& UAssetManager::GetAssetKeyByObject(EAssetType AssetType, const UObject* AssetObject) const
+{
+    for (const auto& [Key, Object] : AssetMap[AssetType])
+    {
+        if (Object == AssetObject)
+        {
+            return Key;
+        }
+    }
+    return NAME_None;
 }
 
 void UAssetManager::AddAssetInfo(const FAssetInfo& Info)
 {
-    AssetRegistry->PathNameToAssetInfo.Add(Info.AssetName, Info);
+    AssetRegistry->PathNameToAssetInfo.Add(Info.GetFullPath(), Info);
 }
 
-void UAssetManager::AddSkeleton(const FName& Key, USkeleton* Skeleton)
+void UAssetManager::AddAsset(const FName& Key, UObject* AssetObject)
 {
-    AssetMap[EAssetType::Skeleton].Add(Key, Skeleton);
+    EAssetType AssetType = GetAssetType(AssetObject);
+
+    if (AssetType != EAssetType::MAX)
+    {
+        AssetMap[AssetType].Add(Key, AssetObject);
+    }
 }
 
-void UAssetManager::AddSkeletalMesh(const FName& Key, USkeletalMesh* SkeletalMesh)
+bool UAssetManager::SavePhysicsAsset(const FString& FilePath, UPhysicsAsset* PhysicsAsset)
 {
-    AssetMap[EAssetType::SkeletalMesh].Add(Key, SkeletalMesh);
+    if (!PhysicsAsset)
+    {
+        return false;
+    }
+    
+    std::filesystem::path Path = (FilePath + ".physicsasset").ToWideString();
+
+    TArray<uint8> SaveData;
+    FMemoryWriter Writer(SaveData);
+
+    SerializeVersion(Writer);
+    PhysicsAsset->SerializeAsset(Writer);
+
+    std::ofstream OutputStream{ Path, std::ios::binary | std::ios::trunc };
+    if (!OutputStream.is_open())
+    {
+        std::filesystem::path ParentPath = Path.parent_path();
+        try
+        {
+            std::filesystem::create_directory(ParentPath);
+        }
+        catch (const std::filesystem::filesystem_error& e)
+        {
+            return false;
+        }
+    }
+
+    if (SaveData.Num() > 0)
+    {
+        OutputStream.write(reinterpret_cast<const char*>(SaveData.GetData()), SaveData.Num());
+
+        if (OutputStream.fail())
+        {
+            return false;
+        }
+    }
+
+    OutputStream.close();
+    return true;
 }
 
-void UAssetManager::AddMaterial(const FName& Key, UMaterial* Material)
+EAssetType UAssetManager::GetAssetType(const UObject* AssetObject) const
 {
-    AssetMap[EAssetType::Material].Add(Key, Material);
-}
+    EAssetType AssetType = EAssetType::MAX;
+    
+    if (AssetObject->IsA<USkeleton>())
+    {
+        AssetType = EAssetType::Skeleton;
+    }
+    else if (AssetObject->IsA<USkeletalMesh>())
+    {
+        AssetType = EAssetType::SkeletalMesh;
+    }
+    else if (AssetObject->IsA<UStaticMesh>())
+    {
+        AssetType = EAssetType::StaticMesh;
+    }
+    else if (AssetObject->IsA<UMaterial>())
+    {
+        AssetType = EAssetType::Material;
+    }
+    else if (AssetObject->IsA<UAnimationAsset>())
+    {
+        AssetType = EAssetType::Animation;
+    }
+    else if (AssetObject->IsA<UParticleSystem>())
+    {
+        AssetType = EAssetType::ParticleSystem;
+    }
+    else if (AssetObject->IsA<UPhysicsAsset>())
+    {
+        AssetType = EAssetType::PhysicsAsset;
+    }
 
-void UAssetManager::AddStaticMesh(const FName& Key, UStaticMesh* StaticMesh)
-{
-    AssetMap[EAssetType::StaticMesh].Add(Key, StaticMesh);
-}
-
-void UAssetManager::AddAnimation(const FName& Key, UAnimationAsset* Animation)
-{
-    AssetMap[EAssetType::Animation].Add(Key, Animation);
-}
-
-void UAssetManager::AddParticleSystem(const FName& Key, UParticleSystem* ParticleSystem)
-{
-    AssetMap[EAssetType::ParticleSystem].Add(Key, ParticleSystem);
+    return AssetType;
 }
 
 void UAssetManager::LoadContentFiles()
 {
     const std::string BasePathName = "Contents/";
+
+    TArray<std::filesystem::directory_entry> ObjEntries;
+    TArray<std::filesystem::directory_entry> FbxEntries;
+    TArray<std::filesystem::directory_entry> PhysicsAssetEntries;
 
     for (const auto& Entry : std::filesystem::recursive_directory_iterator(BasePathName))
     {
@@ -165,36 +257,68 @@ void UAssetManager::LoadContentFiles()
 
         if (Entry.path().extension() == ".obj")
         {
-            // Obj 파일 로드
-            FAssetInfo NewAssetInfo;
-            NewAssetInfo.AssetName = FName(Entry.path().filename().generic_string());
-            NewAssetInfo.PackagePath = FName(Entry.path().parent_path().generic_string());
-            NewAssetInfo.SourceFilePath = Entry.path().generic_string();
-            NewAssetInfo.AssetType = EAssetType::StaticMesh; // obj 파일은 무조건 StaticMesh
-            NewAssetInfo.Size = static_cast<uint32>(std::filesystem::file_size(Entry.path()));
-            
-            AssetRegistry->PathNameToAssetInfo.Add(NewAssetInfo.AssetName, NewAssetInfo);
-            
-            FString MeshName = NewAssetInfo.GetFullPath();
-            FObjManager::CreateStaticMesh(MeshName);
+            ObjEntries.Add(Entry);
         }
         else if (Entry.path().extension() == ".fbx")
         {
-            FAssetInfo AssetInfo = {};
-            AssetInfo.SourceFilePath = Entry.path().generic_string();
-            AssetInfo.PackagePath = FName(Entry.path().parent_path().generic_string());
-            AssetInfo.Size = static_cast<uint32>(std::filesystem::file_size(Entry.path()));
-
-            HandleFBX(AssetInfo);
+            FbxEntries.Add(Entry);
+        }
+        else if (Entry.path().extension() == ".physicsasset")
+        {
+            PhysicsAssetEntries.Add(Entry);
         }
     }
 
+    for (const auto& Entry : ObjEntries)
+    {
+        // Obj 파일 로드
+        FAssetInfo NewAssetInfo;
+        NewAssetInfo.AssetName = FName(Entry.path().filename().generic_string());
+        NewAssetInfo.PackagePath = FName(Entry.path().parent_path().generic_string());
+        NewAssetInfo.SourceFilePath = Entry.path().generic_string();
+        NewAssetInfo.AssetType = EAssetType::StaticMesh; // obj 파일은 무조건 StaticMesh
+        NewAssetInfo.Size = static_cast<uint32>(std::filesystem::file_size(Entry.path()));
+            
+        FString MeshName = NewAssetInfo.GetFullPath();
+        NewAssetInfo.AssetObject = FObjManager::CreateStaticMesh(MeshName);
+            
+        AssetRegistry->PathNameToAssetInfo.Add(NewAssetInfo.AssetName, NewAssetInfo);
+    }
+
+    for (const auto& Entry : FbxEntries)
+    {
+        FAssetInfo AssetInfo = {};
+        AssetInfo.PackagePath = FName(Entry.path().parent_path().generic_string());
+        AssetInfo.SourceFilePath = Entry.path().generic_string();
+        AssetInfo.Size = static_cast<uint32>(std::filesystem::file_size(Entry.path()));
+
+        HandleFBX(AssetInfo);
+    }
     OutputDebugStringA(std::format("FBX Load Time: {:.2f} s\nBinary Load Time: {:.2f} s", FbxLoadTime / 1000.0, BinaryLoadTime / 1000.0).c_str());
+
+    for (const auto& Entry : PhysicsAssetEntries)
+    {
+        FString FileName = Entry.path().filename().generic_string();
+        int32 DotIdx = FileName.FindChar('.', ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+        if (DotIdx != INDEX_NONE)
+        {
+            FileName = FileName.Left(DotIdx);
+        }
+        
+        FAssetInfo AssetInfo = {};
+        AssetInfo.AssetName = FName(FileName);
+        AssetInfo.PackagePath = FName(Entry.path().parent_path().generic_string());
+        AssetInfo.SourceFilePath = Entry.path().generic_string();
+        AssetInfo.AssetType = EAssetType::PhysicsAsset;
+        AssetInfo.Size = static_cast<uint32>(std::filesystem::file_size(Entry.path()));
+
+        HandlePhysicsAsset(AssetInfo);
+    }
 }
 
 void UAssetManager::HandleFBX(const FAssetInfo& AssetInfo)
 {
-    // TODO : ControlEditorPanel Viwer Open과 코드 중복 다수
+    // TODO : ControlEditorPanel Viewer Open과 코드 중복 다수
     // 경로, 이름 준비
     FString BaseName;
 
@@ -284,6 +408,7 @@ void UAssetManager::AddToAssetMap(const FAssetLoadResult& Result, const FString&
         FAssetInfo Info = BaseAssetInfo;
         Info.AssetName = i > 0 ? FName(BaseAssetName + FString::FromInt(i)) : FName(BaseAssetName);
         Info.AssetType = EAssetType::Skeleton;
+        Info.AssetObject = Skeleton;
         
         FString Key = Info.GetFullPath();
         AssetRegistry->PathNameToAssetInfo.Add(Key, Info);
@@ -299,6 +424,7 @@ void UAssetManager::AddToAssetMap(const FAssetLoadResult& Result, const FString&
         FAssetInfo Info = BaseAssetInfo;
         Info.AssetName = i > 0 ? FName(BaseAssetName + FString::FromInt(i)) : FName(BaseAssetName);
         Info.AssetType = EAssetType::SkeletalMesh;
+        Info.AssetObject = SkeletalMesh;
         
         FString Key = Info.GetFullPath();
         AssetRegistry->PathNameToAssetInfo.Add(Key, Info);
@@ -314,6 +440,7 @@ void UAssetManager::AddToAssetMap(const FAssetLoadResult& Result, const FString&
         FAssetInfo Info = BaseAssetInfo;
         Info.AssetName = i > 0 ? FName(BaseAssetName + FString::FromInt(i)) : FName(BaseAssetName);
         Info.AssetType = EAssetType::StaticMesh;
+        Info.AssetObject = StaticMesh;
         
         FString Key = Info.GetFullPath();
         AssetRegistry->PathNameToAssetInfo.Add(Key, Info);
@@ -329,6 +456,7 @@ void UAssetManager::AddToAssetMap(const FAssetLoadResult& Result, const FString&
         FAssetInfo Info = BaseAssetInfo;
         Info.AssetName = FName(BaseAssetName);
         Info.AssetType = EAssetType::Material;
+        Info.AssetObject = Material;
         
         FString Key = Info.GetFullPath();
         AssetRegistry->PathNameToAssetInfo.Add(Key, Info);
@@ -344,6 +472,7 @@ void UAssetManager::AddToAssetMap(const FAssetLoadResult& Result, const FString&
         FAssetInfo Info = BaseAssetInfo;
         Info.AssetName = FName(BaseAssetName);
         Info.AssetType = EAssetType::Animation;
+        Info.AssetObject = Animation;
         
         FString Key = Info.GetFullPath();
         AssetRegistry->PathNameToAssetInfo.Add(Key, Info);
@@ -430,6 +559,69 @@ bool UAssetManager::SaveFbxBinary(const FString& FilePath, FAssetLoadResult& Res
 
     OutputStream.close();
     return true;
+}
+
+void UAssetManager::HandlePhysicsAsset(FAssetInfo& AssetInfo)
+{
+    TArray<uint8> LoadData;
+    {
+        std::ifstream InputStream{ *AssetInfo.SourceFilePath, std::ios::binary | std::ios::ate };
+        if (!InputStream.is_open())
+        {
+            return;
+        }
+
+        const std::streamsize FileSize = InputStream.tellg();
+        if (FileSize < 0)
+        {
+            // Error getting size
+            InputStream.close();
+            return;
+        }
+        if (FileSize == 0)
+        {
+            // Empty file is valid
+            InputStream.close();
+            return; // Buffer remains empty
+        }
+
+        InputStream.seekg(0, std::ios::beg);
+
+        LoadData.SetNum(static_cast<int32>(FileSize));
+        InputStream.read(reinterpret_cast<char*>(LoadData.GetData()), FileSize);
+
+        if (InputStream.fail() || InputStream.gcount() != FileSize)
+        {
+            return;
+        }
+        InputStream.close();
+    }
+
+    FMemoryReader Reader(LoadData);
+    
+    if (!SerializeVersion(Reader))
+    {
+        return;
+    }
+    
+    UPhysicsAsset* PhysicsAsset = FObjectFactory::ConstructObject<UPhysicsAsset>(nullptr, AssetInfo.AssetName);
+    PhysicsAsset->SerializeAsset(Reader);
+    
+    AssetInfo.AssetObject = PhysicsAsset;
+    AddAsset(AssetInfo.GetFullPath(), PhysicsAsset);
+    AddAssetInfo(AssetInfo);
+
+    // Setup SkeletalMesh
+    /**
+     * TODO:
+     * 현재 로직의 한계
+     *   - 여러 피직스 에셋이 같은 스켈레탈 메시를 프리뷰 메시로 가지고있을 때, 마지막으로 읽은 피직스 에셋으로 덮어 씌우게 됨.
+     *     UUID가 높은 피직스 에셋이 나중에 생성된 에셋이므로, 최신 정보를 가지고있을 확률이 조금 더 높긴 함.
+     */
+    if (USkeletalMesh* PreviewMesh = PhysicsAsset->GetPreviewMesh())
+    {
+        PreviewMesh->SetPhysicsAsset(PhysicsAsset);
+    }
 }
 
 bool UAssetManager::SerializeVersion(FArchive& Ar)

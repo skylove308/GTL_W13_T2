@@ -225,13 +225,13 @@ void PhysicsAssetViewerPanel::AddConstraint(const FBodyInstance* BodyInstance1, 
     NewConstraint->ConstraintBone1 = BodyInstance1->BodyInstanceName.ToString();
     NewConstraint->ConstraintBone2 = BodyInstance2->BodyInstanceName.ToString();
 
-    PxTransform GlobalPose1 = BodyInstance1->BIGameObject->rigidBody->getGlobalPose();
-    PxTransform GlobalPose2 = BodyInstance2->BIGameObject->rigidBody->getGlobalPose();
+    PxTransform GlobalPose1 = BodyInstance1->BIGameObject->RigidBody->getGlobalPose();
+    PxTransform GlobalPose2 = BodyInstance2->BIGameObject->RigidBody->getGlobalPose();
     PxTransform LocalFrameParent = GlobalPose2.getInverse() * GlobalPose1;
     PxTransform LocalFrameChild = PxTransform(PxVec3(0));
 
     // PhysX D6 Joint 생성
-    physx::PxD6Joint* Joint = physx::PxD6JointCreate(*GEngine->PhysicsManager->GetPhysics(), BodyInstance1->BIGameObject->rigidBody, LocalFrameParent, BodyInstance2->BIGameObject->rigidBody, LocalFrameChild);
+    physx::PxD6Joint* Joint = physx::PxD6JointCreate(*GEngine->PhysicsManager->GetPhysics(), BodyInstance1->BIGameObject->RigidBody, LocalFrameParent, BodyInstance2->BIGameObject->RigidBody, LocalFrameChild);
 
     if (Joint)
     {

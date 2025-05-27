@@ -77,7 +77,7 @@ void USkeletalMeshComponent::EndPhysicsTickComponent(float DeltaTime)
         for (FBodyInstance* BI : Bodies)
         {
             BI->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
-            XMMATRIX DXMatrix = BodyInstance->BIGameObject->worldMatrix;
+            XMMATRIX DXMatrix = BodyInstance->BIGameObject->WorldMatrix;
             XMFLOAT4X4 dxMat;
             XMStoreFloat4x4(&dxMat, DXMatrix);
 
