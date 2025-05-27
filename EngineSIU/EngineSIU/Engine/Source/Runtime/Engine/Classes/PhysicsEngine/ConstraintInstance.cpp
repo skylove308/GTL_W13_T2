@@ -1,4 +1,8 @@
-﻿#include "ConstraintInstance.h"
+#include "ConstraintInstance.h"
+
+FConstraintInstance::FConstraintInstance()
+{
+}
 
 void FConstraintInstanceBase::SerializeAsset(FArchive& Ar)
 {
