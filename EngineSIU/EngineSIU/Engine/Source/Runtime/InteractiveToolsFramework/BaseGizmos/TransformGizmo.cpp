@@ -15,6 +15,8 @@ ATransformGizmo::ATransformGizmo()
 {
     static int GizmoCnt = 0;
     UE_LOG(ELogLevel::Error, "Gizmo Created %d", GizmoCnt++);
+
+    SetActorTickInEditor(true);
     
     FObjManager::CreateStaticMesh("Assets/Editor/Gizmo/GizmoTranslationX.obj");
     FObjManager::CreateStaticMesh("Assets/Editor/Gizmo/GizmoTranslationY.obj");
@@ -150,11 +152,13 @@ void ATransformGizmo::Tick(float DeltaTime)
             
             }
         }
+
+        // 기즈모는 예외로 액터에서 컴포넌트 틱 호출
+        for (auto& Comp : GetComponents())
+        {
+            Comp->TickComponent(DeltaTime);
+        }
     }
-
-
-    //
-
 }
 
 void ATransformGizmo::Initialize(FEditorViewportClient* InViewport)

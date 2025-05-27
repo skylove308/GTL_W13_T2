@@ -144,7 +144,7 @@ struct FConstraintInstanceBase
 struct FConstraintInstance : public FConstraintInstanceBase
 {
     DECLARE_STRUCT(FConstraintInstance)
-    FConstraintInstance() = default;
+    FConstraintInstance();
     
     // 기본 정보
     UPROPERTY_WITH_FLAGS(EditAnywhere, FString, JointName)                          // 조인트 이름
