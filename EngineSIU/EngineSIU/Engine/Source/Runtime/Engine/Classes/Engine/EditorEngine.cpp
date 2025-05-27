@@ -47,12 +47,6 @@ void UEditorEngine::Init()
 
     EditorPlayer = FObjectFactory::ConstructObject<AEditorPlayer>(this);
 
-    if (AssetManager == nullptr)
-    {
-        AssetManager = FObjectFactory::ConstructObject<UAssetManager>(this);
-        assert(AssetManager);
-        AssetManager->InitAssetManager();
-    }
     // TODO: 필요할 때 활성화 하기
     // LoadLevel("Saved/AutoSaves.scene");
 }

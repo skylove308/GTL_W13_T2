@@ -49,6 +49,18 @@ void UAssetManager::InitAssetManager()
     LoadContentFiles();
 }
 
+void UAssetManager::ReleaseAssetManager()
+{
+    for (const auto& [Key, AssetObject] : AssetMap[EAssetType::PhysicsAsset])
+    {
+        const FAssetInfo& Info = AssetRegistry->PathNameToAssetInfo[Key];
+        if (Info.AssetObject)
+        {
+            SavePhysicsAsset(Info.GetFullPath(), Cast<UPhysicsAsset>(AssetObject));
+        }
+    }
+}
+
 const TMap<FName, FAssetInfo>& UAssetManager::GetAssetRegistry()
 {
     return AssetRegistry->PathNameToAssetInfo;
@@ -143,6 +155,41 @@ void UAssetManager::AddAsset(const FName& Key, UObject* AssetObject)
     {
         AssetMap[AssetType].Add(Key, AssetObject);
     }
+}
+
+bool UAssetManager::SavePhysicsAsset(const FString& FilePath, UPhysicsAsset* PhysicsAsset)
+{
+    if (!PhysicsAsset)
+    {
+        return false;
+    }
+    
+    std::filesystem::path Path = FilePath.ToWideString();
+
+    TArray<uint8> SaveData;
+    FMemoryWriter Writer(SaveData);
+
+    SerializeVersion(Writer);
+    PhysicsAsset->SerializeAsset(Writer);
+
+    std::ofstream OutputStream{ Path, std::ios::binary | std::ios::trunc };
+    if (!OutputStream.is_open())
+    {
+        return false;
+    }
+
+    if (SaveData.Num() > 0)
+    {
+        OutputStream.write(reinterpret_cast<const char*>(SaveData.GetData()), SaveData.Num());
+
+        if (OutputStream.fail())
+        {
+            return false;
+        }
+    }
+
+    OutputStream.close();
+    return true;
 }
 
 EAssetType UAssetManager::GetAssetType(const UObject* AssetObject) const

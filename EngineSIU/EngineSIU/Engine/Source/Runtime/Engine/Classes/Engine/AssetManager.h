@@ -83,6 +83,8 @@ public:
     
     void InitAssetManager();
 
+    void ReleaseAssetManager();
+
     const TMap<FName, FAssetInfo>& GetAssetRegistry();
     TMap<FName, FAssetInfo>& GetAssetRegistryRef();
 
@@ -102,6 +104,8 @@ public:
     void AddAssetInfo(const FAssetInfo& Info);
     
     void AddAsset(const FName& Key, UObject* AssetObject);
+
+    bool SavePhysicsAsset(const FString& FilePath, UPhysicsAsset* PhysicsAsset);
 
 private:
     inline static TMap<EAssetType, TMap<FName, UObject*>> AssetMap;
