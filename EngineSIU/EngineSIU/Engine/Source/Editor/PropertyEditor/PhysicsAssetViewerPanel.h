@@ -42,6 +42,7 @@ private:
 
     ID3D11ShaderResourceView* BoneIconSRV = nullptr;
     ID3D11ShaderResourceView* NonWeightBoneIconSRV = nullptr;
+    ID3D11ShaderResourceView* BodyInstanceIconSRV = nullptr;
 
     int32 SelectedBoneIndex = INDEX_NONE;
 
