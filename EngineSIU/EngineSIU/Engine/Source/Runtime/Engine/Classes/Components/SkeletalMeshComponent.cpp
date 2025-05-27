@@ -77,7 +77,23 @@ void USkeletalMeshComponent::EndPhysicsTickComponent(float DeltaTime)
         for (FBodyInstance* BI : Bodies)
         {
             BI->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
+            XMMATRIX DXMatrix = BodyInstance->BIGameObject->WorldMatrix;
+            XMFLOAT4X4 dxMat;
+            XMStoreFloat4x4(&dxMat, DXMatrix);
+
+            FMatrix WorldMatrix;
+            for (int32 Row = 0; Row < 4; ++Row)
+            {
+                for (int32 Col = 0; Col < 4; ++Col)
+                {
+                    WorldMatrix.M[Row][Col] = *(&dxMat._11 + Row * 4 + Col);
+                }
+            }
+
+            BonePoseContext.Pose[BI->BoneIndex] = FTransform(WorldMatrix);
         }
+
+        CPUSkinning();
     }
 }
 
@@ -383,6 +399,32 @@ GameObject* USkeletalMeshComponent::CreatePhysXGameObject()
     GameObject* obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance, SkeletalMeshAsset->GetPhysicsAsset()->BodySetups);
 
     return obj;
+}
+
+void USkeletalMeshComponent::AddBodyInstance(FBodyInstance* BodyInstance)
+{
+    Bodies.Add(BodyInstance);
+}
+
+void USkeletalMeshComponent::AddConstraintInstance(FConstraintInstance* ConstraintInstance)
+{
+    Constraints.Add(ConstraintInstance);
+}
+
+void USkeletalMeshComponent::RemoveBodyInstance(FBodyInstance* BodyInstance)
+{
+    if (BodyInstance)
+    {
+        Bodies.Remove(BodyInstance);
+    }
+}
+
+void USkeletalMeshComponent::RemoveConstraintInstance(FConstraintInstance* ConstraintInstance)
+{
+    if (ConstraintInstance)
+    {
+        Constraints.Remove(ConstraintInstance);
+    }
 }
 
 bool USkeletalMeshComponent::NeedToSpawnAnimScriptInstance() const

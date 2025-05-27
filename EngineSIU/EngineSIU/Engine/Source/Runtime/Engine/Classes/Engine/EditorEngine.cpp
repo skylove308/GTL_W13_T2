@@ -20,6 +20,7 @@
 #include "World/ParticleViewerWorld.h"
 #include "Physics/PhysicsManager.h"
 #include "SkeletalMesh.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -408,12 +409,14 @@ void UEditorEngine::StartPhysicsAssetViewer(FName PreviewMeshKey, FName PhysicsA
     else
     {
         FWorldContext& WorldContext = CreateNewWorldContext(EWorldType::PhysicsAssetViewer);
-        PhysicsAssetViewerWorld = UPhysicsAssetViewerWorld::CreateWorld(this); // PhysicsAssetViewerWorld가 생성됩니다.
+        PhysicsAssetViewerWorld = UPhysicsAssetViewerWorld::CreateWorld(this);
         WorldContext.SetCurrentWorld(PhysicsAssetViewerWorld);
     }
 
     ActiveWorld = PhysicsAssetViewerWorld;
     PhysicsAssetViewerWorld->WorldType = EWorldType::PhysicsAssetViewer;
+    PhysicsManager->CreateScene(ActiveWorld);
+    PhysicsManager->SetCurrentScene(ActiveWorld);
 
     // 스켈레탈 액터 스폰
     ASkeletalMeshActor* SkeletalActor = PhysicsAssetViewerWorld->SpawnActor<ASkeletalMeshActor>();
@@ -446,18 +449,10 @@ void UEditorEngine::StartPhysicsAssetViewer(FName PreviewMeshKey, FName PhysicsA
     
     if (PhysicsAssetViewerWorld) // PhysicsAssetViewerWorld가 유효한지 다시 확인하는 것이 좋습니다.
     {
-        // 만약 UPhysicsAssetViewerWorld가 USkeletalViewerWorld를 상속받지 않는다면, 
-        // 직접 캐스팅하거나 PhysicsAssetViewerWorld 클래스에 MeshComp를 저장할 별도의 변수를 추가해야 합니다.
-        // 예를 들어, UPhysicsAssetViewerWorld에 USkeletalMeshComponent* CurrentPhysicsMeshComp; 와 같은 변수를 만들고
-        // PhysicsAssetViewerWorld->SetCurrentPhysicsMeshComp(MeshComp); 와 같이 호출합니다.
-
-        // 현재 상황에서 가장 직접적인 수정: PhysicsAssetViewerWorld가 USkeletalViewerWorld라고 가정하고 호출
-        // 만약 UPhysicsAssetViewerWorld 클래스가 SetSkeletalMeshComponent를 가지고 있다면 이렇게 호출
         PhysicsAssetViewerWorld->SetSkeletalMeshComponent(MeshComp);
     }
     else
     {
-        // 에러 로그: PhysicsAssetViewerWorld가 유효하지 않습니다.
         UE_LOG(ELogLevel::Error, TEXT("PhysicsAssetViewerWorld is null after creation attempt in StartPhysicsAssetViewer."));
     }
 
@@ -602,6 +597,31 @@ void UEditorEngine::EndParticleViewer()
         Camera.SetLocation(CameraLocation);
         Camera.SetRotation(CameraRotation);
         
+        ClearActorSelection();
+        ClearComponentSelection();
+    }
+    ActiveWorld = EditorWorld;
+
+    if (AEditorPlayer* Player = GetEditorPlayer())
+    {
+        Player->SetCoordMode(ECoordMode::CDM_WORLD);
+    }
+}
+
+void UEditorEngine::EndPhysicsAssetViewer()
+{
+    if (PhysicsAssetViewerWorld)
+    {
+        this->ClearActorSelection();
+        WorldList.Remove(GetWorldContextFromWorld(PhysicsAssetViewerWorld));
+        PhysicsAssetViewerWorld->Release();
+        GUObjectArray.MarkRemoveObject(PhysicsAssetViewerWorld);
+        PhysicsAssetViewerWorld = nullptr;
+
+        FViewportCamera& Camera = *GEngineLoop.GetLevelEditor()->GetActiveViewportClient()->GetPerspectiveCamera();
+        Camera.SetLocation(CameraLocation);
+        Camera.SetRotation(CameraRotation);
+
         ClearActorSelection();
         ClearComponentSelection();
     }

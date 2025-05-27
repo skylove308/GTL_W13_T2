@@ -14,6 +14,7 @@ class UParticleViewerWorld;
 class UParticleSystem;
 class AActor;
 class USceneComponent;
+class UPhysicsAsset;
 
 class UEditorEngine : public UEngine
 {
@@ -44,6 +45,7 @@ public:
     void EndPIE();
     void EndSkeletalMeshViewer();
     void EndParticleViewer();
+    void EndPhysicsAssetViewer();
 
     void SetPhysXScene(UWorld* World);
 

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Container/Array.h"
 
 #include <PxPhysicsAPI.h>
@@ -54,6 +54,7 @@ class UBodySetupCore : public UObject
     
 public:
     UBodySetupCore() = default;
+    void SetBoneName(const FName& InBoneName) { BoneName = InBoneName; }
 
     FName BoneName;
 

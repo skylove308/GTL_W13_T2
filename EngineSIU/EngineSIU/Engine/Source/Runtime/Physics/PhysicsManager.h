@@ -47,12 +47,17 @@ public:
     void SetCurrentScene(UWorld* World) { CurrentScene = SceneMap[World]; }
     void SetCurrentScene(PxScene* Scene) { CurrentScene = Scene; }
     
+    void DestroyGameObject(GameObject* GameObject) const;
+    
     GameObject CreateBox(const PxVec3& Pos, const PxVec3& HalfExtents) const;
     GameObject* CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, TArray<UBodySetup*> BodySetups) const;
 
     PxShape* CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
     PxShape* CreateSphereShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
     PxShape* CreateCapsuleShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
+
+    PxPhysics* GetPhysics() { return Physics; }
+    PxMaterial* GetMaterial() const { return Material; }
     
     void Simulate(float DeltaTime);
     void ShutdownPhysX();
