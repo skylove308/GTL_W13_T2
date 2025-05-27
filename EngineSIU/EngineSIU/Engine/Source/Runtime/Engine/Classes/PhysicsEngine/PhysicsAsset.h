@@ -70,6 +70,7 @@ public:
 
     // DisplayName = Primitives
     FKAggregateGeom AggGeom;
+    TArray<AggregateGeomAttributes> GeomAttributes;
 
     virtual void SerializeAsset(FArchive& Ar) override;
 };

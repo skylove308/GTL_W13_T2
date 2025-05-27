@@ -409,23 +409,23 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
 
         for(int j = 0; j < Bodies.Num(); j++)
         {
-            if (NewConstraint->ConstraintBone1 == Bodies[j]->BodyInstanceName)
+            if (NewConstraint->ConstraintBone1 == Bodies[j]->BodyInstanceName.ToString())
             {
                 BodyInstance1 = Bodies[j];
             }
-            if (NewConstraint->ConstraintBone2 == Bodies[j]->BodyInstanceName)
+            if (NewConstraint->ConstraintBone2 == Bodies[j]->BodyInstanceName.ToString())
             {
                 BodyInstance2 = Bodies[j];
             }
         }
 
-        PxTransform GlobalPose1 = BodyInstance1->BIGameObject->rigidBody->getGlobalPose();
-        PxTransform GlobalPose2 = BodyInstance2->BIGameObject->rigidBody->getGlobalPose();
+        PxTransform GlobalPose1 = BodyInstance1->BIGameObject->RigidBody->getGlobalPose();
+        PxTransform GlobalPose2 = BodyInstance2->BIGameObject->RigidBody->getGlobalPose();
         PxTransform LocalFrameParent = GlobalPose2.getInverse() * GlobalPose1;
         PxTransform LocalFrameChild = PxTransform(PxVec3(0));
 
         // PhysX D6 Joint 생성
-        physx::PxD6Joint* Joint = physx::PxD6JointCreate(*GEngine->PhysicsManager->GetPhysics(), BodyInstance1->BIGameObject->rigidBody, LocalFrameParent, BodyInstance2->BIGameObject->rigidBody, LocalFrameChild);
+        physx::PxD6Joint* Joint = physx::PxD6JointCreate(*GEngine->PhysicsManager->GetPhysics(), BodyInstance1->BIGameObject->RigidBody, LocalFrameParent, BodyInstance2->BIGameObject->RigidBody, LocalFrameChild);
 
         if (Joint)
         {
