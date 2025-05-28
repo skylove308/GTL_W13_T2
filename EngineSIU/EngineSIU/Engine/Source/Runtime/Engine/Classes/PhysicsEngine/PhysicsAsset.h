@@ -27,7 +27,8 @@ struct FKAggregateGeom
     TArray<physx::PxShape*> CapsuleElems;
 };
 
-enum class ERigidBodyType {
+enum class ERigidBodyType : uint8
+{
     STATIC,
     DYNAMIC, 
     KINEMATIC
