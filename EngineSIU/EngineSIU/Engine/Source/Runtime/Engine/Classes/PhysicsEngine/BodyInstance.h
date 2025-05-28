@@ -32,7 +32,7 @@ struct FBodyInstance
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, COMNudge)
     
     /** 관성 텐서 스케일 (회전 저항) */
-    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, InertiaTensorScale, = FVector(0.1, 0.1, 0.1f))
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, InertiaTensorScale, = FVector(1.0f, 1.0f, 1.0f))
     
     // ==================== 시뮬레이션 설정 ====================
     

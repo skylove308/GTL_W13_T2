@@ -168,7 +168,6 @@ void USkeletalMeshComponent::TickComponent(float DeltaTime)
 
 void USkeletalMeshComponent::EndPhysicsTickComponent(float DeltaTime)
 {
-    //Super::EndPhysicsTickComponent(DeltaTime);
     if (bSimulate)
     {
         const FReferenceSkeleton& RefSkeleton = SkeletalMeshAsset->GetSkeleton()->GetReferenceSkeleton();
@@ -561,7 +560,7 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
     {
         RigidBodyType = ERigidBodyType::KINEMATIC;
     }
-    
+
     // BodyInstance 생성
     const auto& Skeleton = SkeletalMeshAsset->GetSkeleton()->GetReferenceSkeleton();
     TArray<UBodySetup*> BodySetups = SkeletalMeshAsset->GetPhysicsAsset()->BodySetups;
@@ -615,13 +614,13 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
         PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
         PxQuat Quat = PxQuat(Rotation.X, Rotation.Y, Rotation.Z, Rotation.W);
         GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(Pos, Quat, NewBody, BodySetups[i], RigidBodyType);
-        
+
         if (RigidBodyType != ERigidBodyType::STATIC)
         {
             Obj->DynamicRigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bApplyGravity);
             //Obj->DynamicRigidBody->addTorque(PxVec3(100.0f, 0.0f, 0.0f), PxForceMode::eIMPULSE);
         }
-        
+
         NewBody->SetGameObject(Obj);
         NewBody->BodyInstanceName = BodySetups[i]->BoneName;
         NewBody->BoneIndex = BoneIndex;
@@ -631,13 +630,13 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
 
     // Constraint Instance 생성
     TArray<FConstraintSetup*> ConstraintSetups = SkeletalMeshAsset->GetPhysicsAsset()->ConstraintSetups;
-    for(int i=0; i < ConstraintSetups.Num(); i++)
+    for (int i = 0; i < ConstraintSetups.Num(); i++)
     {
         FConstraintInstance* NewConstraintInstance = new FConstraintInstance;
         FBodyInstance* BodyInstance1 = nullptr;
         FBodyInstance* BodyInstance2 = nullptr;
 
-        for(int j = 0; j < Bodies.Num(); j++)
+        for (int j = 0; j < Bodies.Num(); j++)
         {
             if (ConstraintSetups[i]->ConstraintBone1 == Bodies[j]->BodyInstanceName.ToString())
             {
@@ -653,7 +652,7 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
         {
             GEngine->PhysicsManager->CreateJoint(BodyInstance1->BIGameObject, BodyInstance2->BIGameObject, NewConstraintInstance, ConstraintSetups[i]);
         }
-       
+
         Constraints.Add(NewConstraintInstance);
     }
 }
