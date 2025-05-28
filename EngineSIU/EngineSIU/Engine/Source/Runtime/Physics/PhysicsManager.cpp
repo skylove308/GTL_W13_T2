@@ -656,62 +656,40 @@ void FPhysicsManager::DestroyGameObject(GameObject* GameObject) const
     delete GameObject;
 }
 
-PxShape* FPhysicsManager::CreateBoxShape(const PxVec3& Pos, const PxVec3& RotationEuler, const PxVec3& HalfExtents) const
+PxShape* FPhysicsManager::CreateBoxShape(const PxVec3& Pos, const PxQuat& Quat, const PxVec3& HalfExtents) const
 {
     // Box 모양 생성
     PxShape* Result = Physics->createShape(PxBoxGeometry(HalfExtents), *Material);
     
-    // 오일러 각도를 쿼터니언으로 변환
-    PxQuat Rotation = EulerToQuat(RotationEuler);
-    
     // 위치와 회전을 모두 적용한 Transform 생성
-    PxTransform LocalTransform(Pos, Rotation);
+    PxTransform LocalTransform(Pos, Quat);
     Result->setLocalPose(LocalTransform);
     
     return Result;
 }
 
-PxShape* FPhysicsManager::CreateSphereShape(const PxVec3& Pos, const PxVec3& RotationEuler, float Radius) const
+PxShape* FPhysicsManager::CreateSphereShape(const PxVec3& Pos, const PxQuat& Quat, float Radius) const
 {
     // Sphere 모양 생성 (구는 회전에 영향받지 않지만 일관성을 위해 적용)
     PxShape* Result = Physics->createShape(PxSphereGeometry(Radius), *Material);
     
-    // 오일러 각도를 쿼터니언으로 변환
-    PxQuat Rotation = EulerToQuat(RotationEuler);
-    
     // 위치와 회전을 모두 적용한 Transform 생성
-    PxTransform LocalTransform(Pos, Rotation);
+    PxTransform LocalTransform(Pos, Quat);
     Result->setLocalPose(LocalTransform);
     
     return Result;
 }
 
-PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& Pos, const PxVec3& RotationEuler, float Radius, float HalfHeight) const
+PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& Pos, const PxQuat& Quat, float Radius, float HalfHeight) const
 {
     // Capsule 모양 생성
     PxShape* Result = Physics->createShape(PxCapsuleGeometry(Radius, HalfHeight), *Material);
     
-    // 오일러 각도를 쿼터니언으로 변환
-    PxQuat Rotation = EulerToQuat(RotationEuler);
-    
     // 위치와 회전을 모두 적용한 Transform 생성
-    PxTransform LocalTransform(Pos, Rotation);
+    PxTransform LocalTransform(Pos, Quat);
     Result->setLocalPose(LocalTransform);
     
     return Result;
-}
-
-// 오일러 각도를 쿼터니언으로 변환하는 헬퍼 함수
-PxQuat FPhysicsManager::EulerToQuat(const PxVec3& EulerAngles) const
-{
-    // PhysX의 PxTransform을 이용한 변환
-    PxTransform rotX(PxVec3(0), PxQuat(EulerAngles.x, PxVec3(1, 0, 0)));
-    PxTransform rotY(PxVec3(0), PxQuat(EulerAngles.y, PxVec3(0, 1, 0)));
-    PxTransform rotZ(PxVec3(0), PxQuat(EulerAngles.z, PxVec3(0, 0, 1)));
-    
-    PxTransform result = rotZ * rotY * rotX;
-    
-    return result.q;
 }
 
 void FPhysicsManager::Simulate(float DeltaTime)

@@ -221,12 +221,13 @@ void UPrimitiveComponent::EndPhysicsTickComponent(float DeltaTime)
         // ✅ 쿼터니언에서 오일러 각도로 변환
         XMFLOAT4 quat;
         XMStoreFloat4(&quat, rotation);
-        FQuat MyQuat = FQuat(quat.x, quat.y, quat.z, quat.w);
-        FVector eulerAngles = JungleMath::QuaternionToEuler(MyQuat);
+        
+        FQuat MyQuat = FQuat(-quat.x, -quat.y, quat.z, quat.w);
+        FRotator Rotator = MyQuat.Rotator();
         
         // ✅ Unreal Engine에 적용 (라디안 → 도 변환)
-        SetWorldLocation(FVector(pos.x, pos.y, pos.z));
-        SetWorldRotation(FRotator(-eulerAngles.Y, eulerAngles.Z, eulerAngles.X));
+        SetWorldLocation(FVector(-pos.x, -pos.y, pos.z));
+        SetWorldRotation(Rotator);
     }
 }
 
@@ -538,9 +539,10 @@ void UPrimitiveComponent::CreatePhysXGameObject()
     ////////////////////////
     
     FVector Location = GetComponentLocation();
-    FQuat Rotation = GetComponentRotation().Quaternion();
-    PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
-    PxQuat Rot = PxQuat(Rotation.X, Rotation.Y, Rotation.Z, Rotation.W);
+    PxVec3 PPos = PxVec3(Location.X, Location.Y, Location.Z);
+    
+    FQuat Quat = GetComponentRotation().Quaternion();
+    PxQuat PQuat = PxQuat(Quat.X, Quat.Y, Quat.Z, Quat.W);
 
     if (GeomAttributes.Num() == 0)
     {
@@ -554,33 +556,34 @@ void UPrimitiveComponent::CreatePhysXGameObject()
     for (const auto& GeomAttribute : GeomAttributes)
     {
         PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
-        PxVec3 Rotation = PxVec3(GeomAttribute.Rotation.Roll, GeomAttribute.Rotation.Pitch, GeomAttribute.Rotation.Yaw);
+        FQuat GeomQuat = GeomAttribute.Rotation.Quaternion();
+        PxQuat GeomPQuat = PxQuat(GeomQuat.X, GeomQuat.Y, GeomQuat.Z, GeomQuat.W);
         PxVec3 Extent = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
 
         switch (GeomAttribute.GeomType)
         {
         case EGeomType::ESphere:
         {
-            PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, Extent.x);
+            PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, GeomPQuat, Extent.x);
             BodySetup->AggGeom.SphereElems.Add(PxSphere);
             break;
         }
         case EGeomType::EBox:
         {
-            PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, Rotation, Extent);
+            PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, GeomPQuat, Extent);
             BodySetup->AggGeom.BoxElems.Add(PxBox);
             break;
         }
         case EGeomType::ECapsule:
         {
-            PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, Extent.x, Extent.z);
+            PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z);
             BodySetup->AggGeom.SphereElems.Add(PxCapsule);
             break;
         }
         }
     }
     
-    GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(Pos, Rot, BodyInstance,  BodySetup, RigidBodyType);
+    GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(PPos, PQuat, BodyInstance,  BodySetup, RigidBodyType);
 }
 
 void UPrimitiveComponent::BeginPlay()
