@@ -718,6 +718,7 @@ void FPhysicsManager::Simulate(float DeltaTime)
 {
     if (CurrentScene)
     {
+        QUICK_SCOPE_CYCLE_COUNTER(SimulatePass_CPU)
         CurrentScene->simulate(DeltaTime);
         CurrentScene->fetchResults(true);
     }
@@ -763,5 +764,14 @@ void FPhysicsManager::CleanupPVD() {
         }
         Pvd->release();
         Pvd = nullptr;
+    }
+}
+
+void FPhysicsManager::CleanupScene()
+{
+    if (CurrentScene)
+    {
+        CurrentScene->release();
+        CurrentScene = nullptr;
     }
 }

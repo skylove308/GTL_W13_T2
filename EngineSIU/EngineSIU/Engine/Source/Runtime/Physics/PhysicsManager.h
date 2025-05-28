@@ -20,8 +20,6 @@ class UWorld;
 using namespace physx;
 using namespace DirectX;
 
-// #define SCOPED_READ_LOCK(scene) PxSceneReadLock scopedReadLock(*scene);
-
 class UPrimitiveComponent;
 
 // 게임 오브젝트
@@ -31,7 +29,7 @@ struct GameObject {
     XMMATRIX WorldMatrix = XMMatrixIdentity();
 
     void UpdateFromPhysics(PxScene* Scene) {
-        // SCOPED_READ_LOCK(gScene);
+        PxSceneReadLock scopedReadLock(*Scene);
         PxTransform t = DynamicRigidBody->getGlobalPose();
         PxMat44 mat(t);
         WorldMatrix = XMLoadFloat4x4(reinterpret_cast<const XMFLOAT4X4*>(&mat));
@@ -73,6 +71,7 @@ public:
     void Simulate(float DeltaTime);
     void ShutdownPhysX();
     void CleanupPVD();
+    void CleanupScene();
 
 private:
     PxDefaultAllocator Allocator;
