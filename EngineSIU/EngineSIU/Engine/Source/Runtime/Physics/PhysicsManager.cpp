@@ -153,7 +153,7 @@ GameObject FPhysicsManager::CreateBox(const PxVec3& Pos, const PxVec3& HalfExten
     return Obj;
 }
 
-GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetup, ERigidBodyType RigidBodyType) const
+GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, const PxQuat& Rot, FBodyInstance* BodyInstance, UBodySetup* BodySetup, ERigidBodyType RigidBodyType) const
 {
     GameObject* Obj = new GameObject();
     
@@ -162,19 +162,19 @@ GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* 
     {
     case ERigidBodyType::STATIC:
     {
-        Obj->StaticRigidBody = CreateStaticRigidBody(Pos, BodyInstance, BodySetup);
+        Obj->StaticRigidBody = CreateStaticRigidBody(Pos, Rot, BodyInstance, BodySetup);
         ApplyBodyInstanceSettings(Obj->StaticRigidBody, BodyInstance);
         break;
     }
     case ERigidBodyType::DYNAMIC:
     {
-        Obj->DynamicRigidBody = CreateDynamicRigidBody(Pos, BodyInstance, BodySetup);
+        Obj->DynamicRigidBody = CreateDynamicRigidBody(Pos, Rot, BodyInstance, BodySetup);
         ApplyBodyInstanceSettings(Obj->DynamicRigidBody, BodyInstance);
         break;
     }
     case ERigidBodyType::KINEMATIC:
     {
-        Obj->DynamicRigidBody = CreateDynamicRigidBody(Pos, BodyInstance, BodySetup);
+        Obj->DynamicRigidBody = CreateDynamicRigidBody(Pos, Rot, BodyInstance, BodySetup);
         Obj->DynamicRigidBody->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
         ApplyBodyInstanceSettings(Obj->DynamicRigidBody, BodyInstance);
         break;
@@ -186,9 +186,9 @@ GameObject* FPhysicsManager::CreateGameObject(const PxVec3& Pos, FBodyInstance* 
     return Obj;
 }
 
-PxRigidDynamic* FPhysicsManager::CreateDynamicRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetup) const
+PxRigidDynamic* FPhysicsManager::CreateDynamicRigidBody(const PxVec3& Pos, const PxQuat& Rot, FBodyInstance* BodyInstance, UBodySetup* BodySetup) const
 {
-    const PxTransform Pose(Pos);
+    const PxTransform Pose(Pos, Rot);
     PxRigidDynamic* DynamicRigidBody = Physics->createRigidDynamic(Pose);
     
     // Shape 추가
@@ -204,9 +204,9 @@ PxRigidDynamic* FPhysicsManager::CreateDynamicRigidBody(const PxVec3& Pos, FBody
     return DynamicRigidBody;
 }
 
-PxRigidStatic* FPhysicsManager::CreateStaticRigidBody(const PxVec3& Pos, FBodyInstance* BodyInstance, UBodySetup* BodySetup) const
+PxRigidStatic* FPhysicsManager::CreateStaticRigidBody(const PxVec3& Pos, const PxQuat& Rot, FBodyInstance* BodyInstance, UBodySetup* BodySetup) const
 {
-    const PxTransform Pose(Pos);
+    const PxTransform Pose(Pos, Rot);
     PxRigidStatic* StaticRigidBody = Physics->createRigidStatic(Pose);
     
     // Shape 추가
@@ -450,7 +450,7 @@ void FPhysicsManager::CreateJoint(const GameObject* Obj1, const GameObject* Obj2
     PxTransform GlobalPose1 = Obj1->DynamicRigidBody->getGlobalPose();
     PxTransform GlobalPose2 = Obj2->DynamicRigidBody->getGlobalPose();
         
-    PxTransform LocalFrameParent = GlobalPose2.getInverse() * GlobalPose1;
+    PxTransform LocalFrameParent = GlobalPose1.getInverse() * GlobalPose2;
     PxTransform LocalFrameChild = PxTransform(PxVec3(0));
 
     // PhysX D6 Joint 생성
@@ -649,7 +649,19 @@ void FPhysicsManager::DestroyGameObject(GameObject* GameObject) const
 PxShape* FPhysicsManager::CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
 {
     PxShape* Result = Physics->createShape(PxBoxGeometry(HalfExtents), *Material);
-    PxTransform LocalPos(Pos);
+    // 1) 도(degree) → 라디안으로 변환
+    const float RadX = Rotation.x * PxPi / 180.0f;
+    const float RadY = Rotation.y * PxPi / 180.0f;
+    const float RadZ = Rotation.z * PxPi / 180.0f;
+
+    // 2) 축별 쿼터니언 생성 (Pitch=X, Yaw=Y, Roll=Z 순서 예시)
+    PxQuat qx(RadX, PxVec3(1, 0, 0));
+    PxQuat qy(RadY, PxVec3(0, 1, 0));
+    PxQuat qz(RadZ, PxVec3(0, 0, 1));
+
+    // 3) 원하는 회전 순서로 합성 (Roll*Pitch*Yaw 등)
+    PxQuat quat = qz * qx * qy;
+    PxTransform LocalPos(Pos, quat);
     Result->setLocalPose(LocalPos);
     return Result;
 }
@@ -657,7 +669,19 @@ PxShape* FPhysicsManager::CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotati
 PxShape* FPhysicsManager::CreateSphereShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
 {
     PxShape* Result = Physics->createShape(PxSphereGeometry(HalfExtents.x), *Material);
-    PxTransform LocalPos(Pos);
+    // 1) 도(degree) → 라디안으로 변환
+    const float RadX = Rotation.x * PxPi / 180.0f;
+    const float RadY = Rotation.y * PxPi / 180.0f;
+    const float RadZ = Rotation.z * PxPi / 180.0f;
+
+    // 2) 축별 쿼터니언 생성 (Pitch=X, Yaw=Y, Roll=Z 순서 예시)
+    PxQuat qx(RadX, PxVec3(1, 0, 0));
+    PxQuat qy(RadY, PxVec3(0, 1, 0));
+    PxQuat qz(RadZ, PxVec3(0, 0, 1));
+
+    // 3) 원하는 회전 순서로 합성 (Roll*Pitch*Yaw 등)
+    PxQuat quat = qz * qx * qy;
+    PxTransform LocalPos(Pos, quat);
     Result->setLocalPose(LocalPos);
     return Result;
 }
@@ -665,7 +689,19 @@ PxShape* FPhysicsManager::CreateSphereShape(const PxVec3& Pos, const PxVec3& Rot
 PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
 {
     PxShape* Result = Physics->createShape(PxCapsuleGeometry(HalfExtents.x, HalfExtents.z), *Material);
-    PxTransform LocalPos(Pos);
+    // 1) 도(degree) → 라디안으로 변환
+    const float RadX = Rotation.x * PxPi / 180.0f;
+    const float RadY = Rotation.y * PxPi / 180.0f;
+    const float RadZ = Rotation.z * PxPi / 180.0f;
+
+    // 2) 축별 쿼터니언 생성 (Pitch=X, Yaw=Y, Roll=Z 순서 예시)
+    PxQuat qx(RadX, PxVec3(1, 0, 0));
+    PxQuat qy(RadY, PxVec3(0, 1, 0));
+    PxQuat qz(RadZ, PxVec3(0, 0, 1));
+
+    // 3) 원하는 회전 순서로 합성 (Roll*Pitch*Yaw 등)
+    PxQuat quat = qz * qx * qy;
+    PxTransform LocalPos(Pos, quat);
     Result->setLocalPose(LocalPos);
     return Result;
 }
