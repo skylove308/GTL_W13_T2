@@ -11,6 +11,7 @@
 #include "Animation/AnimSingleNodeInstance.h"
 #include "Animation/AnimTypes.h"
 #include "Engine/Engine.h"
+#include "Misc/Parse.h"
 #include "PhysicsEngine/PhysicsAsset.h"
 #include "UObject/Casts.h"
 #include "UObject/ObjectFactory.h"
@@ -57,6 +58,67 @@ UObject* USkeletalMeshComponent::Duplicate(UObject* InOuter)
     NewComponent->SetLooping(this->IsLooping());
     NewComponent->SetPlaying(this->IsPlaying());
     return NewComponent;
+}
+
+void USkeletalMeshComponent::SetProperties(const TMap<FString, FString>& InProperties)
+{
+    Super::SetProperties(InProperties);
+
+    if (InProperties.Contains("SkeletalMeshKey"))
+    {
+        FName SkelMeshKey = FName(InProperties["SkeletalMeshKey"]);
+        if (USkeletalMesh* SkelMesh = Cast<USkeletalMesh>(UAssetManager::Get().GetAsset(EAssetType::SkeletalMesh, SkelMeshKey)))
+        {
+            SetSkeletalMeshAsset(SkelMesh);
+        }
+    }
+    
+    if (InProperties.Contains("AnimationMode"))
+    {
+        const EAnimationMode Mode = static_cast<EAnimationMode>(FString::ToInt(InProperties["AnimationMode"]));
+        SetAnimationMode(Mode);
+    }
+
+    if (InProperties.Contains("AnimClass") && AnimationMode == EAnimationMode::AnimationBlueprint)
+    {
+        UClass* InAnimClass = UClass::FindClass(InProperties["AnimClass"]);
+        SetAnimClass(InAnimClass);
+    }
+
+    if (InProperties.Contains("AnimToPlay") && AnimationMode == EAnimationMode::AnimationSingleNode)
+    {
+        FName AnimKey = FName(InProperties["AnimToPlay"]);
+        if (UAnimationAsset* Anim = Cast<UAnimationAsset>(UAssetManager::Get().GetAsset(EAssetType::Animation, AnimKey)))
+        {
+            SetAnimation(Anim);
+        }
+    }
+}
+
+void USkeletalMeshComponent::GetProperties(TMap<FString, FString>& OutProperties) const
+{
+    Super::GetProperties(OutProperties);
+
+    const FName SkelMeshKey = UAssetManager::Get().GetAssetKeyByObject(EAssetType::SkeletalMesh, GetSkeletalMeshAsset());
+    OutProperties.Add(TEXT("SkeletalMeshKey"), SkelMeshKey.ToString());
+
+    OutProperties.Add(TEXT("AnimationMode"), FString::FromInt(static_cast<uint8>(AnimationMode)));
+
+    FString AnimClassStr = FName().ToString();
+    if (AnimationMode == EAnimationMode::AnimationBlueprint)
+    {
+        if (AnimClass && AnimClass.Get())
+        {
+            AnimClassStr = AnimClass.Get()->GetName();
+        }
+    }
+    OutProperties.Add(TEXT("AnimClass"), AnimClassStr);
+
+    if (AnimationMode == EAnimationMode::AnimationSingleNode)
+    {
+        const FName AnimKey = UAssetManager::Get().GetAssetKeyByObject(EAssetType::Animation, GetAnimation());
+        OutProperties.Add(TEXT("AnimToPlay"), AnimKey.ToString());
+    }
 }
 
 void USkeletalMeshComponent::TickComponent(float DeltaTime)
@@ -600,7 +662,7 @@ void USkeletalMeshComponent::SetAnimClass(UClass* NewClass)
     SetAnimInstanceClass(NewClass);
 }
 
-UClass* USkeletalMeshComponent::GetAnimClass()
+UClass* USkeletalMeshComponent::GetAnimClass() const
 {
     return AnimClass;
 }
