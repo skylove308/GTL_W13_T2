@@ -10,6 +10,7 @@
 #include "Engine/OverlapInfo.h"
 #include "Engine/OverlapResult.h"
 #include "GameFramework/Actor.h"
+#include "Math/JungleMath.h"
 #include "Misc/Parse.h"
 #include "World/World.h"
 #include "PhysicsEngine/PhysicsAsset.h"
@@ -209,15 +210,23 @@ void UPrimitiveComponent::EndPhysicsTickComponent(float DeltaTime)
     {
         BodyInstance->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
         XMMATRIX Matrix = BodyInstance->BIGameObject->WorldMatrix;
-        XMVECTOR RotationVec = XMQuaternionRotationMatrix(Matrix);
-        float X = XMVectorGetX(Matrix.r[3]);
-        float Y = XMVectorGetY(Matrix.r[3]);
-        float Z = XMVectorGetZ(Matrix.r[3]);
-        float RX = XMVectorGetX(RotationVec);
-        float RY = XMVectorGetY(RotationVec);
-        float RZ = XMVectorGetZ(RotationVec);
-        SetWorldLocation(FVector(X, Y, Z));
-        SetWorldRotation(FRotator(RX, RY, RZ));
+        
+        XMVECTOR scale, rotation, translation;
+        XMMatrixDecompose(&scale, &rotation, &translation, Matrix);
+        
+        // ✅ 위치 추출
+        XMFLOAT3 pos;
+        XMStoreFloat3(&pos, translation);
+        
+        // ✅ 쿼터니언에서 오일러 각도로 변환
+        XMFLOAT4 quat;
+        XMStoreFloat4(&quat, rotation);
+        FQuat MyQuat = FQuat(quat.x, quat.y, quat.z, quat.w);
+        FVector eulerAngles = JungleMath::QuaternionToEuler(MyQuat);
+        
+        // ✅ Unreal Engine에 적용 (라디안 → 도 변환)
+        SetWorldLocation(FVector(pos.x, pos.y, pos.z));
+        SetWorldRotation(FRotator(-eulerAngles.Y, eulerAngles.Z, eulerAngles.X));
     }
 }
 
