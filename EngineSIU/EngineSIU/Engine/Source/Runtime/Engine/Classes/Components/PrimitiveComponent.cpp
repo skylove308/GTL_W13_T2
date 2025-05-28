@@ -492,7 +492,17 @@ const TArray<FOverlapInfo>& UPrimitiveComponent::GetOverlapInfos() const
 
 void UPrimitiveComponent::CreatePhysXGameObject()
 {
+    if (!bSimulate)
+    {
+        return;
+    }
+    
     BodyInstance = new FBodyInstance(this);
+
+    ////////////// 테스트 코드
+    BodyInstance->bSimulatePhysics = bSimulate;
+    BodyInstance->bEnableGravity = bApplyGravity;
+    ////////////////////////
     
     FVector Location = GetComponentLocation();
     PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
@@ -536,17 +546,11 @@ void UPrimitiveComponent::CreatePhysXGameObject()
     }
     
     GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance,  BodySetup, RigidBodyType);
-    if (RigidBodyType != ERigidBodyType::STATIC)
-    {
-        Obj->DynamicRigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bApplyGravity);
-    }
 }
 
 void UPrimitiveComponent::BeginPlay()
 {
     USceneComponent::BeginPlay();
-
-    CreatePhysXGameObject();
 }
 
 void UPrimitiveComponent::UpdateOverlapsImpl(const TArray<FOverlapInfo>* NewPendingOverlaps, bool bDoNotifies, const TArray<const FOverlapInfo>* OverlapsAtEndLocation)

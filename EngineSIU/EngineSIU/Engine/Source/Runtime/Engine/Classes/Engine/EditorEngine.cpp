@@ -19,6 +19,7 @@
 #include "Physics/PhysicsManager.h"
 #include "SkeletalMesh.h"
 #include "PhysicsEngine/PhysicsAsset.h"
+#include "Particles/ParticleSystem.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -46,9 +47,8 @@ void UEditorEngine::Init()
     ActiveWorld = EditorWorld;
 
     EditorPlayer = FObjectFactory::ConstructObject<AEditorPlayer>(this);
-
-    // TODO: 필요할 때 활성화 하기
-    // LoadLevel("Saved/AutoSaves.scene");
+    
+    LoadLevel("Saved/AutoSaves.scene");
 }
 
 void UEditorEngine::Release()
@@ -82,22 +82,33 @@ void UEditorEngine::Tick(float DeltaTime)
                 {
                     for (AActor* Actor : CachedActors)
                     {
-                        if (Actor && Actor->IsActorTickInEditor())
+                        if (!Actor)
+                        {
+                            continue;
+                        }
+
+                        const bool bActorTickInEditor = Actor->IsActorTickInEditor();
+                        if (bActorTickInEditor)
                         {
                             Actor->Tick(DeltaTime);
+                        }
 
-                            // 물리기반 시뮬레이션을 위한 TickGroup 처리
-                            for (auto* Comp : Actor->GetComponents())
+                        for (const auto& Comp : Actor->GetComponents())
+                        {
+                            // 파티클 컴포넌트는 항상 Tick 호출
+                            if (bActorTickInEditor || Comp->IsA<UParticleSystemComponent>())
                             {
                                 Comp->TickComponent(DeltaTime);
                             }
+                        }
 
+                        if (bActorTickInEditor)
+                        {
                             PhysicsManager->Simulate(DeltaTime);
 
                             for (auto* Comp : Actor->GetComponents())
                             {
                                 Comp->EndPhysicsTickComponent(DeltaTime);
-
                             }
                         }
                     }
@@ -311,9 +322,9 @@ void UEditorEngine::StartSkeletalMeshViewer(FName SkeletalMeshName, UAnimationAs
     }
 }
 
-void UEditorEngine::StartParticleViewer(FName ParticleName, UParticleSystem* ParticleSystem)
+void UEditorEngine::StartParticleViewer(UParticleSystem* ParticleSystemAsset)
 {
-    if (ParticleName == "")
+    if (!ParticleSystemAsset)
     {
         return;
     }
@@ -345,7 +356,7 @@ void UEditorEngine::StartParticleViewer(FName ParticleName, UParticleSystem* Par
     ParticleActor->SetActorTickInEditor(true);
     
     UParticleSystemComponent* ParticleSystemComponent = ParticleActor->AddComponent<UParticleSystemComponent>();
-    ParticleSystemComponent->SetParticleSystem(ParticleSystem);
+    ParticleSystemComponent->SetParticleSystem(ParticleSystemAsset);
     
     ParticleActor->SetRootComponent(ParticleSystemComponent);
     ParticleActor->SetActorLabel(TEXT("OBJ_PARTICLE"));
@@ -356,7 +367,7 @@ void UEditorEngine::StartParticleViewer(FName ParticleName, UParticleSystem* Par
     auto ParticlePanel = std::dynamic_pointer_cast<ParticleViewerPanel>(EditorPanel);
     ParticleViewerPanel* ParticleViewerPanel = ParticlePanel.get();
     ParticleViewerPanel->SetParticleSystemComponent(ParticleSystemComponent);
-    ParticleViewerPanel->SetParticleSystem(ParticleSystem);
+    ParticleViewerPanel->SetParticleSystem(ParticleSystemAsset);
 
     // ParticleActor 강제 설정
     Cast<UEditorEngine>(GEngine)->SelectActor(ParticleActor);

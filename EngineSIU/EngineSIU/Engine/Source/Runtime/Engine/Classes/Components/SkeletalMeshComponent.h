@@ -32,6 +32,9 @@ public:
 
     virtual UObject* Duplicate(UObject* InOuter) override;
 
+    virtual void SetProperties(const TMap<FString, FString>& InProperties) override;
+    virtual void GetProperties(TMap<FString, FString>& OutProperties) const override;
+
     virtual void TickComponent(float DeltaTime) override;
     virtual void EndPhysicsTickComponent(float DeltaTime) override;
 
@@ -128,7 +131,6 @@ public:
     void RemoveBodyInstance(FBodyInstance* BodyInstance);
     void RemoveConstraintInstance(FConstraintInstance* ConstraintInstance);
 
-    
 protected:
     bool NeedToSpawnAnimScriptInstance() const;
 
@@ -162,7 +164,7 @@ public:
 
     void SetAnimClass(UClass* NewClass);
     
-    UClass* GetAnimClass();
+    UClass* GetAnimClass() const;
     
     void SetAnimInstanceClass(class UClass* NewClass);
 };

@@ -4,6 +4,8 @@
 #include "Particles/ParticleSystem.h"
 #include "UnrealEd/EditorViewportClient.h"
 #include "ParticleEmitter.h"
+#include "Engine/AssetManager.h"
+#include "UObject/Casts.h"
 
 UParticleSystemComponent::UParticleSystemComponent()
     : AccumTickTime(0.f)
@@ -13,7 +15,12 @@ UParticleSystemComponent::UParticleSystemComponent()
 
 UObject* UParticleSystemComponent::Duplicate(UObject* InOuter)
 {
-    return nullptr;
+    ThisClass* NewComponent = Cast<ThisClass>(Super::Duplicate(InOuter));
+    NewComponent->SetRelativeTransform(GetRelativeTransform());
+
+    NewComponent->SetParticleSystem(GetParticleSystem());
+    
+    return NewComponent;
 }
 
 void UParticleSystemComponent::InitializeComponent()
@@ -54,10 +61,25 @@ void UParticleSystemComponent::TickComponent(float DeltaTime)
 
 void UParticleSystemComponent::GetProperties(TMap<FString, FString>& OutProperties) const
 {
+    Super::GetProperties(OutProperties);
+
+    const FName TemplateKey = UAssetManager::Get().GetAssetKeyByObject(EAssetType::ParticleSystem, Template);
+    OutProperties.Add(TEXT("TemplateKey"), TemplateKey.ToString());
 }
 
 void UParticleSystemComponent::SetProperties(const TMap<FString, FString>& InProperties)
 {
+    Super::SetProperties(InProperties);
+
+    if (InProperties.Contains(TEXT("TemplateKey")))
+    {
+        FName TemplateKey = InProperties[TEXT("TemplateKey")];
+        UObject* Object = UAssetManager::Get().GetAsset(EAssetType::ParticleSystem, TemplateKey);
+        if (UParticleSystem* ParticleSystem = Cast<UParticleSystem>(Object))
+        {
+            SetParticleSystem(ParticleSystem);
+        }
+    }
 }
 
 void UParticleSystemComponent::InitializeSystem()

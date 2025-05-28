@@ -39,3 +39,10 @@ void UParticleModuleSpawn::GetSpawnRate(float& MinSpawnRate, float& MaxSpawnRate
     MinSpawnRate = MinSpawn * MinScale;
     MaxSpawnRate = MaxSpawn * MaxScale;
 }
+
+void UParticleModuleSpawn::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    Ar << Rate << RateScale << BurstTime << BurstCount;
+}

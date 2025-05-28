@@ -45,6 +45,8 @@ private:
     ID3D11ShaderResourceView* BodyInstanceIconSRV = nullptr;
 
     int32 SelectedBoneIndex = INDEX_NONE;
+    int32 SelectedBodyIndex = INDEX_NONE;
+    int32 SelectedConstraintIndex = INDEX_NONE;
 
     FReferenceSkeleton* CopiedRefSkeleton = nullptr;
     USkeletalMeshComponent* RefSkeletalMeshComponent = nullptr;

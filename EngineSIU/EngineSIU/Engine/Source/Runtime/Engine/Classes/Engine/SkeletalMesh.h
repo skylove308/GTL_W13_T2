@@ -33,9 +33,9 @@ public:
 protected:
     std::unique_ptr<FSkeletalMeshRenderData> RenderData;
 
-    USkeleton* Skeleton;
+    USkeleton* Skeleton = nullptr;
 
-    UPhysicsAsset* PhysicsAsset;
+    UPhysicsAsset* PhysicsAsset = nullptr;
 
     FReferenceSkeleton RefSkeleton;
 };

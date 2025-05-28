@@ -95,4 +95,6 @@ public:
 	//  *	@return	int32			The maximum burst count
 	//  */
 	// virtual int32 GetMaximumBurstCount() { return 0; }
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };

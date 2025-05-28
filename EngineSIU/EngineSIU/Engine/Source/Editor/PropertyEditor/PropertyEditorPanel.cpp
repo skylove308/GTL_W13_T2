@@ -795,20 +795,25 @@ void PropertyEditorPanel::RenderForParticleSystem(UParticleSystemComponent* Part
     if (ImGui::Button("Open Viewer"))
     {
         UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
-        if (!Engine)
+        if (Engine && ParticleSystemComponent)
         {
-            return;
-        }
-        if (ParticleSystemComponent)
-        {
-            UParticleSystem* ParticleSystem = ParticleSystemComponent->GetParticleSystem();
-            if (ParticleSystem == nullptr)
+            UParticleSystem* ParticleSystemAsset = ParticleSystemComponent->GetParticleSystem();
+            if (!ParticleSystemAsset)
             {
-                ParticleSystem = FObjectFactory::ConstructObject<UParticleSystem>(nullptr);
-                UAssetManager::Get().AddAsset(ParticleSystem->GetName(), ParticleSystem);
-                ParticleSystemComponent->SetParticleSystem(ParticleSystem);
+                ParticleSystemAsset = FObjectFactory::ConstructObject<UParticleSystem>(nullptr);
+        
+                FAssetInfo Info;
+                Info.AssetName = ParticleSystemAsset->GetName();
+                Info.PackagePath = TEXT("Contents/ParticleSystem");
+                Info.AssetType = EAssetType::ParticleSystem;
+                Info.AssetObject = ParticleSystemAsset;
+                UAssetManager::Get().AddAssetInfo(Info);
+
+                UAssetManager::Get().AddAsset(Info.GetFullPath(), ParticleSystemAsset);
+                ParticleSystemComponent->SetParticleSystem(ParticleSystemAsset);
             }
-            Engine->StartParticleViewer(FName("TempParticle"), ParticleSystem);
+            
+            Engine->StartParticleViewer(ParticleSystemAsset);
         }
     }
 }

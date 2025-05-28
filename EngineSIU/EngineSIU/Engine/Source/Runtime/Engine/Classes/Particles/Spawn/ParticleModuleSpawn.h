@@ -34,4 +34,6 @@ public:
     virtual void GetSpawnRate(float& MinSpawnRate, float& MaxSpawnRate) override;
     
     //~ End UParticleModuleSpawnBase Interface
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };

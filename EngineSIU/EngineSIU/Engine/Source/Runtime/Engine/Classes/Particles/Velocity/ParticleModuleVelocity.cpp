@@ -50,3 +50,10 @@ void UParticleModuleVelocity::Spawn(FParticleEmitterInstance* Owner, int32 Offse
 
     ParticleBase->BaseVelocity = Velocity;
 }
+
+void UParticleModuleVelocity::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    Ar << StartVelocity << StartVelocityRadial;
+}

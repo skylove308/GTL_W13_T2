@@ -8,3 +8,10 @@ void UParticleModuleSpawnBase::DisplayProperty()
         Property->DisplayInImGui(this);
     }
 }
+
+void UParticleModuleSpawnBase::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    Ar << bProcessSpawnRate << bProcessBurstList;
+}

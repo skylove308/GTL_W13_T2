@@ -10,3 +10,10 @@ void UParticleModuleSizeBase::DisplayProperty()
         ImGui::PopID();
     }
 }
+
+void UParticleModuleSizeBase::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    Ar << bUseUniformSize;
+}

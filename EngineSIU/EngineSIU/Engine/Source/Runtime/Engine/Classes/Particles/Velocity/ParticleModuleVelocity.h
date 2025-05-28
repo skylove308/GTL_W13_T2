@@ -20,4 +20,6 @@ public:
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, FDistributionVector, StartVelocity)
     UPROPERTY_WITH_FLAGS(EditAnywhere, FDistributionFloat, StartVelocityRadial)
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };

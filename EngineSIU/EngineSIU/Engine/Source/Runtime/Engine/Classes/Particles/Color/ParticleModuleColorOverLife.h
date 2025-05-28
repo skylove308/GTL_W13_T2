@@ -23,4 +23,6 @@ public:
     virtual void Update(FParticleEmitterInstance* Owner, int32 Offset, float DeltaTime) override;
 
     virtual void DisplayProperty() override;
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };

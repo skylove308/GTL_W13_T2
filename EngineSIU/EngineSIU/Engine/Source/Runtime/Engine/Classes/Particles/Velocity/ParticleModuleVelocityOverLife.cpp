@@ -95,3 +95,10 @@ void UParticleModuleVelocityOverLife::Update(FParticleEmitterInstance* Owner, in
             
     END_UPDATE_LOOP
 }
+
+void UParticleModuleVelocityOverLife::SerializeAsset(FArchive& Ar)
+{
+    Super::SerializeAsset(Ar);
+
+    Ar << bUseConstantChange << bUseVelocityCurve << CurveScale << StartVelocity << EndVelocity;
+}

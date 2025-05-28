@@ -21,3 +21,9 @@ int32 UParticleModule::GetInstancePayloadSize() const
 {
     return int32();
 }
+
+void UParticleModule::SerializeAsset(FArchive& Ar)
+{
+    Ar << ModuleName << bSpawnModule << bUpdateModule << bFinalUpdateModule << bEnabled
+       << ModulePayloadOffset << InstancePayloadOffset;
+}

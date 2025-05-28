@@ -11,6 +11,7 @@
 #include "Animation/AnimSingleNodeInstance.h"
 #include "Animation/AnimTypes.h"
 #include "Engine/Engine.h"
+#include "Misc/Parse.h"
 #include "PhysicsEngine/PhysicsAsset.h"
 #include "UObject/Casts.h"
 #include "UObject/ObjectFactory.h"
@@ -40,6 +41,7 @@ UObject* USkeletalMeshComponent::Duplicate(UObject* InOuter)
 {
     ThisClass* NewComponent = Cast<ThisClass>(Super::Duplicate(InOuter));
 
+    NewComponent->SetRelativeTransform(GetRelativeTransform());
     NewComponent->SetSkeletalMeshAsset(SkeletalMeshAsset);
     NewComponent->SetAnimationMode(AnimationMode);
     if (AnimationMode == EAnimationMode::AnimationBlueprint)
@@ -58,6 +60,102 @@ UObject* USkeletalMeshComponent::Duplicate(UObject* InOuter)
     return NewComponent;
 }
 
+void USkeletalMeshComponent::SetProperties(const TMap<FString, FString>& InProperties)
+{
+    Super::SetProperties(InProperties);
+
+    if (InProperties.Contains("SkeletalMeshKey"))
+    {
+        FName SkelMeshKey = FName(InProperties["SkeletalMeshKey"]);
+        if (USkeletalMesh* SkelMesh = Cast<USkeletalMesh>(UAssetManager::Get().GetAsset(EAssetType::SkeletalMesh, SkelMeshKey)))
+        {
+            SetSkeletalMeshAsset(SkelMesh);
+        }
+    }
+    
+    if (InProperties.Contains("AnimationMode"))
+    {
+        const EAnimationMode Mode = static_cast<EAnimationMode>(FString::ToInt(InProperties["AnimationMode"]));
+        SetAnimationMode(Mode);
+    }
+
+    if (InProperties.Contains("AnimClass") && AnimationMode == EAnimationMode::AnimationBlueprint)
+    {
+        UClass* InAnimClass = UClass::FindClass(InProperties["AnimClass"]);
+        SetAnimClass(InAnimClass);
+    }
+
+    if (AnimationMode == EAnimationMode::AnimationSingleNode)
+    {
+        if (InProperties.Contains("AnimToPlay"))
+        {
+            FName AnimKey = FName(InProperties["AnimToPlay"]);
+            if (UAnimationAsset* Anim = Cast<UAnimationAsset>(UAssetManager::Get().GetAsset(EAssetType::Animation, AnimKey)))
+            {
+                SetAnimation(Anim);
+            }
+        }
+
+        if (InProperties.Contains("PlayRate"))
+        {
+            SetPlayRate(FString::ToFloat(InProperties["PlayRate"]));
+        }
+        if (InProperties.Contains("bLooping"))
+        {
+            SetLooping(InProperties["bLooping"] == "true");
+        }
+        if (InProperties.Contains("bPlaying"))
+        {
+            SetPlaying(InProperties["bPlaying"] == "true");
+        }
+        if (InProperties.Contains("bReverse"))
+        {
+            SetReverse(InProperties["bReverse"] == "true");
+        }
+        if (InProperties.Contains("LoopStartFrame"))
+        {
+            SetLoopStartFrame(FString::ToFloat(InProperties["LoopStartFrame"]));
+        }
+        if (InProperties.Contains("LoopEndFrame"))
+        {
+            SetLoopEndFrame(FString::ToFloat(InProperties["LoopEndFrame"]));
+        }
+    }
+}
+
+void USkeletalMeshComponent::GetProperties(TMap<FString, FString>& OutProperties) const
+{
+    Super::GetProperties(OutProperties);
+
+    const FName SkelMeshKey = UAssetManager::Get().GetAssetKeyByObject(EAssetType::SkeletalMesh, GetSkeletalMeshAsset());
+    OutProperties.Add(TEXT("SkeletalMeshKey"), SkelMeshKey.ToString());
+
+    OutProperties.Add(TEXT("AnimationMode"), FString::FromInt(static_cast<uint8>(AnimationMode)));
+
+    FString AnimClassStr = FName().ToString();
+    if (AnimationMode == EAnimationMode::AnimationBlueprint)
+    {
+        if (AnimClass && AnimClass.Get())
+        {
+            AnimClassStr = AnimClass.Get()->GetName();
+        }
+    }
+    OutProperties.Add(TEXT("AnimClass"), AnimClassStr);
+
+    if (AnimationMode == EAnimationMode::AnimationSingleNode)
+    {
+        const FName AnimKey = UAssetManager::Get().GetAssetKeyByObject(EAssetType::Animation, GetAnimation());
+        OutProperties.Add(TEXT("AnimToPlay"), AnimKey.ToString());
+
+        OutProperties.Add(TEXT("PlayRate"), std::to_string(GetPlayRate()));
+        OutProperties.Add(TEXT("bLooping"), IsLooping() ? "true" : "false");
+        OutProperties.Add(TEXT("bPlaying"), IsPlaying() ? "true" : "false");
+        OutProperties.Add(TEXT("bReverse"), IsReverse() ? "true" : "false");
+        OutProperties.Add(TEXT("LoopStartFrame"), std::to_string(GetLoopStartFrame()));
+        OutProperties.Add(TEXT("LoopEndFrame"), std::to_string(GetLoopEndFrame()));
+    }
+}
+
 void USkeletalMeshComponent::TickComponent(float DeltaTime)
 {
     Super::TickComponent(DeltaTime);
@@ -70,7 +168,7 @@ void USkeletalMeshComponent::TickComponent(float DeltaTime)
 
 void USkeletalMeshComponent::EndPhysicsTickComponent(float DeltaTime)
 {
-    Super::EndPhysicsTickComponent(DeltaTime);
+    //Super::EndPhysicsTickComponent(DeltaTime);
     if (bSimulate)
     {
         for (FBodyInstance* BI : Bodies)
@@ -78,7 +176,7 @@ void USkeletalMeshComponent::EndPhysicsTickComponent(float DeltaTime)
             if (RigidBodyType != ERigidBodyType::STATIC)
             {
                 BI->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
-                XMMATRIX DXMatrix = BodyInstance->BIGameObject->WorldMatrix;
+                XMMATRIX DXMatrix = BI->BIGameObject->WorldMatrix;
                 XMFLOAT4X4 dxMat;
                 XMStoreFloat4x4(&dxMat, DXMatrix);
 
@@ -392,53 +490,88 @@ void USkeletalMeshComponent::InitAnim()
 
 void USkeletalMeshComponent::CreatePhysXGameObject()
 {
-    Super::CreatePhysXGameObject();
-    //for (int i = 0; i < Bodies.Num(); i++)
-    //{
-    //    FReferenceSkeleton CopiedRefSkeleton = SkeletalMeshAsset->GetSkeleton()->GetReferenceSkeleton();
-    //    physx::PxVec3 BonePos = physx::PxVec3(CopiedRefSkeleton.RawRefBonePose[i].GetTranslation().X, CopiedRefSkeleton.RawRefBonePose[i].GetTranslation().Y, CopiedRefSkeleton.RawRefBonePose[i].GetTranslation().Z);
-    //    GameObject* obj = GEngine->PhysicsManager->CreateGameObject(BonePos, Bodies[i], SkeletalMeshAsset->GetPhysicsAsset()->BodySetup);
-    //    Bodies[i]->SetGameObject(obj);
-    //}
+    if (RigidBodyType == ERigidBodyType::STATIC)
+    {
+        RigidBodyType = ERigidBodyType::KINEMATIC;
+    }
+    
+    // BodyInstance 생성
+    const auto& Skeleton = SkeletalMeshAsset->GetSkeleton()->GetReferenceSkeleton();
+    TArray<UBodySetup*> BodySetups = SkeletalMeshAsset->GetPhysicsAsset()->BodySetups;
+    for (int i = 0; i < BodySetups.Num(); i++)
+    {
+        FBodyInstance* NewBody = new FBodyInstance(this);
 
-    //for(int i=0; i < Constraints.Num(); i++)
-    //{
-    //    FConstraintInstance* NewConstraint = Constraints[i];
-    //    FBodyInstance* BodyInstance1 = nullptr;
-    //    FBodyInstance* BodyInstance2 = nullptr;
+        for (const auto& GeomAttribute : BodySetups[i]->GeomAttributes)
+        {
+            PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
+            PxVec3 Rotation = PxVec3(GeomAttribute.Rotation.Pitch, GeomAttribute.Rotation.Yaw, GeomAttribute.Rotation.Roll);
+            PxVec3 Extent = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
 
-    //    for(int j = 0; j < Bodies.Num(); j++)
-    //    {
-    //        if (NewConstraint->ConstraintBone1 == Bodies[j]->BodyInstanceName.ToString())
-    //        {
-    //            BodyInstance1 = Bodies[j];
-    //        }
-    //        if (NewConstraint->ConstraintBone2 == Bodies[j]->BodyInstanceName.ToString())
-    //        {
-    //            BodyInstance2 = Bodies[j];
-    //        }
-    //    }
+            switch (GeomAttribute.GeomType)
+            {
+            case EGeomType::ESphere:
+            {
+                PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, Extent);
+                BodySetups[i]->AggGeom.SphereElems.Add(PxSphere);
+                break;
+            }
+            case EGeomType::EBox:
+            {
+                PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, Rotation, Extent);
+                BodySetups[i]->AggGeom.BoxElems.Add(PxBox);
+                break;
+            }
+            case EGeomType::ECapsule:
+            {
+                PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, Extent);
+                BodySetups[i]->AggGeom.SphereElems.Add(PxCapsule);
+                break;
+            }
+            }
+        }
 
-    //    PxTransform GlobalPose1 = BodyInstance1->BIGameObject->RigidBody->getGlobalPose();
-    //    PxTransform GlobalPose2 = BodyInstance2->BIGameObject->RigidBody->getGlobalPose();
-    //    PxTransform LocalFrameParent = GlobalPose2.getInverse() * GlobalPose1;
-    //    PxTransform LocalFrameChild = PxTransform(PxVec3(0));
+        int BoneIndex = Skeleton.FindBoneIndex(BodySetups[i]->BoneName);
+        FVector Location = Skeleton.GetRawRefBonePose()[BoneIndex].Translation;
+        PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
+        GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(Pos, NewBody, BodySetups[i], RigidBodyType);
+        
+        if (RigidBodyType != ERigidBodyType::STATIC)
+        {
+            Obj->DynamicRigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bApplyGravity);
+        }
+        
+        NewBody->SetGameObject(Obj);
+        NewBody->BodyInstanceName = BodySetups[i]->BoneName;
+        NewBody->BoneIndex = BoneIndex;
 
-    //    // PhysX D6 Joint 생성
-    //    physx::PxD6Joint* Joint = physx::PxD6JointCreate(*GEngine->PhysicsManager->GetPhysics(), BodyInstance1->BIGameObject->RigidBody, LocalFrameParent, BodyInstance2->BIGameObject->RigidBody, LocalFrameChild);
+        Bodies.Add(NewBody);
+    }
 
-    //    if (Joint)
-    //    {
-    //        // 각도 제한 설정
-    //        Joint->setMotion(physx::PxD6Axis::eTWIST, physx::PxD6Motion::eLIMITED);
-    //        Joint->setMotion(physx::PxD6Axis::eSWING1, physx::PxD6Motion::eLIMITED);
-    //        Joint->setMotion(physx::PxD6Axis::eSWING2, physx::PxD6Motion::eLIMITED);
-    //        Joint->setTwistLimit(physx::PxJointAngularLimitPair(-physx::PxPi / 4, physx::PxPi / 4));
-    //        Joint->setSwingLimit(physx::PxJointLimitCone(physx::PxPi / 6, physx::PxPi / 6));
-    //    }
+    // Constraint Instance 생성
+    TArray<FConstraintSetup*> ConstraintSetups = SkeletalMeshAsset->GetPhysicsAsset()->ConstraintSetups;
+    for(int i=0; i < ConstraintSetups.Num(); i++)
+    {
+        FConstraintInstance* NewConstraintInstance = new FConstraintInstance;
+        FBodyInstance* BodyInstance1 = nullptr;
+        FBodyInstance* BodyInstance2 = nullptr;
 
-    //    NewConstraint->ConstraintData = Joint;
-    //}
+        for(int j = 0; j < Bodies.Num(); j++)
+        {
+            if (ConstraintSetups[i]->ConstraintBone1 == Bodies[j]->BodyInstanceName.ToString())
+            {
+                BodyInstance1 = Bodies[j];
+            }
+            if (ConstraintSetups[i]->ConstraintBone2 == Bodies[j]->BodyInstanceName.ToString())
+            {
+                BodyInstance2 = Bodies[j];
+            }
+        }
+
+        GEngine->PhysicsManager->CreateJoint(BodyInstance1->BIGameObject, BodyInstance2->BIGameObject, NewConstraintInstance, ConstraintSetups[i]);
+
+        Constraints.Add(NewConstraintInstance);
+    }
 }
 
 void USkeletalMeshComponent::AddBodyInstance(FBodyInstance* BodyInstance)
@@ -564,7 +697,7 @@ void USkeletalMeshComponent::SetAnimClass(UClass* NewClass)
     SetAnimInstanceClass(NewClass);
 }
 
-UClass* USkeletalMeshComponent::GetAnimClass()
+UClass* USkeletalMeshComponent::GetAnimClass() const
 {
     return AnimClass;
 }

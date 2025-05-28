@@ -11,5 +11,7 @@ public:
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bInWorldSpace)
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bApplyOwnerScale)
+
+    virtual void SerializeAsset(FArchive& Ar) override;
 };
 
