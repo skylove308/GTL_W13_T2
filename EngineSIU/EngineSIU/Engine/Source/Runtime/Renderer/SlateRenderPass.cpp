@@ -1,4 +1,4 @@
-#include "SlateRenderPass.h"
+﻿#include "SlateRenderPass.h"
 
 #include "RendererHelpers.h"
 #include "UnrealClient.h"
@@ -40,13 +40,13 @@ void FSlateRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& View
         ClientHeightFloat /= 0.5f;
         
         Transform.Scale = FVector2D(
-    Rect.Width / ClientWidthFloat,
-    Rect.Height / ClientHeightFloat
+            Rect.Width / ClientWidthFloat,
+            Rect.Height / ClientHeightFloat
         );
         
         Transform.Offset = FVector2D(
-    (Rect.TopLeftX + Rect.Width * 0.5f) / ClientWidthFloat * 2.0f - 1.0f,
-    1.0f - (Rect.TopLeftY + Rect.Height * 0.5f) / ClientHeightFloat * 2.0f
+            (Rect.TopLeftX + Rect.Width * 0.5f) / ClientWidthFloat * 2.0f - 1.0f,
+            1.0f - (Rect.TopLeftY + Rect.Height * 0.5f) / ClientHeightFloat * 2.0f
         );
     }
     else if (GEngine->ActiveWorld->WorldType == EWorldType::PhysicsAssetViewer)
@@ -59,15 +59,15 @@ void FSlateRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& View
             Rect.Height / ClientHeightFloat
         );
 
-        float centerX = Rect.TopLeftX + Rect.Width * 0.5f; // 중앙 정렬용
-        float ndcX = centerX / ClientWidthFloat * 2.0f - 0.6;
+        float CenterX = Rect.TopLeftX + Rect.Width * 0.5f; // 중앙 정렬용
+        float NdcX = CenterX / ClientWidthFloat * 2.0f - 0.6;
 
-        float centerY = Rect.TopLeftY + Rect.Height * 0.5f;
-        float ndcY = 1.0f - centerY / ClientHeightFloat * 2.0f;
+        float CenterY = Rect.TopLeftY + Rect.Height * 0.5f;
+        float NdcY = 1.0f - CenterY / ClientHeightFloat * 2.0f;
 
         Transform.Offset = FVector2D(
-            ndcX,
-            ndcY
+            NdcX,
+            NdcY
         );
     }
     else
