@@ -26,7 +26,8 @@ void PhysicsAssetViewerPanel::Render()
         return;
     }
 
-    if (BoneIconSRV == nullptr || NonWeightBoneIconSRV == nullptr) {
+    if (BoneIconSRV == nullptr || NonWeightBoneIconSRV == nullptr)
+    {
         LoadBoneIcon();
     }
 
@@ -49,16 +50,20 @@ void PhysicsAssetViewerPanel::Render()
     /* Panel Size */
     ImGui::SetNextWindowSize(ImVec2(PanelWidth, PanelHeight), ImGuiCond_Always);
 
-    constexpr ImGuiWindowFlags PanelFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar;
+    constexpr ImGuiWindowFlags PanelFlags =
+        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar;
 
-    if (Engine->ActiveWorld && Engine->ActiveWorld->WorldType == EWorldType::PhysicsAssetViewer) {
-
-        if (CopiedRefSkeleton == nullptr) {
+    if (Engine->ActiveWorld && Engine->ActiveWorld->WorldType == EWorldType::PhysicsAssetViewer)
+    {
+        if (CopiedRefSkeleton == nullptr)
+        {
             CopyRefSkeleton(); // 선택된 액터/컴포넌트로부터 스켈레톤 정보 복사
         }
 
         // CopiedRefSkeleton이 여전히 null이면 렌더링하지 않음
-        if (CopiedRefSkeleton == nullptr || CopiedRefSkeleton->RawRefBoneInfo.IsEmpty()) {
+        if (CopiedRefSkeleton == nullptr || CopiedRefSkeleton->RawRefBoneInfo.IsEmpty())
+        {
             ImGui::Begin("Bone Hierarchy", nullptr, PanelFlags); // 창은 표시하되 내용은 비움
             ImGui::Text("No skeleton selected or skeleton has no bones.");
             ImGui::End();
@@ -68,16 +73,16 @@ void PhysicsAssetViewerPanel::Render()
         ImGui::Begin("Physics Asset Viewer", nullptr, PanelFlags);
 
         // 1) 남은 영역을 구해서
-        ImVec2 avail = ImGui::GetContentRegionAvail();
+        ImVec2 Avail = ImGui::GetContentRegionAvail();
 
         // 2) 분할 비율(예: 상단 60% / 하단 40%)
-        float splitRatio = 0.6f;
-        float bonePanelHeight = avail.y * splitRatio;
+        float SplitRatio = 0.6f;
+        float BonePanelHeight = Avail.y * SplitRatio;
 
         ImGui::Text("Bone Hierarchy");
         ImGui::Separator();
         // --- 상단: Bone Tree Panel ---
-        ImGui::BeginChild("##Bone Hierarchy", ImVec2(0, bonePanelHeight), true, PanelFlags);
+        ImGui::BeginChild("##Bone Hierarchy", ImVec2(0, BonePanelHeight), true, PanelFlags);
         {
             // 루트 본부터 트리 그리기
             for (int32 i = 0; i < CopiedRefSkeleton->RawRefBoneInfo.Num(); ++i)
@@ -201,7 +206,6 @@ void PhysicsAssetViewerPanel::Render()
                         break;
                     }
                 }
-
             }
         }
         else if(SelectedConstraintIndex != INDEX_NONE && RefSkeletalMeshComponent)
@@ -230,8 +234,6 @@ void PhysicsAssetViewerPanel::Render()
 
     float ExitPanelWidth = (Width) * 0.2f - 6.0f;
     float ExitPanelHeight = 30.0f;
-
-    const float margin = 10.0f;
 
     float ExitPanelPosX = Width - ExitPanelWidth;
     float ExitPanelPosY = Height - ExitPanelHeight - 10;
@@ -280,7 +282,9 @@ int32 PhysicsAssetViewerPanel::GetSelectedBoneIndex() const
 FString PhysicsAssetViewerPanel::GetSelectedBoneName() const
 {
     if (SelectedBoneIndex == INDEX_NONE || !SkeletalMesh)
+    {
         return TEXT("");
+    }
     const auto& RefSkel = SkeletalMesh->GetSkeleton()->GetReferenceSkeleton();
     return RefSkel.RawRefBoneInfo[SelectedBoneIndex].Name.ToString();
 }
@@ -303,9 +307,9 @@ void PhysicsAssetViewerPanel::ClearRefSkeletalMeshComponent()
 
 void PhysicsAssetViewerPanel::AddBody(int32 BoneIndex, const FName& BoneName)
 {
-    physx::PxVec3 BonePos = physx::PxVec3(CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().X, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().Y, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().Z);
-    physx::PxVec3 Rotation = physx::PxVec3(CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().X, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().Y, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().Z);
-    physx::PxVec3 HalfScale = physx::PxVec3(0.5f, 0.5f, 0.5f); // 예시로 0.5로 설정, 실제 스케일은 필요에 따라 조정
+    physx::PxVec3 BonePos = physx::PxVec3(0.0f, 0.0f, 0.0f);
+    physx::PxVec3 Rotation = physx::PxVec3(0.0f, 0.0f, 0.0f);
+    physx::PxVec3 HalfScale = physx::PxVec3(1.0f, 1.0f, 1.0f);
 
     UBodySetup* BodySetup = FObjectFactory::ConstructObject<UBodySetup>(nullptr);
 

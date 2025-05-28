@@ -225,6 +225,7 @@ void FPhysicsManager::AttachShapesToActor(PxRigidActor* Actor, UBodySetup* BodyS
     // Sphere 추가
     for (const auto& Sphere : BodySetup->AggGeom.SphereElems)
     {
+    
         Actor->attachShape(*Sphere);
     }
 

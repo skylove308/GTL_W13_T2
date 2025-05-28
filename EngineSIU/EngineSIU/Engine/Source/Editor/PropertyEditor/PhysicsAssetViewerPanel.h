@@ -30,7 +30,8 @@ public:
     void RemoveConstraint(int32 ConstraintIndex);
 
 private:
-    float Width = 0, Height = 0;
+    float Width = 0;
+    float Height = 0;
     USkeletalMesh* SkeletalMesh;
 
     void LoadBoneIcon();
