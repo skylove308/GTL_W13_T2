@@ -10,6 +10,7 @@
 #include "Engine/OverlapInfo.h"
 #include "Engine/OverlapResult.h"
 #include "GameFramework/Actor.h"
+#include "Misc/Parse.h"
 #include "World/World.h"
 #include "PhysicsEngine/PhysicsAsset.h"
 
@@ -260,6 +261,9 @@ void UPrimitiveComponent::GetProperties(TMap<FString, FString>& OutProperties) c
     OutProperties.Add(TEXT("m_Type"), m_Type);
     OutProperties.Add(TEXT("AABB_min"), AABB.MinLocation.ToString());
     OutProperties.Add(TEXT("AABB_max"), AABB.MaxLocation.ToString());
+    OutProperties.Add(TEXT("bSimulate"), bSimulate ? TEXT("true") : TEXT("false"));
+    OutProperties.Add(TEXT("bApplyGravity"), bApplyGravity ? TEXT("true") : TEXT("false"));
+    OutProperties.Add(TEXT("RigidBodyType"), FString::FromInt(static_cast<uint8>(RigidBodyType)));
 }
 
 void UPrimitiveComponent::SetProperties(const TMap<FString, FString>& InProperties)
@@ -288,6 +292,21 @@ void UPrimitiveComponent::SetProperties(const TMap<FString, FString>& InProperti
     if (AABBmaxStr)
     {
         AABB.MaxLocation.InitFromString(*AABBmaxStr);
+    }
+
+    if (InProperties.Contains(TEXT("bSimulate")))
+    {
+        bSimulate = InProperties[TEXT("bSimulate")] == "true";
+    }
+
+    if (InProperties.Contains(TEXT("bApplyGravity")))
+    {
+        bApplyGravity = InProperties[TEXT("bApplyGravity")] == "true";
+    }
+
+    if (InProperties.Contains(TEXT("RigidBodyType")))
+    {
+        RigidBodyType = static_cast<ERigidBodyType>(FString::ToInt(InProperties[TEXT("RigidBodyType")]));
     }
 }
 

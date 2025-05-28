@@ -85,12 +85,40 @@ void USkeletalMeshComponent::SetProperties(const TMap<FString, FString>& InPrope
         SetAnimClass(InAnimClass);
     }
 
-    if (InProperties.Contains("AnimToPlay") && AnimationMode == EAnimationMode::AnimationSingleNode)
+    if (AnimationMode == EAnimationMode::AnimationSingleNode)
     {
-        FName AnimKey = FName(InProperties["AnimToPlay"]);
-        if (UAnimationAsset* Anim = Cast<UAnimationAsset>(UAssetManager::Get().GetAsset(EAssetType::Animation, AnimKey)))
+        if (InProperties.Contains("AnimToPlay"))
         {
-            SetAnimation(Anim);
+            FName AnimKey = FName(InProperties["AnimToPlay"]);
+            if (UAnimationAsset* Anim = Cast<UAnimationAsset>(UAssetManager::Get().GetAsset(EAssetType::Animation, AnimKey)))
+            {
+                SetAnimation(Anim);
+            }
+        }
+
+        if (InProperties.Contains("PlayRate"))
+        {
+            SetPlayRate(FString::ToFloat(InProperties["PlayRate"]));
+        }
+        if (InProperties.Contains("bLooping"))
+        {
+            SetLooping(InProperties["bLooping"] == "true");
+        }
+        if (InProperties.Contains("bPlaying"))
+        {
+            SetPlaying(InProperties["bPlaying"] == "true");
+        }
+        if (InProperties.Contains("bReverse"))
+        {
+            SetReverse(InProperties["bReverse"] == "true");
+        }
+        if (InProperties.Contains("LoopStartFrame"))
+        {
+            SetLoopStartFrame(FString::ToFloat(InProperties["LoopStartFrame"]));
+        }
+        if (InProperties.Contains("LoopEndFrame"))
+        {
+            SetLoopEndFrame(FString::ToFloat(InProperties["LoopEndFrame"]));
         }
     }
 }
@@ -118,6 +146,13 @@ void USkeletalMeshComponent::GetProperties(TMap<FString, FString>& OutProperties
     {
         const FName AnimKey = UAssetManager::Get().GetAssetKeyByObject(EAssetType::Animation, GetAnimation());
         OutProperties.Add(TEXT("AnimToPlay"), AnimKey.ToString());
+
+        OutProperties.Add(TEXT("PlayRate"), std::to_string(GetPlayRate()));
+        OutProperties.Add(TEXT("bLooping"), IsLooping() ? "true" : "false");
+        OutProperties.Add(TEXT("bPlaying"), IsPlaying() ? "true" : "false");
+        OutProperties.Add(TEXT("bReverse"), IsReverse() ? "true" : "false");
+        OutProperties.Add(TEXT("LoopStartFrame"), std::to_string(GetLoopStartFrame()));
+        OutProperties.Add(TEXT("LoopEndFrame"), std::to_string(GetLoopEndFrame()));
     }
 }
 

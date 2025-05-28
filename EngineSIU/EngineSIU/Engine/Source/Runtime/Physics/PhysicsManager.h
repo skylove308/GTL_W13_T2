@@ -12,7 +12,7 @@
 #include "PhysicsEngine/PhysicsAsset.h"
 
 
-enum class ERigidBodyType;
+enum class ERigidBodyType : uint8;
 struct FBodyInstance;
 class UBodySetup;
 class UWorld;
