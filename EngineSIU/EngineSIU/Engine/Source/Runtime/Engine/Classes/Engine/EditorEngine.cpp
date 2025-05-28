@@ -86,6 +86,15 @@ void UEditorEngine::Tick(float DeltaTime)
                         {
                             continue;
                         }
+
+                        // 파티클 컴포넌트는 항상 Tick 호출
+                        for (const auto& Comp : Actor->GetComponents())
+                        {
+                            if (Comp->IsA<UParticleSystemComponent>())
+                            {
+                                Comp->TickComponent(DeltaTime);
+                            }
+                        }
                         
                         if (Actor->IsActorTickInEditor())
                         {
@@ -103,10 +112,6 @@ void UEditorEngine::Tick(float DeltaTime)
                             {
                                 Comp->EndPhysicsTickComponent(DeltaTime);
                             }
-                        }
-                        else if (auto PSC = Actor->GetComponentByClass<UParticleSystemComponent>())
-                        {
-                            PSC->TickComponent(DeltaTime);
                         }
                     }
                 }
