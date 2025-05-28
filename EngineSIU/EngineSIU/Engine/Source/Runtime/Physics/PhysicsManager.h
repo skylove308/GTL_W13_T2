@@ -60,9 +60,9 @@ public:
                                      ERigidBodyType::DYNAMIC) const;
     void CreateJoint(const GameObject* Obj1, const GameObject* Obj2, FConstraintInstance* ConstraintInstance, const FConstraintSetup* ConstraintSetup) const;
 
-    PxShape* CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
-    PxShape* CreateSphereShape(const PxVec3& Pos, const PxVec3& RotationEuler, float Radius) const;
-    PxShape* CreateCapsuleShape(const PxVec3& Pos, const PxVec3& RotationEuler, float Radius, float HalfHeight) const;
+    PxShape* CreateBoxShape(const PxVec3& Pos, const PxQuat& Quat, const PxVec3& HalfExtents) const;
+    PxShape* CreateSphereShape(const PxVec3& Pos, const PxQuat& Quat, float Radius) const;
+    PxShape* CreateCapsuleShape(const PxVec3& Pos, const PxQuat& Quat, float Radius, float HalfHeight) const;
     PxQuat EulerToQuat(const PxVec3& EulerAngles) const;
 
     PxPhysics* GetPhysics() { return Physics; }
@@ -86,7 +86,7 @@ private:
     PxPvd* Pvd;
     PxPvdTransport* Transport;
 
-    PxRigidDynamic* CreateDynamicRigidBody(const PxVec3& Pos, const const PxQuat& Rot, FBodyInstance* BodyInstance, UBodySetup* BodySetups) const;
+    PxRigidDynamic* CreateDynamicRigidBody(const PxVec3& Pos, const PxQuat& Rot, FBodyInstance* BodyInstance, UBodySetup* BodySetups) const;
     PxRigidStatic* CreateStaticRigidBody(const PxVec3& Pos, const PxQuat& Rot, FBodyInstance* BodyInstance, UBodySetup* BodySetups) const;
     void AttachShapesToActor(PxRigidActor* Actor, UBodySetup* BodySetup) const;
     void ApplyMassAndInertiaSettings(PxRigidDynamic* DynamicBody, const FBodyInstance* BodyInstance) const;

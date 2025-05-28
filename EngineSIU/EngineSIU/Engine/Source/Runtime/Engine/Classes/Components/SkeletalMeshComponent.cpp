@@ -571,26 +571,27 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
         for (const auto& GeomAttribute : BodySetups[i]->GeomAttributes)
         {
             PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
-            PxVec3 Rotation = PxVec3(GeomAttribute.Rotation.Pitch, GeomAttribute.Rotation.Yaw, GeomAttribute.Rotation.Roll);
+            FQuat GeomQuat = GeomAttribute.Rotation.Quaternion();
+            PxQuat GeomPQuat = PxQuat(GeomQuat.X, GeomQuat.Y, GeomQuat.Z, GeomQuat.W);
             PxVec3 Extent = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
 
             switch (GeomAttribute.GeomType)
             {
             case EGeomType::ESphere:
             {
-                PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, Extent.x);
+                PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, GeomPQuat, Extent.x);
                 BodySetups[i]->AggGeom.SphereElems.Add(PxSphere);
                 break;
             }
             case EGeomType::EBox:
             {
-                PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, Rotation, Extent);
+                PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, GeomPQuat, Extent);
                 BodySetups[i]->AggGeom.BoxElems.Add(PxBox);
                 break;
             }
             case EGeomType::ECapsule:
             {
-                PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, Extent.x, Extent.z);
+                PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z);
                 BodySetups[i]->AggGeom.SphereElems.Add(PxCapsule);
                 break;
             }
