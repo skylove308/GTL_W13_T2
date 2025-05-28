@@ -26,13 +26,13 @@ struct FBodyInstance
     // ==================== 질량과 관성 ====================
     
     /** 바디의 질량 (킬로그램) */
-    UPROPERTY_WITH_FLAGS(EditAnywhere, float, MassInKg)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, MassInKg, = 1.0f)
     
     /** 질량 중심 오프셋 */
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, COMNudge)
     
     /** 관성 텐서 스케일 (회전 저항) */
-    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, InertiaTensorScale)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, InertiaTensorScale, = FVector(0.1, 0.1, 0.1f))
     
     // ==================== 시뮬레이션 설정 ====================
     
@@ -71,10 +71,10 @@ struct FBodyInstance
     // ==================== 댐핑 (저항) ====================
     
     /** 선형 댐핑 - 이동 속도 감소율 */
-    UPROPERTY_WITH_FLAGS(EditAnywhere, float, LinearDamping)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, LinearDamping, = 0.1f)
     
     /** 각속도 댐핑 - 회전 속도 감소율 */
-    UPROPERTY_WITH_FLAGS(EditAnywhere, float, AngularDamping)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, AngularDamping, = 0.1f)
     
     // ==================== 충돌 설정 (TODO: 충돌 시스템 구현 후 추가) ====================
     
@@ -94,13 +94,13 @@ struct FBodyInstance
     // ==================== 고급 물리 설정 ====================
     
     /** 연속 충돌 검출 (CCD) 활성화 */
-    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bUseCCD)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bUseCCD, = true)
     
     /** 복잡한 충돌을 단순 충돌로 사용할지 */
-    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bUseComplexAsSimpleCollision)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bUseComplexAsSimpleCollision, = true)
     
     /** 비동기 물리 시뮬레이션 사용 */
-    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bUseAsyncScene)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bUseAsyncScene, = true)
     
     /** 최대 각속도 제한 */
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MaxAngularVelocity, = 100)

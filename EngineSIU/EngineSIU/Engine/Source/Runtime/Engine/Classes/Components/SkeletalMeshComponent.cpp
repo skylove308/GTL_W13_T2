@@ -579,7 +579,7 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
             {
             case EGeomType::ESphere:
             {
-                PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, Extent);
+                PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, Extent.x);
                 BodySetups[i]->AggGeom.SphereElems.Add(PxSphere);
                 break;
             }
@@ -591,7 +591,7 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
             }
             case EGeomType::ECapsule:
             {
-                PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, Extent);
+                PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, Extent.x, Extent.z);
                 BodySetups[i]->AggGeom.SphereElems.Add(PxCapsule);
                 break;
             }

@@ -50,7 +50,7 @@ void FPhysicsManager::InitPhysX()
     
     Physics = PxCreatePhysics(PX_PHYSICS_VERSION, *Foundation, PxTolerancesScale(), true, Pvd);
     
-    Material = Physics->createMaterial(0.5f, 0.5f, 0.6f);
+    Material = Physics->createMaterial(0.5f, 0.7f, 0.1f);
 
     PxInitExtensions(*Physics, Pvd);
 }
@@ -256,13 +256,23 @@ void FPhysicsManager::ApplyMassAndInertiaSettings(PxRigidDynamic* DynamicBody, c
         PxRigidBodyExt::updateMassAndInertia(*DynamicBody, 1000.0f); // 기본 밀도
     }
     
-    // 질량 중심 오프셋 적용
-    if (!BodyInstance->COMNudge.IsZero())
-    {
-        PxVec3 COMOffset(BodyInstance->COMNudge.X, BodyInstance->COMNudge.Y, BodyInstance->COMNudge.Z);
-        PxRigidBodyExt::setMassAndUpdateInertia(*DynamicBody, DynamicBody->getMass(), &COMOffset);
-    }
-    
+    // // 질량 중심 오프셋 적용
+    // if (!BodyInstance->COMNudge.IsZero())
+    // {
+    //     // PxVec3 COMOffset(BodyInstance->COMNudge.X, BodyInstance->COMNudge.Y, BodyInstance->COMNudge.Z);
+    //     // PxRigidBodyExt::setMassAndUpdateInertia(*DynamicBody, 1.0f);
+    //     
+    //     float newMass = 1.0f;
+    //     DynamicBody->setMass(newMass);
+    //
+    //     // 🔸 문제 2: MassSpaceInertiaTensor: 0.000, 0.000, 0.000 해결
+    //     // 구체의 경우 (반지름 1.0f 가정)
+    //     float radius = 1.0f;
+    //     float I = (2.0f / 5.0f) * newMass * radius * radius; // = 0.4f
+    //     PxVec3 inertia(I, I, I);
+    //     DynamicBody->setMassSpaceInertiaTensor(inertia);
+    // }
+    //
     // 관성 텐서 스케일 적용
     if (BodyInstance->InertiaTensorScale != FVector::OneVector)
     {
@@ -646,28 +656,62 @@ void FPhysicsManager::DestroyGameObject(GameObject* GameObject) const
     delete GameObject;
 }
 
-PxShape* FPhysicsManager::CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
+PxShape* FPhysicsManager::CreateBoxShape(const PxVec3& Pos, const PxVec3& RotationEuler, const PxVec3& HalfExtents) const
 {
+    // Box 모양 생성
     PxShape* Result = Physics->createShape(PxBoxGeometry(HalfExtents), *Material);
-    PxTransform LocalPos(Pos);
-    Result->setLocalPose(LocalPos);
+    
+    // 오일러 각도를 쿼터니언으로 변환
+    PxQuat Rotation = EulerToQuat(RotationEuler);
+    
+    // 위치와 회전을 모두 적용한 Transform 생성
+    PxTransform LocalTransform(Pos, Rotation);
+    Result->setLocalPose(LocalTransform);
+    
     return Result;
 }
 
-PxShape* FPhysicsManager::CreateSphereShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
+PxShape* FPhysicsManager::CreateSphereShape(const PxVec3& Pos, const PxVec3& RotationEuler, float Radius) const
 {
-    PxShape* Result = Physics->createShape(PxSphereGeometry(HalfExtents.x), *Material);
-    PxTransform LocalPos(Pos);
-    Result->setLocalPose(LocalPos);
+    // Sphere 모양 생성 (구는 회전에 영향받지 않지만 일관성을 위해 적용)
+    PxShape* Result = Physics->createShape(PxSphereGeometry(Radius), *Material);
+    
+    // 오일러 각도를 쿼터니언으로 변환
+    PxQuat Rotation = EulerToQuat(RotationEuler);
+    
+    // 위치와 회전을 모두 적용한 Transform 생성
+    PxTransform LocalTransform(Pos, Rotation);
+    Result->setLocalPose(LocalTransform);
+    
     return Result;
 }
 
-PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const
+PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& Pos, const PxVec3& RotationEuler, float Radius, float HalfHeight) const
 {
-    PxShape* Result = Physics->createShape(PxCapsuleGeometry(HalfExtents.x, HalfExtents.z), *Material);
-    PxTransform LocalPos(Pos);
-    Result->setLocalPose(LocalPos);
+    // Capsule 모양 생성
+    PxShape* Result = Physics->createShape(PxCapsuleGeometry(Radius, HalfHeight), *Material);
+    
+    // 오일러 각도를 쿼터니언으로 변환
+    PxQuat Rotation = EulerToQuat(RotationEuler);
+    
+    // 위치와 회전을 모두 적용한 Transform 생성
+    PxTransform LocalTransform(Pos, Rotation);
+    Result->setLocalPose(LocalTransform);
+    
     return Result;
+}
+
+// 오일러 각도를 쿼터니언으로 변환하는 헬퍼 함수
+PxQuat FPhysicsManager::EulerToQuat(const PxVec3& EulerAngles) const
+{
+    // PhysX의 PxTransform을 이용한 변환
+    PxTransform rotX(PxVec3(0), PxQuat(EulerAngles.x, PxVec3(1, 0, 0)));
+    PxTransform rotY(PxVec3(0), PxQuat(EulerAngles.y, PxVec3(0, 1, 0)));
+    PxTransform rotZ(PxVec3(0), PxQuat(EulerAngles.z, PxVec3(0, 0, 1)));
+    
+    PxTransform result = rotZ * rotY * rotX;
+    
+    return result.q;
 }
 
 void FPhysicsManager::Simulate(float DeltaTime)
