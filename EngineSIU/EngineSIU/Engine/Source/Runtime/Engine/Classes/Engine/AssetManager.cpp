@@ -190,19 +190,23 @@ bool UAssetManager::SavePhysicsAsset(const FString& FilePath, UPhysicsAsset* Phy
     SerializeVersion(Writer);
     PhysicsAsset->SerializeAsset(Writer);
 
-    std::ofstream OutputStream{ Path, std::ios::binary | std::ios::trunc };
-    if (!OutputStream.is_open())
+    std::filesystem::path ParentPath = Path.parent_path();
+    if (!std::filesystem::exists(ParentPath))
     {
-        std::filesystem::path ParentPath = Path.parent_path();
         try
         {
             std::filesystem::create_directory(ParentPath);
-            OutputStream = std::ofstream{ Path, std::ios::binary | std::ios::trunc };
         }
         catch (const std::filesystem::filesystem_error& e)
         {
             return false;
         }
+    }
+
+    std::ofstream OutputStream{ Path, std::ios::binary | std::ios::trunc };
+    if (!OutputStream.is_open())
+    {
+        return false;
     }
 
     if (SaveData.Num() > 0)
@@ -234,19 +238,23 @@ bool UAssetManager::SaveParticleSystemAsset(const FString& FilePath, UParticleSy
     SerializeVersion(Writer);
     ParticleSystemAsset->SerializeAsset(Writer);
 
-    std::ofstream OutputStream{ Path, std::ios::binary | std::ios::trunc };
-    if (!OutputStream.is_open())
+    std::filesystem::path ParentPath = Path.parent_path();
+    if (!std::filesystem::exists(ParentPath))
     {
-        std::filesystem::path ParentPath = Path.parent_path();
         try
         {
             std::filesystem::create_directory(ParentPath);
-            OutputStream = std::ofstream{ Path, std::ios::binary | std::ios::trunc };
         }
         catch (const std::filesystem::filesystem_error& e)
         {
             return false;
         }
+    }
+
+    std::ofstream OutputStream{ Path, std::ios::binary | std::ios::trunc };
+    if (!OutputStream.is_open())
+    {
+        return false;
     }
 
     if (SaveData.Num() > 0)
