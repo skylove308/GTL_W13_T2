@@ -356,22 +356,21 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
 
         static const Primitive primitives[] = 
         {
-            { .Label= "Cube",      .OBJ= OBJ_CUBE },
-            { .Label= "Sphere",    .OBJ= OBJ_SPHERE },
-            { .Label= "PointLight", .OBJ= OBJ_POINTLIGHT },
-            { .Label= "SpotLight", .OBJ= OBJ_SPOTLIGHT },
-            { .Label= "DirectionalLight", .OBJ= OBJ_DIRECTIONALLGIHT },
-            { .Label= "AmbientLight", .OBJ= OBJ_AMBIENTLIGHT },
-            { .Label= "Particle",  .OBJ= OBJ_PARTICLE },
-            { .Label= "ParticleSystem",  .OBJ= OBJ_PARTICLESYSTEM },
-            { .Label= "Text",      .OBJ= OBJ_TEXT },
-            { .Label= "Fireball",  .OBJ = OBJ_FIREBALL},
-            { .Label= "Fog",       .OBJ= OBJ_FOG },
-            {.Label = "BoxCol", .OBJ = OBJ_BOX_COLLISION},
-            {.Label = "SphereCol", .OBJ = OBJ_SPHERE_COLLISION},
-            {.Label = "CapsuleCol", .OBJ = OBJ_CAPSULE_COLLISION},
-            {.Label = "SkeletalMeshActor", .OBJ = OBJ_SKELETALMESH},
-            {.Label = "SequencerPlayer", .OBJ = OBJ_SEQUENCERPLAYER},
+            { .Label = "Cube",              .OBJ = OBJ_CUBE },
+            { .Label = "Sphere",            .OBJ = OBJ_SPHERE },
+            { .Label = "PointLight",        .OBJ = OBJ_POINTLIGHT },
+            { .Label = "SpotLight",         .OBJ = OBJ_SPOTLIGHT },
+            { .Label = "DirectionalLight",  .OBJ = OBJ_DIRECTIONALLGIHT },
+            { .Label = "AmbientLight",      .OBJ = OBJ_AMBIENTLIGHT },
+            { .Label = "Particle",          .OBJ = OBJ_PARTICLE },
+            { .Label = "ParticleSystem",    .OBJ = OBJ_PARTICLESYSTEM },
+            { .Label = "Text",              .OBJ = OBJ_TEXT },
+            { .Label = "Fog",               .OBJ = OBJ_FOG },
+            { .Label = "BoxCol",            .OBJ = OBJ_BOX_COLLISION },
+            { .Label = "SphereCol",         .OBJ = OBJ_SPHERE_COLLISION },
+            { .Label = "CapsuleCol",        .OBJ = OBJ_CAPSULE_COLLISION },
+            { .Label = "SkeletalMeshActor", .OBJ = OBJ_SKELETALMESH },
+            { .Label = "SequencerPlayer",   .OBJ = OBJ_SEQUENCERPLAYER },
         };
 
         for (const auto& primitive : primitives)
@@ -453,13 +452,6 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                     TextComponent->SetText(L"Default");
                     SpawnedActor->SetRootComponent(TextComponent);
                     
-                    break;
-                }
-                case OBJ_FIREBALL:
-                {
-                    SpawnedActor = World->SpawnActor<AFireballActor>();
-                    SpawnedActor->SetActorLabel(TEXT("OBJ_FIREBALL"));
-
                     break;
                 }
                 case OBJ_FOG:
