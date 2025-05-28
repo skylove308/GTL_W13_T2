@@ -303,9 +303,9 @@ void PhysicsAssetViewerPanel::ClearRefSkeletalMeshComponent()
 
 void PhysicsAssetViewerPanel::AddBody(int32 BoneIndex, const FName& BoneName)
 {
-    physx::PxVec3 BonePos = physx::PxVec3(CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().X, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().Y, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetTranslation().Z);
-    physx::PxVec3 Rotation = physx::PxVec3(CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().X, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().Y, CopiedRefSkeleton->RawRefBonePose[BoneIndex].GetRotation().Z);
-    physx::PxVec3 HalfScale = physx::PxVec3(0.5f, 0.5f, 0.5f); // 예시로 0.5로 설정, 실제 스케일은 필요에 따라 조정
+    physx::PxVec3 BonePos = physx::PxVec3(0.0f, 0.0f, 0.0f);
+    physx::PxVec3 Rotation = physx::PxVec3(0.0f, 0.0f, 0.0f);
+    physx::PxVec3 HalfScale = physx::PxVec3(1.0f, 1.0f, 1.0f);
 
     UBodySetup* BodySetup = FObjectFactory::ConstructObject<UBodySetup>(nullptr);
 
