@@ -538,7 +538,9 @@ void UPrimitiveComponent::CreatePhysXGameObject()
     ////////////////////////
     
     FVector Location = GetComponentLocation();
+    FQuat Rotation = GetComponentRotation().Quaternion();
     PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
+    PxQuat Rot = PxQuat(Rotation.X, Rotation.Y, Rotation.Z, Rotation.W);
 
     if (GeomAttributes.Num() == 0)
     {
@@ -578,7 +580,7 @@ void UPrimitiveComponent::CreatePhysXGameObject()
         }
     }
     
-    GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(Pos, BodyInstance,  BodySetup, RigidBodyType);
+    GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(Pos, Rot, BodyInstance,  BodySetup, RigidBodyType);
 }
 
 void UPrimitiveComponent::BeginPlay()
