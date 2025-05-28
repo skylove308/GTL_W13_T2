@@ -87,25 +87,23 @@ void UEditorEngine::Tick(float DeltaTime)
                             continue;
                         }
 
-                        // 파티클 컴포넌트는 항상 Tick 호출
+                        const bool bActorTickInEditor = Actor->IsActorTickInEditor();
+                        if (bActorTickInEditor)
+                        {
+                            Actor->Tick(DeltaTime);
+                        }
+
                         for (const auto& Comp : Actor->GetComponents())
                         {
-                            if (Comp->IsA<UParticleSystemComponent>())
+                            // 파티클 컴포넌트는 항상 Tick 호출
+                            if (bActorTickInEditor || Comp->IsA<UParticleSystemComponent>())
                             {
                                 Comp->TickComponent(DeltaTime);
                             }
                         }
-                        
-                        if (Actor->IsActorTickInEditor())
+
+                        if (bActorTickInEditor)
                         {
-                            Actor->Tick(DeltaTime);
-
-                            // 물리기반 시뮬레이션을 위한 TickGroup 처리
-                            for (auto* Comp : Actor->GetComponents())
-                            {
-                                Comp->TickComponent(DeltaTime);
-                            }
-
                             PhysicsManager->Simulate(DeltaTime);
 
                             for (auto* Comp : Actor->GetComponents())

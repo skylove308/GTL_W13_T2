@@ -15,7 +15,12 @@ UParticleSystemComponent::UParticleSystemComponent()
 
 UObject* UParticleSystemComponent::Duplicate(UObject* InOuter)
 {
-    return nullptr;
+    ThisClass* NewComponent = Cast<ThisClass>(Super::Duplicate(InOuter));
+    NewComponent->SetRelativeTransform(GetRelativeTransform());
+
+    NewComponent->SetParticleSystem(GetParticleSystem());
+    
+    return NewComponent;
 }
 
 void UParticleSystemComponent::InitializeComponent()
