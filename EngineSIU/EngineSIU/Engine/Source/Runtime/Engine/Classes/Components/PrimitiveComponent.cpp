@@ -222,11 +222,11 @@ void UPrimitiveComponent::EndPhysicsTickComponent(float DeltaTime)
         XMFLOAT4 quat;
         XMStoreFloat4(&quat, rotation);
         
-        FQuat MyQuat = FQuat(-quat.x, -quat.y, quat.z, quat.w);
+        FQuat MyQuat = FQuat(quat.x, quat.y, quat.z, quat.w);
         FRotator Rotator = MyQuat.Rotator();
         
         // ✅ Unreal Engine에 적용 (라디안 → 도 변환)
-        SetWorldLocation(FVector(-pos.x, -pos.y, pos.z));
+        SetWorldLocation(FVector(pos.x, -pos.y, pos.z));
         SetWorldRotation(Rotator);
     }
 }
