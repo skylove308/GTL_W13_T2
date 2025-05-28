@@ -209,10 +209,15 @@ void UPrimitiveComponent::EndPhysicsTickComponent(float DeltaTime)
     {
         BodyInstance->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
         XMMATRIX Matrix = BodyInstance->BIGameObject->WorldMatrix;
-        float x = XMVectorGetX(Matrix.r[3]);
-        float y = XMVectorGetY(Matrix.r[3]);
-        float z = XMVectorGetZ(Matrix.r[3]);
-        SetWorldLocation(FVector(x, y, z)); 
+        XMVECTOR RotationVec = XMQuaternionRotationMatrix(Matrix);
+        float X = XMVectorGetX(Matrix.r[3]);
+        float Y = XMVectorGetY(Matrix.r[3]);
+        float Z = XMVectorGetZ(Matrix.r[3]);
+        float RX = XMVectorGetX(RotationVec);
+        float RY = XMVectorGetY(RotationVec);
+        float RZ = XMVectorGetZ(RotationVec);
+        SetWorldLocation(FVector(X, Y, Z));
+        SetWorldRotation(FRotator(RX, RY, RZ));
     }
 }
 
@@ -547,7 +552,7 @@ void UPrimitiveComponent::CreatePhysXGameObject()
         {
         case EGeomType::ESphere:
         {
-            PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, Extent);
+            PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, Extent.x);
             BodySetup->AggGeom.SphereElems.Add(PxSphere);
             break;
         }
@@ -559,7 +564,7 @@ void UPrimitiveComponent::CreatePhysXGameObject()
         }
         case EGeomType::ECapsule:
         {
-            PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, Extent);
+            PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, Extent.x, Extent.z);
             BodySetup->AggGeom.SphereElems.Add(PxCapsule);
             break;
         }
