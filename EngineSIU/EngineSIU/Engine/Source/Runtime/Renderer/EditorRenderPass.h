@@ -5,6 +5,7 @@
 #include "RenderPassBase.h"
 #include "RenderResources.h"
 #include "D3D11RHI/DXDBufferManager.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 
 class FDXDBufferManager;
 class UWorld;
@@ -24,6 +25,9 @@ private:
     
     FRenderResourcesDebug Resources = FRenderResourcesDebug();
 
+    // for Physics Asset Viewer
+    TArray<USkeletalMeshComponent*> PreviewMesh;
+    
 private:
     void CreateShaders();
     void CreateBuffers();

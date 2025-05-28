@@ -16,6 +16,7 @@
 #include "Components/SphereComponent.h"
 #include "D3D11RHI/GraphicDevice.h"
 #include "Engine/FObjLoader.h"
+#include "Engine/SkeletalMesh.h"
 #include "Engine/Classes/Actors/Player.h"
 #include "Engine/Classes/Components/Light/LightComponent.h"
 #include "Engine/Classes/Components/Light/DirectionalLightComponent.h"
@@ -273,50 +274,66 @@ void FEditorRenderPass::BindBuffers(const FDebugPrimitiveData& InPrimitiveData) 
 
 void FEditorRenderPass::PrepareRenderArr()
 {
-    if (GEngine->ActiveWorld->WorldType != EWorldType::Editor)
+    const EWorldType WorldType = GEngine->ActiveWorld->WorldType;
+    if (WorldType != EWorldType::Editor && WorldType != EWorldType::PhysicsAssetViewer)
     {
         return;
     }
     
-    // gizmo 제외하고 넣기
     for (const auto* Actor : TObjectRange<AActor>())
     {
         for (const auto* Component : Actor->GetComponents())
         {
-            // AABB용 static mesh component
-            if (UStaticMeshComponent* StaticMesh = Cast<UStaticMeshComponent>(Component))
+            if (WorldType == EWorldType::PhysicsAssetViewer)
             {
-                if (!StaticMesh->IsA<UGizmoBaseComponent>())
+                if (USkeletalMeshComponent* SkelMeshComp = Cast<USkeletalMeshComponent>(Component))
                 {
-                    Resources.Components.StaticMeshComponent.Add(StaticMesh);
+                    if (USkeletalMesh* SkelMesh = SkelMeshComp->GetSkeletalMeshAsset())
+                    {
+                        if (SkelMesh->GetPhysicsAsset())
+                        {
+                            PreviewMesh.Add(SkelMeshComp);
+                        }
+                    }
                 }
             }
-
-            // light
-            if (ULightComponentBase* Light = Cast<ULightComponentBase>(Component))
+            else
             {
-                Resources.Components.Light.Add(Light);
-            }
+                // AABB용 static mesh component
+                if (UStaticMeshComponent* StaticMesh = Cast<UStaticMeshComponent>(Component))
+                {
+                    if (!StaticMesh->IsA<UGizmoBaseComponent>())
+                    {
+                        Resources.Components.StaticMeshComponent.Add(StaticMesh);
+                    }
+                }
 
-            // fog
-            if (UHeightFogComponent* Fog = Cast<UHeightFogComponent>(Component))
-            {
-                Resources.Components.Fog.Add(Fog);
-            }
+                // light
+                if (ULightComponentBase* Light = Cast<ULightComponentBase>(Component))
+                {
+                    Resources.Components.Light.Add(Light);
+                }
 
-            if (USphereComponent* SphereComponent = Cast<USphereComponent>(Component))
-            {
-                Resources.Components.SphereComponents.Add(SphereComponent);
-            }
+                // fog
+                if (UHeightFogComponent* Fog = Cast<UHeightFogComponent>(Component))
+                {
+                    Resources.Components.Fog.Add(Fog);
+                }
 
-            if (UBoxComponent* BoxComponent = Cast<UBoxComponent>(Component))
-            {
-                Resources.Components.BoxComponents.Add(BoxComponent);
-            }
+                if (USphereComponent* SphereComponent = Cast<USphereComponent>(Component))
+                {
+                    Resources.Components.SphereComponents.Add(SphereComponent);
+                }
+
+                if (UBoxComponent* BoxComponent = Cast<UBoxComponent>(Component))
+                {
+                    Resources.Components.BoxComponents.Add(BoxComponent);
+                }
             
-            if (UCapsuleComponent* CapsuleComponent = Cast<UCapsuleComponent>(Component))
-            {
-                Resources.Components.CapsuleComponents.Add(CapsuleComponent);
+                if (UCapsuleComponent* CapsuleComponent = Cast<UCapsuleComponent>(Component))
+                {
+                    Resources.Components.CapsuleComponents.Add(CapsuleComponent);
+                }
             }
         }
     }
@@ -330,6 +347,8 @@ void FEditorRenderPass::ClearRenderArr()
     Resources.Components.SphereComponents.Empty();
     Resources.Components.CapsuleComponents.Empty();
     Resources.Components.BoxComponents.Empty();
+
+    PreviewMesh.Empty();
 }
 
 void FEditorRenderPass::PrepareRender(const std::shared_ptr<FEditorViewportClient>& Viewport)
@@ -697,10 +716,39 @@ void FEditorRenderPass::RenderBoxInstanced(uint64 ShowFlag)
                 {
                     FConstantBufferDebugBox b;
                     FMatrix WorldMatrix =
-                        FTransform(GeomAttribute.Rotation, GeomAttribute.Offset, GeomAttribute.Extent).ToMatrixWithScale()
+                        FTransform(GeomAttribute.Rotation, GeomAttribute.Offset, GeomAttribute.Extent * 2).ToMatrixWithScale()
                         * StaticComp->GetWorldMatrix().GetMatrixWithoutScale();
                     b.WorldMatrix = WorldMatrix;
                     b.Extent = GeomAttribute.Extent;
+                    BufferAll.Add(b);
+                }
+            }
+        }
+    }
+
+    for (const USkeletalMeshComponent* SkelMeshComp : PreviewMesh)
+    {
+        USkeletalMesh* SkeletalMesh = SkelMeshComp->GetSkeletalMeshAsset();
+        UPhysicsAsset* PhysicsAsset = SkeletalMesh->GetPhysicsAsset();
+
+        TArray<FMatrix> BoneMatrices;
+        SkelMeshComp->GetCurrentGlobalBoneMatrices(BoneMatrices);
+        for (const UBodySetup* BodySetup : PhysicsAsset->BodySetups)
+        {
+            const FName BoneName = BodySetup->BoneName;
+            const int32 BoneIndex = SkeletalMesh->GetRefSkeleton().FindRawBoneIndex(BoneName);
+            const FMatrix BoneMatrix = BoneMatrices[BoneIndex];
+            for (const AggregateGeomAttributes& Attributes : BodySetup->GeomAttributes)
+            {
+                if (Attributes.GeomType == EGeomType::EBox)
+                {
+                    FConstantBufferDebugBox b;
+                    FMatrix WorldMatrix =
+                        FTransform(Attributes.Rotation, Attributes.Offset, Attributes.Extent * 2).ToMatrixWithScale()
+                        * BoneMatrix
+                        * SkelMeshComp->GetWorldMatrix().GetMatrixWithoutScale();
+                    b.WorldMatrix = WorldMatrix;
+                    b.Extent = Attributes.Extent;
                     BufferAll.Add(b);
                 }
             }
@@ -772,10 +820,39 @@ void FEditorRenderPass::RenderSphereInstanced(uint64 ShowFlag)
                 {
                     FConstantBufferDebugSphere b;
                     FMatrix WorldMatrix =
-                        FTransform(GeomAttribute.Rotation, GeomAttribute.Offset, GeomAttribute.Extent).ToMatrixWithScale()
+                        FTransform(GeomAttribute.Rotation, GeomAttribute.Offset, GeomAttribute.Extent * 2).ToMatrixWithScale()
                         * StaticComp->GetWorldMatrix().GetMatrixWithoutScale();
                     b.Position = WorldMatrix.GetTranslationVector();
                     b.Radius = GeomAttribute.Extent.X;
+                    BufferAll.Add(b);
+                }
+            }
+        }
+    }
+
+    for (const USkeletalMeshComponent* SkelMeshComp : PreviewMesh)
+    {
+        USkeletalMesh* SkeletalMesh = SkelMeshComp->GetSkeletalMeshAsset();
+        UPhysicsAsset* PhysicsAsset = SkeletalMesh->GetPhysicsAsset();
+
+        TArray<FMatrix> BoneMatrices;
+        SkelMeshComp->GetCurrentGlobalBoneMatrices(BoneMatrices);
+        for (const UBodySetup* BodySetup : PhysicsAsset->BodySetups)
+        {
+            const FName BoneName = BodySetup->BoneName;
+            const int32 BoneIndex = SkeletalMesh->GetRefSkeleton().FindRawBoneIndex(BoneName);
+            const FMatrix BoneMatrix = BoneMatrices[BoneIndex];
+            for (const AggregateGeomAttributes& Attributes : BodySetup->GeomAttributes)
+            {
+                if (Attributes.GeomType == EGeomType::ESphere)
+                {
+                    FConstantBufferDebugSphere b;
+                    FMatrix WorldMatrix =
+                        FTransform(Attributes.Rotation, Attributes.Offset, Attributes.Extent * 2).ToMatrixWithScale()
+                        * BoneMatrix
+                        * SkelMeshComp->GetWorldMatrix().GetMatrixWithoutScale();
+                    b.Position = WorldMatrix.GetTranslationVector();
+                    b.Radius = Attributes.Extent.X;
                     BufferAll.Add(b);
                 }
             }
@@ -851,11 +928,41 @@ void FEditorRenderPass::RenderCapsuleInstanced(uint64 ShowFlag)
                 {
                     FConstantBufferDebugCapsule b;
                     FMatrix WorldMatrix =
-                        FTransform(GeomAttribute.Rotation, GeomAttribute.Offset, GeomAttribute.Extent).ToMatrixWithScale()
+                        FTransform(GeomAttribute.Rotation, GeomAttribute.Offset, GeomAttribute.Extent * 2).ToMatrixWithScale()
                         * StaticComp->GetWorldMatrix().GetMatrixWithoutScale();
                     b.WorldMatrix = WorldMatrix;
                     b.Radius = GeomAttribute.Extent.X;
                     b.Height = GeomAttribute.Extent.Z;
+                    BufferAll.Add(b);
+                }
+            }
+        }
+    }
+
+    for (const USkeletalMeshComponent* SkelMeshComp : PreviewMesh)
+    {
+        USkeletalMesh* SkeletalMesh = SkelMeshComp->GetSkeletalMeshAsset();
+        UPhysicsAsset* PhysicsAsset = SkeletalMesh->GetPhysicsAsset();
+
+        TArray<FMatrix> BoneMatrices;
+        SkelMeshComp->GetCurrentGlobalBoneMatrices(BoneMatrices);
+        for (const UBodySetup* BodySetup : PhysicsAsset->BodySetups)
+        {
+            const FName BoneName = BodySetup->BoneName;
+            const int32 BoneIndex = SkeletalMesh->GetRefSkeleton().FindRawBoneIndex(BoneName);
+            const FMatrix BoneMatrix = BoneMatrices[BoneIndex];
+            for (const AggregateGeomAttributes& Attributes : BodySetup->GeomAttributes)
+            {
+                if (Attributes.GeomType == EGeomType::ECapsule)
+                {
+                    FConstantBufferDebugCapsule b;
+                    FMatrix WorldMatrix =
+                        FTransform(Attributes.Rotation, Attributes.Offset, Attributes.Extent * 2).ToMatrixWithScale()
+                        * BoneMatrix
+                        * SkelMeshComp->GetWorldMatrix().GetMatrixWithoutScale();
+                    b.WorldMatrix = WorldMatrix;
+                    b.Radius = Attributes.Extent.X;
+                    b.Height = Attributes.Extent.Z;
                     BufferAll.Add(b);
                 }
             }
