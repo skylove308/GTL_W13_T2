@@ -619,7 +619,7 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
         if (RigidBodyType != ERigidBodyType::STATIC)
         {
             Obj->DynamicRigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bApplyGravity);
-            Obj->DynamicRigidBody->addTorque(PxVec3(100.0f, 0.0f, 0.0f), PxForceMode::eIMPULSE);
+            //Obj->DynamicRigidBody->addTorque(PxVec3(100.0f, 0.0f, 0.0f), PxForceMode::eIMPULSE);
         }
         
         NewBody->SetGameObject(Obj);

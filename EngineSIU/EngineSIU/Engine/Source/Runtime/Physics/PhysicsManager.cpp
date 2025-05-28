@@ -73,7 +73,7 @@ PxScene* FPhysicsManager::CreateScene(UWorld* World)
     
     PxSceneDesc SceneDesc(Physics->getTolerancesScale());
     
-    SceneDesc.gravity = PxVec3(0, 0, -9.81f);
+    SceneDesc.gravity = PxVec3(0, 0, -1.81f);
     
     Dispatcher = PxDefaultCpuDispatcherCreate(4);
     SceneDesc.cpuDispatcher = Dispatcher;
