@@ -579,7 +579,7 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
             {
             case EGeomType::ESphere:
             {
-                PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, Extent);
+                PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, Rotation, Extent.x);
                 BodySetups[i]->AggGeom.SphereElems.Add(PxSphere);
                 break;
             }
@@ -591,7 +591,7 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
             }
             case EGeomType::ECapsule:
             {
-                PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, Extent);
+                PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, Rotation, Extent.x, Extent.z);
                 BodySetups[i]->AggGeom.SphereElems.Add(PxCapsule);
                 break;
             }
@@ -610,13 +610,16 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
             CurrentGlobalBoneMatrices[i] = CurrentGlobalBoneMatrices[i] * CompToWorld;
         }
         FVector Location = CurrentGlobalBoneMatrices[BoneIndex].GetTranslationVector();
+        FQuat Rotation = FTransform(CurrentGlobalBoneMatrices[BoneIndex]).GetRotation();
         //FVector Location = GetComponentLocation();
         PxVec3 Pos = PxVec3(Location.X, Location.Y, Location.Z);
-        GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(Pos, NewBody, BodySetups[i], RigidBodyType);
+        PxQuat Quat = PxQuat(Rotation.X, Rotation.Y, Rotation.Z, Rotation.W);
+        GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(Pos, Quat, NewBody, BodySetups[i], RigidBodyType);
         
         if (RigidBodyType != ERigidBodyType::STATIC)
         {
             Obj->DynamicRigidBody->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !bApplyGravity);
+            Obj->DynamicRigidBody->addTorque(PxVec3(100.0f, 0.0f, 0.0f), PxForceMode::eIMPULSE);
         }
         
         NewBody->SetGameObject(Obj);
@@ -646,8 +649,11 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
             }
         }
 
-        GEngine->PhysicsManager->CreateJoint(BodyInstance1->BIGameObject, BodyInstance2->BIGameObject, NewConstraintInstance, ConstraintSetups[i]);
-
+        if (BodyInstance1 && BodyInstance2)
+        {
+            GEngine->PhysicsManager->CreateJoint(BodyInstance1->BIGameObject, BodyInstance2->BIGameObject, NewConstraintInstance, ConstraintSetups[i]);
+        }
+       
         Constraints.Add(NewConstraintInstance);
     }
 }

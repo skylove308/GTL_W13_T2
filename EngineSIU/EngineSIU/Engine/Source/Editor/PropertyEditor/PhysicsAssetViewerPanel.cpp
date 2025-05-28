@@ -332,6 +332,7 @@ void PhysicsAssetViewerPanel::RemoveBody(const FName& BoneName)
         if (BodySetups[i]->BoneName == BoneName)
         {
             BodySetups.RemoveAt(i);
+            SelectedBodyIndex = INDEX_NONE; // 선택된 Body 인덱스 초기화
             break;
         }
     }
@@ -362,6 +363,7 @@ void PhysicsAssetViewerPanel::RemoveConstraint(int32 ConstraintIndex)
         {
             delete ConstraintToRemove;
             PhysicsAsset->ConstraintSetups.RemoveAt(ConstraintIndex);
+            SelectedConstraintIndex = INDEX_NONE; // 선택된 Constraint 인덱스 초기화
         }
     }
 }
