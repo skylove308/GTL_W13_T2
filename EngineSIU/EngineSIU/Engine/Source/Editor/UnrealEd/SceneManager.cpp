@@ -139,6 +139,19 @@ bool SceneManager::SaveSceneToJsonFile(const std::filesystem::path& FilePath, co
 {
     FSceneData SceneData = WorldToSceneData(InWorld);
 
+    std::filesystem::path ParentPath = FilePath.parent_path();
+    if (!std::filesystem::exists(ParentPath))
+    {
+        try
+        {
+            std::filesystem::create_directory(ParentPath);
+        }
+        catch (const std::filesystem::filesystem_error& e)
+        {
+            return false;
+        }
+    }
+    
     std::ofstream outFile(FilePath);
     if (!outFile)
     {
