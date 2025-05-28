@@ -464,7 +464,7 @@ float4 DebugCoC(float2 UV)
     else if (nearCoC > 0.01f) // 근경 아웃포커스
     {
         // nearCoC 값에 따라 밝기 조절 가능
-        debugColor = float3(nearCoC, 0.0f, 0.0f); // 빨간색 (밝을수록 강한 근경 CoC)
+        debugColor = float3(0.f, nearCoC, 0.0f); // 빨간색 (밝을수록 강한 근경 CoC)
     }
     else if (farCoC > 0.01f) // 원경 아웃포커스
     {
