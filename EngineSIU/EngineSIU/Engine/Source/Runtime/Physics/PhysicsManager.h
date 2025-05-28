@@ -20,8 +20,6 @@ class UWorld;
 using namespace physx;
 using namespace DirectX;
 
-// #define SCOPED_READ_LOCK(scene) PxSceneReadLock scopedReadLock(*scene);
-
 class UPrimitiveComponent;
 
 // 게임 오브젝트
@@ -31,7 +29,7 @@ struct GameObject {
     XMMATRIX WorldMatrix = XMMatrixIdentity();
 
     void UpdateFromPhysics(PxScene* Scene) {
-        // SCOPED_READ_LOCK(gScene);
+        PxSceneReadLock scopedReadLock(*Scene);
         PxTransform t = DynamicRigidBody->getGlobalPose();
         PxMat44 mat(t);
         WorldMatrix = XMLoadFloat4x4(reinterpret_cast<const XMFLOAT4X4*>(&mat));
@@ -62,9 +60,9 @@ public:
                                      ERigidBodyType::DYNAMIC) const;
     void CreateJoint(const GameObject* Obj1, const GameObject* Obj2, FConstraintInstance* ConstraintInstance, const FConstraintSetup* ConstraintSetup) const;
 
-    PxShape* CreateBoxShape(const PxVec3& Pos, const PxVec3& Rotation, const PxVec3& HalfExtents) const;
-    PxShape* CreateSphereShape(const PxVec3& Pos, const PxVec3& RotationEuler, float Radius) const;
-    PxShape* CreateCapsuleShape(const PxVec3& Pos, const PxVec3& RotationEuler, float Radius, float HalfHeight) const;
+    PxShape* CreateBoxShape(const PxVec3& Pos, const PxQuat& Quat, const PxVec3& HalfExtents) const;
+    PxShape* CreateSphereShape(const PxVec3& Pos, const PxQuat& Quat, float Radius) const;
+    PxShape* CreateCapsuleShape(const PxVec3& Pos, const PxQuat& Quat, float Radius, float HalfHeight) const;
     PxQuat EulerToQuat(const PxVec3& EulerAngles) const;
 
     PxPhysics* GetPhysics() { return Physics; }
@@ -73,6 +71,7 @@ public:
     void Simulate(float DeltaTime);
     void ShutdownPhysX();
     void CleanupPVD();
+    void CleanupScene();
 
 private:
     PxDefaultAllocator Allocator;
@@ -87,7 +86,7 @@ private:
     PxPvd* Pvd;
     PxPvdTransport* Transport;
 
-    PxRigidDynamic* CreateDynamicRigidBody(const PxVec3& Pos, const const PxQuat& Rot, FBodyInstance* BodyInstance, UBodySetup* BodySetups) const;
+    PxRigidDynamic* CreateDynamicRigidBody(const PxVec3& Pos, const PxQuat& Rot, FBodyInstance* BodyInstance, UBodySetup* BodySetups) const;
     PxRigidStatic* CreateStaticRigidBody(const PxVec3& Pos, const PxQuat& Rot, FBodyInstance* BodyInstance, UBodySetup* BodySetups) const;
     void AttachShapesToActor(PxRigidActor* Actor, UBodySetup* BodySetup) const;
     void ApplyMassAndInertiaSettings(PxRigidDynamic* DynamicBody, const FBodyInstance* BodyInstance) const;

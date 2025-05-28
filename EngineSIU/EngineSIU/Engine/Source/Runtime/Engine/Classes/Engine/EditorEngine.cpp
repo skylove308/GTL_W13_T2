@@ -152,16 +152,22 @@ void UEditorEngine::Tick(float DeltaTime)
                             {
                                 Comp->TickComponent(DeltaTime);
                             }
+                        }
+                    }
 
-                            PhysicsManager->Simulate(DeltaTime);
+                    PhysicsManager->Simulate(DeltaTime);
 
+                    for (AActor* Actor : CachedActors)
+                    {
+                        if (Actor)
+                        {
                             for (auto* Comp : Actor->GetComponents())
                             {
                                 Comp->EndPhysicsTickComponent(DeltaTime);
-
                             }
                         }
                     }
+                    
                 }
             }
         }
@@ -177,7 +183,7 @@ void UEditorEngine::Tick(float DeltaTime)
                 {
                     for (AActor* Actor : CachedActors)
                     {
-                        if (Actor && Actor->IsActorTickInEditor())
+                        if (Actor)
                         {
                             Actor->Tick(DeltaTime);
 
@@ -186,13 +192,18 @@ void UEditorEngine::Tick(float DeltaTime)
                             {
                                 Comp->TickComponent(DeltaTime);
                             }
+                        }
+                    }
 
-                            PhysicsManager->Simulate(DeltaTime);
+                    PhysicsManager->Simulate(DeltaTime);
 
+                    for (AActor* Actor : CachedActors)
+                    {
+                        if (Actor)
+                        {
                             for (auto* Comp : Actor->GetComponents())
                             {
                                 Comp->EndPhysicsTickComponent(DeltaTime);
-
                             }
                         }
                     }
@@ -211,7 +222,7 @@ void UEditorEngine::Tick(float DeltaTime)
                 {
                     for (AActor* Actor : CachedActors)
                     {
-                        if (Actor && Actor->IsActorTickInEditor())
+                        if (Actor)
                         {
                             Actor->Tick(DeltaTime);
 
@@ -220,13 +231,18 @@ void UEditorEngine::Tick(float DeltaTime)
                             {
                                 Comp->TickComponent(DeltaTime);
                             }
+                        }
+                    }
 
-                            PhysicsManager->Simulate(DeltaTime);
+                    PhysicsManager->Simulate(DeltaTime);
 
+                    for (AActor* Actor : CachedActors)
+                    {
+                        if (Actor)
+                        {
                             for (auto* Comp : Actor->GetComponents())
                             {
                                 Comp->EndPhysicsTickComponent(DeltaTime);
-
                             }
                         }
                     }
@@ -586,6 +602,7 @@ void UEditorEngine::EndPIE()
         // TODO: PIE에서 EditorWorld로 돌아올 때, 기존 선택된 Picking이 유지되어야 함. 현재는 에러를 막기위해 임시조치.
         ClearActorSelection();
         ClearComponentSelection();
+        PhysicsManager->CleanupScene();
     }
 
     FSlateAppMessageHandler* Handler = GEngineLoop.GetAppMessageHandler();
