@@ -135,16 +135,22 @@ void UEditorEngine::Tick(float DeltaTime)
                             {
                                 Comp->TickComponent(DeltaTime);
                             }
+                        }
+                    }
 
-                            PhysicsManager->Simulate(DeltaTime);
+                    PhysicsManager->Simulate(DeltaTime);
 
+                    for (AActor* Actor : CachedActors)
+                    {
+                        if (Actor)
+                        {
                             for (auto* Comp : Actor->GetComponents())
                             {
                                 Comp->EndPhysicsTickComponent(DeltaTime);
-
                             }
                         }
                     }
+                    
                 }
             }
         }
@@ -160,7 +166,7 @@ void UEditorEngine::Tick(float DeltaTime)
                 {
                     for (AActor* Actor : CachedActors)
                     {
-                        if (Actor && Actor->IsActorTickInEditor())
+                        if (Actor)
                         {
                             Actor->Tick(DeltaTime);
 
@@ -169,13 +175,18 @@ void UEditorEngine::Tick(float DeltaTime)
                             {
                                 Comp->TickComponent(DeltaTime);
                             }
+                        }
+                    }
 
-                            PhysicsManager->Simulate(DeltaTime);
+                    PhysicsManager->Simulate(DeltaTime);
 
+                    for (AActor* Actor : CachedActors)
+                    {
+                        if (Actor)
+                        {
                             for (auto* Comp : Actor->GetComponents())
                             {
                                 Comp->EndPhysicsTickComponent(DeltaTime);
-
                             }
                         }
                     }
@@ -194,7 +205,7 @@ void UEditorEngine::Tick(float DeltaTime)
                 {
                     for (AActor* Actor : CachedActors)
                     {
-                        if (Actor && Actor->IsActorTickInEditor())
+                        if (Actor)
                         {
                             Actor->Tick(DeltaTime);
 
@@ -203,13 +214,18 @@ void UEditorEngine::Tick(float DeltaTime)
                             {
                                 Comp->TickComponent(DeltaTime);
                             }
+                        }
+                    }
 
-                            PhysicsManager->Simulate(DeltaTime);
+                    PhysicsManager->Simulate(DeltaTime);
 
+                    for (AActor* Actor : CachedActors)
+                    {
+                        if (Actor)
+                        {
                             for (auto* Comp : Actor->GetComponents())
                             {
                                 Comp->EndPhysicsTickComponent(DeltaTime);
-
                             }
                         }
                     }

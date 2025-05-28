@@ -80,6 +80,8 @@ int32 FEngineLoop::Init(HINSTANCE hInstance)
     EngineProfiler.RegisterStatScope(TEXT("|- SkinningPass"), FName(TEXT("SkinningPass_CPU")), FName(TEXT("SkinningPass_GPU")));
     EngineProfiler.RegisterStatScope(TEXT("SlatePass"), FName(TEXT("SlatePass_CPU")), FName(TEXT("SlatePass_GPU")));
     EngineProfiler.RegisterStatScope(TEXT("SimulatePass"), FName(TEXT("SimulatePass_CPU")), FName(TEXT("SimulatePass_GPU")));
+    EngineProfiler.RegisterStatScope(TEXT("SimulatePass2"), FName(TEXT("SimulatePass2_CPU")), FName(TEXT("SimulatePass2_GPU")));
+    EngineProfiler.RegisterStatScope(TEXT("SimulatePass3"), FName(TEXT("SimulatePass3_CPU")), FName(TEXT("SimulatePass3_GPU")));
 
     BufferManager->Initialize(GraphicDevice.Device, GraphicDevice.DeviceContext);
     Renderer.Initialize(&GraphicDevice, BufferManager, &GPUTimingManager);

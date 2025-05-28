@@ -5,6 +5,8 @@
 #include "PhysicsEngine/PhysicsAsset.h"
 
 #include "World/World.h"
+#include <thread>
+
 
 void GameObject::SetRigidBodyType(ERigidBodyType RigidBodyType) const
 {
@@ -73,9 +75,10 @@ PxScene* FPhysicsManager::CreateScene(UWorld* World)
     
     PxSceneDesc SceneDesc(Physics->getTolerancesScale());
     
-    SceneDesc.gravity = PxVec3(0, 0, -1.81f);
+    SceneDesc.gravity = PxVec3(0, 0, -9.81f);
     
-    Dispatcher = PxDefaultCpuDispatcherCreate(4);
+    unsigned int hc = std::thread::hardware_concurrency();
+    Dispatcher = PxDefaultCpuDispatcherCreate(hc-2);
     SceneDesc.cpuDispatcher = Dispatcher;
     
     SceneDesc.filterShader = PxDefaultSimulationFilterShader;
