@@ -26,13 +26,13 @@ struct FBodyInstance
     // ==================== 질량과 관성 ====================
     
     /** 바디의 질량 (킬로그램) */
-    UPROPERTY_WITH_FLAGS(EditAnywhere, float, MassInKg, = 1.0f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, MassInKg, = 100.0f)
     
     /** 질량 중심 오프셋 */
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, COMNudge)
     
     /** 관성 텐서 스케일 (회전 저항) */
-    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, InertiaTensorScale, = FVector(1.0f, 1.0f, 1.0f))
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, InertiaTensorScale, = FVector(3.0f, 3.0f, 3.0f))
     
     // ==================== 시뮬레이션 설정 ====================
     
@@ -43,7 +43,7 @@ struct FBodyInstance
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bEnableGravity, = true)
     
     /** 자동으로 인접한 바디와 용접할지 여부 */
-    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bAutoWeld)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bAutoWeld, = true)
     
     /** 시작할 때 깨어있는 상태인지 (잠들어있으면 CPU 절약) */
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bStartAwake, = true)
