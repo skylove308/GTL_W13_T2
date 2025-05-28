@@ -57,6 +57,18 @@ void UEditorEngine::Release()
     {
         EndPIE();
     }
+    if (ActiveWorld->WorldType == EWorldType::SkeletalViewer)
+    {
+        EndSkeletalMeshViewer();
+    }
+    if (ActiveWorld->WorldType == EWorldType::ParticleViewer)
+    {
+        EndParticleViewer();
+    }
+    if (ActiveWorld->WorldType == EWorldType::PhysicsAssetViewer)
+    {
+        EndPhysicsAssetViewer();
+    }
     
     SaveLevel("Saved/AutoSaves.scene");
     
