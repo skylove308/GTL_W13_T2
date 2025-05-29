@@ -104,8 +104,6 @@ void UEditorEngine::Tick(float DeltaTime)
 
                         if (bActorTickInEditor)
                         {
-                            PhysicsManager->Simulate(DeltaTime);
-
                             for (auto* Comp : Actor->GetComponents())
                             {
                                 Comp->EndPhysicsTickComponent(DeltaTime);
@@ -124,6 +122,7 @@ void UEditorEngine::Tick(float DeltaTime)
                 TArray CachedActors = Level->Actors;
                 if (Level)
                 {
+
                     for (AActor* Actor : CachedActors)
                     {
                         if (Actor)
@@ -178,8 +177,6 @@ void UEditorEngine::Tick(float DeltaTime)
                         }
                     }
 
-                    PhysicsManager->Simulate(DeltaTime);
-
                     for (AActor* Actor : CachedActors)
                     {
                         if (Actor)
@@ -216,8 +213,6 @@ void UEditorEngine::Tick(float DeltaTime)
                             }
                         }
                     }
-
-                    PhysicsManager->Simulate(DeltaTime);
 
                     for (AActor* Actor : CachedActors)
                     {
