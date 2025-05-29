@@ -11,19 +11,20 @@ class APlayerController : public AActor
     DECLARE_CLASS(APlayerController, AActor)
     
 public:
-    APlayerController();
-    ~APlayerController();
+    APlayerController() = default;
+    virtual ~APlayerController() override = default;
 
     virtual void PostSpawnInitialize() override;
 
-    virtual void BeginPlay();
+    virtual void BeginPlay() override;
 
     virtual void Tick(float DeltaTime) override;
+    
     void ProcessInput(float DeltaTime) const;
 
-    virtual void Destroyed();
+    virtual void Destroyed() override;
 
-    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
     UInputComponent* GetInputComponent() const { return InputComponent; }
 
@@ -35,10 +36,9 @@ public:
     
     virtual void BindAction(const FString& Key, const std::function<void(float)>& Callback);
 
-    AActor* GetPossessedActor() { return PossessedActor; }
+    AActor* GetPossessedActor() const { return PossessedActor; }
+    
     // 카메라 관련 함수
-public:
-    void FOV(float NewFOV);
     AActor* GetViewTarget() const;
 
     virtual void SpawnPlayerCameraManager();
@@ -50,8 +50,7 @@ public:
     APlayerCameraManager* PlayerCameraManager = nullptr;
     
 protected:
-    UPROPERTY
-    (UInputComponent*, InputComponent, = nullptr)
+    UPROPERTY(UInputComponent*, InputComponent, = nullptr)
 
     virtual void SetupInputComponent();
 

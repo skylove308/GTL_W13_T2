@@ -53,6 +53,23 @@ void UEditorEngine::Init()
 
 void UEditorEngine::Release()
 {
+    if (ActiveWorld->WorldType == EWorldType::PIE)
+    {
+        EndPIE();
+    }
+    if (ActiveWorld->WorldType == EWorldType::SkeletalViewer)
+    {
+        EndSkeletalMeshViewer();
+    }
+    if (ActiveWorld->WorldType == EWorldType::ParticleViewer)
+    {
+        EndParticleViewer();
+    }
+    if (ActiveWorld->WorldType == EWorldType::PhysicsAssetViewer)
+    {
+        EndPhysicsAssetViewer();
+    }
+    
     SaveLevel("Saved/AutoSaves.scene");
     
     for (FWorldContext* WorldContext : WorldList)

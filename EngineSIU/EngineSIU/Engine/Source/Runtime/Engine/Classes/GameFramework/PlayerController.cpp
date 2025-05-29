@@ -6,17 +6,6 @@
 #include "World/World.h"
 
 
-APlayerController::APlayerController()
-    : PlayerCameraManager(nullptr)
-{
-}
-
-
-APlayerController::~APlayerController()
-{
-    UnPossess();
-}
-
 void APlayerController::PostSpawnInitialize()
 {
     AActor::PostSpawnInitialize();
