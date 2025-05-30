@@ -14,20 +14,11 @@ public:
     virtual void SetProperties(const TMap<FString, FString>& InProperties) override;
     virtual void GetProperties(TMap<FString, FString>& OutProperties) const override;
 
+    /** 반지름과 반높이를 동시에 설정하고, 내부적으로 클램프를 적용합니다. */
+    void InitCapsuleSize(float InRadius, float InHalfHeight);
+
     float GetHalfHeight() const { return CapsuleHalfHeight; }
-    void SetHalfHeight(float InHeight)
-    {
-        InHeight = FMath::Clamp(InHeight, CapsuleRadius, 10000.f);
-        CapsuleHalfHeight = InHeight;
-    }
-
     float GetRadius() const { return CapsuleRadius; }
-    void SetRadius(float InRadius)
-    {
-        InRadius = FMath::Clamp(InRadius, 0.f, CapsuleHalfHeight);
-        CapsuleRadius = InRadius;
-    }
-
     void GetEndPoints(FVector& OutStart, FVector& OutEnd) const;
     
 private:

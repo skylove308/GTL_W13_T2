@@ -1249,21 +1249,14 @@ void PropertyEditorPanel::RenderForShapeComponent(UShapeComponent* ShapeComponen
 
     if (UCapsuleComponent* Component = Cast<UCapsuleComponent>(ShapeComponent))
     {
-        if (ImGui::TreeNodeEx("Box Collision", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
+        if (ImGui::TreeNodeEx("Capsule Collision", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
         {
             float HalfHeight = Component->GetHalfHeight();
             float Radius = Component->GetRadius();
-
-            ImGui::Text("HalfHeight");
-            ImGui::SameLine();
-            if (ImGui::DragFloat("##HalfHeight", &HalfHeight, 0.01f, 0.f, 1000.f)) {
-                Component->SetHalfHeight(HalfHeight);
-            }
-
-            ImGui::Text("Radius");
-            ImGui::SameLine();
-            if (ImGui::DragFloat("##Radius", &Radius, 0.01f, 0.f, 1000.f)) {
-                Component->SetRadius(Radius);
+            if (ImGui::DragFloat("##HalfHeight", &HalfHeight, 0.01f, 0.f, 1000.f) 
+                || ImGui::DragFloat("##Radius",     &Radius,     0.01f, 0.f, 1000.f))
+            {
+                Component->InitCapsuleSize(Radius, HalfHeight);
             }
             ImGui::TreePop();
         }
