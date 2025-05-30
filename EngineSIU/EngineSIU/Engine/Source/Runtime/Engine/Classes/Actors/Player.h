@@ -55,3 +55,35 @@ public:
     EControlMode GetControlMode() const { return ControlMode; }
     ECoordMode GetCoordMode() const { return CoordMode; }
 };
+
+class APlayer : public AActor
+{
+    DECLARE_CLASS(APlayer, AActor)
+
+public:
+    APlayer() = default;
+
+    virtual UObject* Duplicate(UObject* InOuter) override;
+    virtual void Tick(float DeltaTime) override;
+};
+
+#pragma region W10
+class ASequencerPlayer : public APlayer
+{
+    DECLARE_CLASS(ASequencerPlayer, APlayer)
+
+public:
+    ASequencerPlayer();
+    virtual ~ASequencerPlayer() override = default;
+
+    virtual void PostSpawnInitialize() override;
+    virtual void Tick(float DeltaTime) override;
+    virtual UObject* Duplicate(UObject* InOuter) override;
+
+    FName Socket = "jx_c_camera";
+    USkeletalMeshComponent* SkeletalMeshComponent = nullptr;
+
+private:
+    UCameraComponent* CameraComponent = nullptr;
+};
+#pragma endregion

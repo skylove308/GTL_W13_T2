@@ -20,7 +20,6 @@
 #include "SkeletalMesh.h"
 #include "PhysicsEngine/PhysicsAsset.h"
 #include "Particles/ParticleSystem.h"
-#include "GameFramework/Character.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -538,7 +537,7 @@ void UEditorEngine::StartPhysicsAssetViewer(FName PreviewMeshKey, FName PhysicsA
 
 void UEditorEngine::BindEssentialObjects()
 {
-    for (const auto Iter: TObjectRange<ACharacter>())
+    for (const auto Iter: TObjectRange<APlayer>())
     {
         if (Iter->GetWorld() == ActiveWorld)
         {
@@ -550,7 +549,7 @@ void UEditorEngine::BindEssentialObjects()
     //실수로 안만들면 넣어주기
     if (ActiveWorld->GetMainPlayer() == nullptr)
     {
-        ACharacter* TempPlayer = ActiveWorld->SpawnActor<ACharacter>();
+        APlayer* TempPlayer = ActiveWorld->SpawnActor<APlayer>();
         TempPlayer->SetActorLabel(TEXT("OBJ_PLAYER"));
         TempPlayer->SetActorTickInEditor(false);
         ActiveWorld->SetMainPlayer(TempPlayer);

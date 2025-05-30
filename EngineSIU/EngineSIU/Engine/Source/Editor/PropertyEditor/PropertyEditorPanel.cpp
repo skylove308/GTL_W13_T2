@@ -43,7 +43,6 @@
 #include "imgui/imgui_curve.h"
 #include "Math/Transform.h"
 #include "Animation/AnimStateMachine.h"
-#include "GameFramework/SequencerPlayer.h"
 #include "Particles/ParticleEmitter.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -330,6 +329,14 @@ void PropertyEditorPanel::RenderForSceneComponent(USceneComponent* SceneComponen
 void PropertyEditorPanel::RenderForCameraComponent(UCameraComponent* InCameraComponent)
 {
     
+}
+
+void PropertyEditorPanel::RenderForPlayerActor(APlayer* InPlayerActor)
+{
+    if (ImGui::Button("SetMainPlayer"))
+    {
+        GEngine->ActiveWorld->SetMainPlayer(InPlayerActor);
+    }
 }
 
 void PropertyEditorPanel::RenderForActor(AActor* SelectedActor, USceneComponent* TargetComponent) const

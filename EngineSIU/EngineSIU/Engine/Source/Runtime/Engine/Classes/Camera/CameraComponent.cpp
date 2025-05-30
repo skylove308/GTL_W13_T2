@@ -1,6 +1,5 @@
 #include "CameraComponent.h"
 #include "Engine/Engine.h"
-#include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "UObject/Casts.h"
 #include "World/World.h"
