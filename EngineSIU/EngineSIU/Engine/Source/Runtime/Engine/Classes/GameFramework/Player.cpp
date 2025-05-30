@@ -56,7 +56,6 @@ void APlayer::SetupInputComponent(UInputComponent* PlayerInputComponent)
 
 void APlayer::MoveForward(float DeltaTime)
 {
-    UE_LOG(ELogLevel::Display, "MoveForward Execute");
     FVector Delta = GetActorForwardVector() * MoveSpeed * DeltaTime;
     SetActorLocation(GetActorLocation() + Delta);
 }
@@ -75,7 +74,6 @@ void APlayer::MoveUp(float DeltaTime)
 
 void APlayer::RotateYaw(float DeltaTime)
 {
-    UE_LOG(ELogLevel::Display, "RotateYaw Execute");
     FRotator NewRotation = GetActorRotation();
     NewRotation.Yaw += DeltaTime * RotationSpeed; // Yaw 회전 속도
     SetActorRotation(NewRotation);
@@ -83,7 +81,6 @@ void APlayer::RotateYaw(float DeltaTime)
 
 void APlayer::RotatePitch(float DeltaTime)
 {
-    UE_LOG(ELogLevel::Display, "RotatePitch Execute");
     FRotator NewRotation = GetActorRotation();
     NewRotation.Pitch = FMath::Clamp(NewRotation.Pitch - DeltaTime*RotationSpeed, -89.0f, 89.0f);
     SetActorRotation(NewRotation);

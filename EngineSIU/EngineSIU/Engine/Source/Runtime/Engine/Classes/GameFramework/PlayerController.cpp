@@ -66,7 +66,7 @@ void APlayerController::SetViewTarget(class AActor* NewViewTarget, struct FViewT
     }
 }
 
-void APlayerController::Possess(AActor* InActor)
+void APlayerController::Possess(APawn* InActor)
 {
     PossessedActor = InActor;
     bHasPossessed = true;
