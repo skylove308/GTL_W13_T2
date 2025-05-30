@@ -149,7 +149,8 @@ void FLuaScriptManager::HotReloadLuaScript()
     {
         for (const ULuaScriptComponent* LuaComponent : ActiveLuaComponents)
         {
-            if (LuaComponent->GetScriptName() == ChangedScript)
+            const FString FullPath = "LuaScripts/Actors/" + LuaComponent->GetScriptName() + ".lua";
+            if (FullPath == ChangedScript)
             {
                 LuaComponent->GetOwner()->BindSelfLuaProperties();
                 UE_LOG(ELogLevel::Display, TEXT("Lua Script Reloaded: %s"), *ChangedScript);
