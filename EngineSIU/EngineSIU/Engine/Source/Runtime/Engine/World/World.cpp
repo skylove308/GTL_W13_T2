@@ -2,7 +2,7 @@
 
 #include "CollisionManager.h"
 #include "PhysicsManager.h"
-#include "Actors/Player.h"
+#include "Actors/EditorPlayer.h"
 #include "GameFramework/Character.h"
 #include "BaseGizmos/TransformGizmo.h"
 #include "Classes/Components/StaticMeshComponent.h"

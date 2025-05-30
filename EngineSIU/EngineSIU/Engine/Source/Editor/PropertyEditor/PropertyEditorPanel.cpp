@@ -6,7 +6,7 @@
 //#include <tchar.h>
 
 #include "World/World.h"
-#include "Actors/Player.h"
+#include "Actors/EditorPlayer.h"
 #include "Animation/AnimationAsset.h"
 #include "Animation/AnimSequence.h"
 #include "Animation/AnimSingleNodeInstance.h"

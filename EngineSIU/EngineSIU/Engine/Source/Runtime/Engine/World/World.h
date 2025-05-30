@@ -5,7 +5,7 @@
 #include "UObject/ObjectMacros.h"
 #include "WorldType.h"
 #include "Level.h"
-#include "Actors/Player.h"
+#include "Actors/EditorPlayer.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/EventManager.h"
 #include "UObject/UObjectIterator.h"

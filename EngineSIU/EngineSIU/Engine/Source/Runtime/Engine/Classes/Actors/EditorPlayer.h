@@ -4,7 +4,6 @@
 #include "UObject/ObjectMacros.h"
 #include "UObject/ObjectTypes.h"
 
-
 class USkeletalMeshComponent;
 class UCameraComponent;
 class UGizmoBaseComponent;
