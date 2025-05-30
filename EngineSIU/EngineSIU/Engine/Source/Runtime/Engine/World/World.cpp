@@ -3,6 +3,7 @@
 #include "CollisionManager.h"
 #include "PhysicsManager.h"
 #include "Actors/Player.h"
+#include "GameFramework/Character.h"
 #include "BaseGizmos/TransformGizmo.h"
 #include "Classes/Components/StaticMeshComponent.h"
 #include "Engine/FObjLoader.h"
@@ -182,7 +183,7 @@ UWorld* UWorld::GetWorld() const
     return const_cast<UWorld*>(this);
 }
 
-APlayer* UWorld::GetMainPlayer() const
+ACharacter* UWorld::GetMainPlayer() const
 {
     if (MainPlayer)
     {
@@ -190,7 +191,7 @@ APlayer* UWorld::GetMainPlayer() const
     }
     
     //메인플레이어 설정안하면 있는거중 한개
-    for (const auto Iter: TObjectRange<APlayer>())
+    for (const auto Iter: TObjectRange<ACharacter>())
     {
         if (Iter->GetWorld() == GEngine->ActiveWorld)
         {

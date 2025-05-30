@@ -39,6 +39,7 @@
 #include "Renderer/CompositingPass.h"
 #include <Engine/FbxLoader.h>
 #include "Engine/Classes/Engine/AssetManager.h"
+#include "GameFramework/SequencerPlayer.h"
 #include "Particles/ParticleSystemComponent.h"
 
 ControlEditorPanel::ControlEditorPanel()
