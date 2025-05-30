@@ -185,7 +185,7 @@ public:
     ULuaScriptComponent* GetLuaScriptComponent() const { return LuaScriptComponent; } 
     
 private:
-    UPROPERTY(EditAnywhere, ULuaScriptComponent*, LuaScriptComponent, = nullptr);
+    UPROPERTY(EditAnywhere | EditInline, ULuaScriptComponent*, LuaScriptComponent, = nullptr)
     
 };
 
