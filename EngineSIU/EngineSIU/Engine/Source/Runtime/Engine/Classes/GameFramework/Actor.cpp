@@ -105,6 +105,13 @@ UObject* AActor::Duplicate(UObject* InOuter)
 void AActor::BeginPlay()
 {
     // TODO: 나중에 삭제를 Pending으로 하던가 해서 복사비용 줄이기
+
+    if (bUseScript)
+    {
+        RegisterLuaType(FLuaScriptManager::Get().GetLua());
+        BindSelfLuaProperties();
+    }
+
     const auto CopyComponents = OwnedComponents;
     for (UActorComponent* Comp : CopyComponents)
     {
@@ -386,8 +393,12 @@ void AActor::InitLuaScriptComponent()
         if (LuaScriptComponent == nullptr)
         {
             LuaScriptComponent = AddComponent<ULuaScriptComponent>("LuaComponent");
-            RegisterLuaType(FLuaScriptManager::Get().GetLua());;
         }
+    }
+
+    if (LuaScriptComponent)
+    {
+        RegisterLuaType(FLuaScriptManager::Get().GetLua());
     }
 }
 
