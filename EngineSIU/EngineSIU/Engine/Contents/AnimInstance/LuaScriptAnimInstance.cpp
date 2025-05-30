@@ -1,4 +1,4 @@
-﻿#include "MyAnimInstance.h"
+﻿#include "LuaScriptAnimInstance.h"
 
 #include "Animation/AnimationAsset.h"
 #include "Animation/AnimationRuntime.h"
@@ -11,7 +11,7 @@
 #include "UObject/Casts.h"
 #include "UObject/ObjectFactory.h"
 
-UMyAnimInstance::UMyAnimInstance()
+ULuaScriptAnimInstance::ULuaScriptAnimInstance()
     : PrevAnim(nullptr)
     , CurrAnim(nullptr)
     , ElapsedTime(0.f)
@@ -28,18 +28,13 @@ UMyAnimInstance::UMyAnimInstance()
     , bIsBlending(false)
 {
     StateMachine = FObjectFactory::ConstructObject<UAnimStateMachine>(this);
-    IDLE = UAssetManager::Get().GetAnimation(FString("Contents/Asset/Idle"));
-    Dance = UAssetManager::Get().GetAnimation(FString("Contents/Asset/GangnamStyle"));
-    SlowRun = UAssetManager::Get().GetAnimation(FString("Contents/Asset/SlowRun"));
-    NarutoRun = UAssetManager::Get().GetAnimation(FString("Contents/Asset/NarutoRun"));
-    FastRun = UAssetManager::Get().GetAnimation(FString("Contents/Asset/FastRun"));
 }
 
-void UMyAnimInstance::NativeInitializeAnimation()
+void ULuaScriptAnimInstance::NativeInitializeAnimation()
 {
 }
 
-void UMyAnimInstance::NativeUpdateAnimation(float DeltaSeconds, FPoseContext& OutPose)
+void ULuaScriptAnimInstance::NativeUpdateAnimation(float DeltaSeconds, FPoseContext& OutPose)
 {
     UAnimInstance::NativeUpdateAnimation(DeltaSeconds, OutPose);
     StateMachine->ProcessState();
@@ -88,8 +83,8 @@ void UMyAnimInstance::NativeUpdateAnimation(float DeltaSeconds, FPoseContext& Ou
         CurrPose.Pose[BoneIdx] = RefSkeleton.RawRefBonePose[BoneIdx];
     }
     
-    FAnimExtractContext ExtractA(GetElapsedTime(), false);
-    FAnimExtractContext ExtractB(GetElapsedTime(), false);
+    FAnimExtractContext ExtractA(ElapsedTime, false);
+    FAnimExtractContext ExtractB(ElapsedTime, false);
 
     PrevAnim->GetAnimationPose(PrevPose, ExtractA);
     CurrAnim->GetAnimationPose(CurrPose, ExtractB);
@@ -98,29 +93,9 @@ void UMyAnimInstance::NativeUpdateAnimation(float DeltaSeconds, FPoseContext& Ou
 #pragma endregion
 }
 
-void UMyAnimInstance::SetAnimState(EAnimState InAnimState)
+void ULuaScriptAnimInstance::SetTargetAnimation(UAnimSequence* InAnimation, float InBlendingTime)
 {
-    if (CurrAnim != GetAnimForState(InAnimState))
-    {
-        PrevAnim = CurrAnim;
-        CurrAnim = GetAnimForState(InAnimState);
-
-        BlendAlpha = 0.f;
-        BlendStartTime = ElapsedTime;
-
-        bIsBlending = true;
-    }
+    CurrAnim = InAnimation;
+    BlendDuration = InBlendingTime;
 }
 
-UAnimSequence* UMyAnimInstance::GetAnimForState(EAnimState InAnimState)
-{
-    switch (InAnimState)
-    {
-    case AS_Idle:      return Cast<UAnimSequence>(IDLE);
-    case AS_Dance:     return Cast<UAnimSequence>(Dance);
-    case AS_SlowRun:   return Cast<UAnimSequence>(SlowRun);
-    case AS_NarutoRun: return Cast<UAnimSequence>(NarutoRun);
-    case AS_FastRun:   return Cast<UAnimSequence>(FastRun);
-    default:           return nullptr;
-    }
-}

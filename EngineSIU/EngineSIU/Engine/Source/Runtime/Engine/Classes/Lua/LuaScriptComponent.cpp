@@ -24,6 +24,25 @@ UObject* ULuaScriptComponent::Duplicate(UObject* InOuter)
     return NewComponent;
 }
 
+void ULuaScriptComponent::GetProperties(TMap<FString, FString>& OutProperties) const
+{
+    Super::GetProperties(OutProperties);
+
+    OutProperties.Add(("ScriptName"), *ScriptName);
+}
+
+void ULuaScriptComponent::SetProperties(const TMap<FString, FString>& Properties)
+{
+    Super::SetProperties(Properties);
+    const FString* TempStr = nullptr;
+    
+    TempStr = Properties.Find(TEXT("ScriptName"));
+    if (TempStr)
+    {
+        ScriptName = *TempStr;
+    }
+}
+
 void ULuaScriptComponent::InitializeComponent()
 {
     if (HasBeenInitialized())
@@ -31,15 +50,6 @@ void ULuaScriptComponent::InitializeComponent()
         return;
     }
     Super::InitializeComponent();
-    if (ScriptName.IsEmpty())
-    {
-        /*if (GetWorld() && GetWorld()->GetActiveLevel())
-        {
-            FString SceneName = GetWorld()->GetActiveLevel()->GetLevelName();
-            ScriptName = FString::Printf(TEXT("Scripts/%s/%s.lua"), *SceneName, *GetOwner()->GetClass()->GetName());
-        }*/
-    }
-
     FLuaScriptManager::Get().RegisterActiveLuaComponent(this);
 }
 
@@ -78,12 +88,17 @@ void ULuaScriptComponent::DestroyComponent(bool bPromoteChildren)
 
 bool ULuaScriptComponent::LoadScript()
 {
+    // ScriptName 이 없으면 등록 안함.
+    if (ScriptName.IsEmpty())
+    {
+        return false;
+    }
+    
     SelfTable = FLuaScriptManager::Get().CreateLuaTable(ScriptName);
 
     if (!SelfTable.valid())
     {
         return false;
     }
-
     return true;
 }
