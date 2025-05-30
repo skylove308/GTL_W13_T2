@@ -1,4 +1,4 @@
-﻿#include "PostProcessRenderPass.h"
+#include "PostProcessRenderPass.h"
 
 #include "CameraEffectRenderPass.h"
 #include "EngineBaseTypes.h"
@@ -28,8 +28,9 @@ void FPostProcessRenderPass::Render(const std::shared_ptr<FEditorViewportClient>
     {
         QUICK_SCOPE_CYCLE_COUNTER(FogPass_CPU)
         QUICK_GPU_SCOPE_CYCLE_COUNTER(FogPass_GPU, *GPUTimingManager)
-        //FogRenderPass->Render(Viewport);
+        FogRenderPass->Render(Viewport);
     }
+
 
     if (ShowFlag & EEngineShowFlags::SF_DOF)
     {
