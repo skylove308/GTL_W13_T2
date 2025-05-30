@@ -18,6 +18,9 @@ public:
 
     virtual UObject* Duplicate(UObject* InOuter) override;
 
+    virtual void GetProperties(TMap<FString, FString>& OutProperties) const override;
+    virtual void SetProperties(const TMap<FString, FString>& Properties) override;
+
     virtual void InitializeComponent() override;
 
     // 기본 함수는 자체적으로 불러지도록 세팅.
@@ -39,7 +42,7 @@ public:
     sol::table& GetLuaSelfTable() { return SelfTable; }
 
 private:
-    FString ScriptName;
+    UPROPERTY(EditAnywhere, FString, ScriptName, = "")
     sol::table SelfTable;
 };
 

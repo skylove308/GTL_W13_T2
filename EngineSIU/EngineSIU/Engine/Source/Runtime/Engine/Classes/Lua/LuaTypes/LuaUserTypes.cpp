@@ -83,7 +83,10 @@ void LuaTypes::FBindLua<FVector>::Bind(sol::table& Table)
 
         // Operators
         sol::meta_function::equal_to, &FVector::operator==,
-        sol::meta_function::addition, &FVector::operator+,
+        sol::meta_function::addition, sol::overload(
+        sol::resolve<FVector(const FVector&) const>(&FVector::operator+),  // FVector + FVector
+        sol::resolve<FVector(float) const>(&FVector::operator+)            // FVector + float
+    ),
         sol::meta_function::subtraction, [](const FVector& A, const FVector& B) { return A - B; },
         sol::meta_function::multiplication, sol::overload(
             sol::resolve<FVector(const FVector&) const>(&FVector::operator*),

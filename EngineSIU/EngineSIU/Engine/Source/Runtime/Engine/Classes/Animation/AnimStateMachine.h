@@ -2,32 +2,26 @@
 #include<UObject/Object.h>
 #include "UObject/ObjectMacros.h"
 
-enum EAnimState
-{
-    AS_Idle,
-    AS_Dance,
-    AS_SlowRun,
-    AS_NarutoRun,
-    AS_FastRun,
-};
+#include "sol/sol.hpp"
+
+class APawn;
+
 class UAnimStateMachine : public UObject
 {
     DECLARE_CLASS(UAnimStateMachine, UObject)
 
-    public:
+public:
     UAnimStateMachine();
     virtual ~UAnimStateMachine() override = default;
+
     void ProcessState();
-    void MoveFast();
-    void MoveSlow();
-    void Dance();
-    void StopDance();
     
-    FString GetStateName(EAnimState State) const;
-    EAnimState GetState() const;
+    void InitLuaStateMachine();
     
-    private:
-    EAnimState CurrentState;
-    int MoveSpeed;
-    bool bIsDancing;
+    FString GetLuaScriptName() const { return LuaScriptName; }
+
+private:
+    UPROPERTY(EditAnywhere, FString, LuaScriptName, = TEXT(""));
+    sol::table LuaTable;
+
 };

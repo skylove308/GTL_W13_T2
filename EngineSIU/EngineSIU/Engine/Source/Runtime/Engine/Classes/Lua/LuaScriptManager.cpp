@@ -59,7 +59,7 @@ sol::state& FLuaScriptManager::GetLua()
 }
 
 sol::table FLuaScriptManager::CreateLuaTable(const FString& ScriptName)
-{   
+{
     if (!std::filesystem::exists(*ScriptName))
     {
         UE_LOG(ELogLevel::Error, TEXT("InValid Lua File name."));
@@ -158,7 +158,7 @@ void FLuaScriptManager::HotReloadLuaScript()
 
         for (UAnimStateMachine* AnimStateMachine : ActiveAnimLua)
         {
-            if (AnimStateMachine->GetScriptFilePath() == ChangedScript)
+            if (AnimStateMachine->GetLuaScriptName() == ChangedScript)
             {
                 AnimStateMachine->InitLuaStateMachine();
                 UE_LOG(ELogLevel::Display, TEXT("Lua Script Reloaded: %s"), *ChangedScript);
