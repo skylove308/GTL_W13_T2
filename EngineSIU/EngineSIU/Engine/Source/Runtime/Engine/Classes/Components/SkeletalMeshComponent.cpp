@@ -160,9 +160,13 @@ void USkeletalMeshComponent::TickComponent(float DeltaTime)
 {
     Super::TickComponent(DeltaTime);
 
+    TickPose(DeltaTime);
+    UpdateBoneTransformToPhysScene();
     if(!bSimulate)
     {
-        TickPose(DeltaTime);
+    }
+    else
+    {
     }
 }
 
@@ -681,6 +685,59 @@ void USkeletalMeshComponent::RemoveConstraintInstance(FConstraintInstance* Const
     if (ConstraintInstance)
     {
         Constraints.Remove(ConstraintInstance);
+    }
+}
+
+void USkeletalMeshComponent::UpdateBoneTransformToPhysScene()
+{
+    TArray<FMatrix> CurrentGlobalBoneMatrices;
+    GetCurrentGlobalBoneMatrices(CurrentGlobalBoneMatrices);
+
+    const FReferenceSkeleton& RefSkeleton = SkeletalMeshAsset->GetSkeleton()->GetReferenceSkeleton();
+    const int32 BoneNum = RefSkeleton.RawRefBoneInfo.Num();
+
+    // to world transform
+    FMatrix CompToWorld = GetComponentTransform().ToMatrixWithScale();
+    for (int32 i = 0; i < BoneNum; ++i)
+    {
+        // 컴포넌트 공간 → 월드 공간
+        CurrentGlobalBoneMatrices[i] = CurrentGlobalBoneMatrices[i] * CompToWorld;
+    }
+
+    for (auto& BodyInstance : Bodies)
+    {
+        if (GameObject* BIGameObject = BodyInstance->BIGameObject)
+        {
+            int32 BoneIndex = BodyInstance->BoneIndex;
+            if (BoneIndex != INDEX_NONE && BIGameObject->DynamicRigidBody)
+            {
+                FVector Location = CurrentGlobalBoneMatrices[BoneIndex].GetTranslationVector();
+                FQuat Rotation = FTransform(CurrentGlobalBoneMatrices[BoneIndex]).GetRotation();
+                PxTransform UpdatedPxTransform = PxTransform(PxVec3(Location.X, Location.Y, Location.Z), PxQuat(Rotation.X, Rotation.Y, Rotation.Z, Rotation.W));
+                BIGameObject->DynamicRigidBody->setKinematicTarget(UpdatedPxTransform);
+            }
+        }
+    }
+}
+
+void USkeletalMeshComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+    int i = 1;
+    OnChangeRigidBodyFlag();
+}
+
+void USkeletalMeshComponent::OnChangeRigidBodyFlag()
+{
+    if (Bodies.Num() <= 0)
+        return;
+
+    bool bIsKinematic = RigidBodyType == ERigidBodyType::KINEMATIC;
+    for (auto& Body : Bodies)
+    {
+        if (Body->BIGameObject && Body->BIGameObject->DynamicRigidBody)
+        {
+            Body->BIGameObject->DynamicRigidBody->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, bIsKinematic);
+        }
     }
 }
 

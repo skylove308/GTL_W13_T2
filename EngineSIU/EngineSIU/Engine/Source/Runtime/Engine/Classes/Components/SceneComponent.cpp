@@ -371,7 +371,7 @@ void USceneComponent::SetRelativeTransform(const FTransform& InTransform)
     RelativeRotation = InTransform.GetRotation().GetNormalized().Rotator();
     RelativeScale3D = InTransform.GetScale3D();
 
-    UpdateOverlaps();
+    //UpdateOverlaps();
 }
 
 void USceneComponent::SetWorldTransform(const FTransform& InTransform)

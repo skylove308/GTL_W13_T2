@@ -683,6 +683,14 @@ PxShape* FPhysicsManager::CreateSphereShape(const PxVec3& Pos, const PxQuat& Qua
     return Result;
 }
 
+PxShape* FPhysicsManager::CreateCapsuleShape(const FVector& Pos, const FQuat& Quat, float Radius, float HalfHeight) const
+{
+    PxVec3 PxPos = PxVec3(Pos.X, Pos.Y, Pos.Z);
+    PxQuat PxQuatRot = PxQuat(Quat.X, Quat.Y, Quat.Z, Quat.W);
+
+    return CreateCapsuleShape(PxPos, PxQuatRot, Radius, HalfHeight);
+}
+
 PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& Pos, const PxQuat& Quat, float Radius, float HalfHeight) const
 {
     // Capsule 모양 생성
