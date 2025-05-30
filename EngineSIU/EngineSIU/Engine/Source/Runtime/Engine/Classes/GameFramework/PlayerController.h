@@ -14,6 +14,8 @@ public:
     APlayerController() = default;
     virtual ~APlayerController() override = default;
 
+    virtual UObject* Duplicate(UObject* InOuter) override;
+
     virtual void PostSpawnInitialize() override;
 
     virtual void BeginPlay() override;
@@ -28,7 +30,7 @@ public:
 
     UInputComponent* GetInputComponent() const { return InputComponent; }
 
-    void SetViewTarget(class AActor* NewViewTarget, struct FViewTargetTransitionParams TransitionParams);
+    void SetViewTarget(AActor* NewViewTarget, FViewTargetTransitionParams TransitionParams);
 
     virtual void Possess(AActor* InActor);
 

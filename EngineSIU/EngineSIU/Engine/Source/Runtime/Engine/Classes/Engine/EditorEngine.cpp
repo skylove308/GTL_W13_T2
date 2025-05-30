@@ -563,6 +563,7 @@ void UEditorEngine::BindEssentialObjects()
     ActiveWorld->SetPlayerController(PlayerController);
     
     ActiveWorld->GetPlayerController()->Possess(ActiveWorld->GetMainPlayer());
+    ActiveWorld->GetMainPlayer()->SetupInputComponent(ActiveWorld->GetPlayerController()->GetInputComponent());
 }
 
 void UEditorEngine::SetPhysXScene(UWorld* World)
