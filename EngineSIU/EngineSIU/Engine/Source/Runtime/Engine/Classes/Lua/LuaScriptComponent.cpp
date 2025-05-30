@@ -84,6 +84,7 @@ void ULuaScriptComponent::DestroyComponent(bool bPromoteChildren)
 {
     FLuaScriptManager::Get().UnRigisterActiveLuaComponent(this);
     Super::DestroyComponent(bPromoteChildren);
+    SelfTable.reset(); // Lua 테이블 초기화
 }
 
 bool ULuaScriptComponent::LoadScript()
@@ -93,10 +94,12 @@ bool ULuaScriptComponent::LoadScript()
     {
         return false;
     }
-    
-    SelfTable = FLuaScriptManager::Get().CreateLuaTable(ScriptName);
 
-    if (!SelfTable.valid())
+    const FString ScriptFullName = "LuaScripts/Actors/" + ScriptName + ".lua";
+    
+    SelfTable = FLuaScriptManager::Get().CreateLuaTable(ScriptFullName);
+
+        if (!SelfTable.valid())
     {
         return false;
     }

@@ -186,6 +186,7 @@ public:
     
 private:
     UPROPERTY(EditAnywhere | EditInline, ULuaScriptComponent*, LuaScriptComponent, = nullptr)
+    UPROPERTY(EditAnywhere, bool, bUseScript, = true)
     
 };
 

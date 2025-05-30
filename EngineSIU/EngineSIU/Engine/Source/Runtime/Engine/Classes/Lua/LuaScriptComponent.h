@@ -4,8 +4,7 @@
 #include "sol/sol.hpp"
 
 // console 디버깅용.
-// #pragma comment( linker, "/entry:WinMainCRTStartup /subsystem:console" )
-
+#pragma comment( linker, "/entry:WinMainCRTStartup /subsystem:console" )
 
 class AActor;
 
