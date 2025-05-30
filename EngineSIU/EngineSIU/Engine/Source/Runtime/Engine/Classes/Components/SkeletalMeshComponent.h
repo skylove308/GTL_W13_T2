@@ -131,6 +131,12 @@ public:
     void RemoveBodyInstance(FBodyInstance* BodyInstance);
     void RemoveConstraintInstance(FConstraintInstance* ConstraintInstance);
 
+    void UpdateBoneTransformToPhysScene();
+
+    virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
+    void OnChangeRigidBodyFlag();
+
 protected:
     bool NeedToSpawnAnimScriptInstance() const;
 
