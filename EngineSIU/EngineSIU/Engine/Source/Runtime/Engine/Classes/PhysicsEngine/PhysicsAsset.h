@@ -8,6 +8,7 @@
 
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
+#include "Math/Shapes.h"
 
 class USkeletalMesh;
 struct FConstraintSetup;
