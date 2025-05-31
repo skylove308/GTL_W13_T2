@@ -1,8 +1,10 @@
 #pragma once
 #include "OverlayShapeRenderPass.h"
 
+class UPrimitiveComponent;
 class UStaticMeshComponent;
 class USkeletalMeshComponent;
+class UShapeComponent;
 
 class FGeometryDebugRenderPass : public FOverlayShapeRenderPass
 {
@@ -16,8 +18,9 @@ public:
     virtual void ClearRenderArr() override;
 
 private:
-    void RenderStaticComp(UStaticMeshComponent* StaticComp, bool bPreviewWorld);
+    void RenderPrimitiveComp(UPrimitiveComponent* PrimitiveComp, bool bPreviewWorld);
     void RenderSkelComp(USkeletalMeshComponent* SkelComp, bool bPreviewWorld);
+    void RenderShapeComp(UShapeComponent* ShapeComp);
 
     // FOverlayShapeRenderPass을(를) 통해 상속됨
     void PrepareRender(const std::shared_ptr<FEditorViewportClient>& Viewport) override;

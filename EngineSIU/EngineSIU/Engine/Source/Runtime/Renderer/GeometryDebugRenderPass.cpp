@@ -8,6 +8,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Physics/PhysicsManager.h"
+#include <Components/ShapeComponent.h>
 
 FGeometryDebugRenderPass::FGeometryDebugRenderPass()  
 {  
@@ -41,7 +42,7 @@ void FGeometryDebugRenderPass::Render(const std::shared_ptr<FEditorViewportClien
             {
                 continue;
             }
-            RenderStaticComp(SMComp, false);
+            RenderPrimitiveComp(SMComp, false);
         }
 
         for (USkeletalMeshComponent* SkelComp : TObjectRange<USkeletalMeshComponent>())
@@ -51,6 +52,15 @@ void FGeometryDebugRenderPass::Render(const std::shared_ptr<FEditorViewportClien
                 continue;
             }
             RenderSkelComp(SkelComp, false);
+        }
+
+        for (UShapeComponent* ShapeComp : TObjectRange<UShapeComponent>())
+        {
+            if (!ShapeComp || ShapeComp->GetWorld() != World)
+            {
+                continue;
+            }
+            RenderPrimitiveComp(ShapeComp, false);
         }
     }
     Super::Render(Viewport);
@@ -62,7 +72,7 @@ void FGeometryDebugRenderPass::ClearRenderArr()
     Super::ClearRenderArr();
 }
 
-void FGeometryDebugRenderPass::RenderStaticComp(UStaticMeshComponent* StaticComp, bool bPreviewWorld)
+void FGeometryDebugRenderPass::RenderPrimitiveComp(UPrimitiveComponent* PrimitiveComp, bool bPreviewWorld)
 {
     UEditorEngine* EditorEngine = Cast<UEditorEngine>(GEngine);
     if (!EditorEngine)
@@ -70,21 +80,21 @@ void FGeometryDebugRenderPass::RenderStaticComp(UStaticMeshComponent* StaticComp
         return;
     }
 
-    TArray<AggregateGeomAttributes>& Geometries = StaticComp->GeomAttributes;
+    TArray<AggregateGeomAttributes>& Geometries = PrimitiveComp->GeomAttributes;
     FLinearColor Color = FLinearColor(1, 0, 1, 0.3);
 
     if (!bPreviewWorld)
     {
         if (UEditorEngine* Engine = Cast<UEditorEngine>(GEngine))
         {
-            if (Engine->GetSelectedActor() == StaticComp->GetOwner())
+            if (Engine->GetSelectedActor() == PrimitiveComp->GetOwner())
             {
                 Color = FLinearColor(0, 1, 1, 0.3);
             }
         }
     }
 
-    FMatrix InitialMatrix = StaticComp->GetWorldMatrix();
+    FMatrix InitialMatrix = PrimitiveComp->GetWorldMatrix();
     //InitialMatrix = InitialMatrix.GetMatrixWithoutScale();
     FVector InitialPosition = InitialMatrix.GetTranslationVector();
     FQuat InitialRotation = InitialMatrix.ToQuat();
@@ -227,6 +237,71 @@ void FGeometryDebugRenderPass::RenderSkelComp(USkeletalMeshComponent* SkelComp, 
                 Capsules.Add(TPair<Shape::FCapsule, FLinearColor>(Capsule, CapsuleColor));
             }
         }
+    }
+}
+
+void FGeometryDebugRenderPass::RenderShapeComp(UShapeComponent* ShapeComp)
+{
+    if (!ShapeComp || !ShapeComp->BodyInstance)
+    {
+        return;
+    }
+    FBodyInstance* BodyInstance = ShapeComp->BodyInstance;
+    if (!BodyInstance->BIGameObject || !BodyInstance->BIGameObject->DynamicRigidBody)
+    {
+        return;
+    }
+    physx::PxRigidDynamic* Actor = BodyInstance->BIGameObject->DynamicRigidBody;
+    int32 ShapeCount = Actor->getNbShapes();
+    if (ShapeCount <= 0)
+    {
+        return; // Shape가 없는 경우
+    }
+    TArray<physx::PxShape*> Shapes;
+    Shapes.SetNum(ShapeCount);
+    BodyInstance->BIGameObject->DynamicRigidBody->getShapes(Shapes.GetData(), ShapeCount);
+    FLinearColor Color = FLinearColor(1, 0, 1, 0.3);
+    for (physx::PxShape* Shape : Shapes)
+    {
+        physx::PxTransform ShapeGlobalTransform = Actor->getGlobalPose() * Shape->getLocalPose();
+        physx::PxGeometryHolder GeometryHolder = Shape->getGeometry();
+        physx::PxGeometryType::Enum GeometryType = GeometryHolder.getType();
+        switch (GeometryType)
+        {
+        case physx::PxGeometryType::eSPHERE:
+        {
+            Shape::FSphere Sphere(FVector(ShapeGlobalTransform.p.x, ShapeGlobalTransform.p.y, ShapeGlobalTransform.p.z), GeometryHolder.sphere().radius);
+            Spheres.Add(TPair<Shape::FSphere, FLinearColor>(Sphere, Color));
+            break;
+        }
+        case physx::PxGeometryType::eBOX:
+        {
+            Shape::FOrientedBox OrientedBox;
+            OrientedBox.Center = FVector(ShapeGlobalTransform.p.x, ShapeGlobalTransform.p.y, ShapeGlobalTransform.p.z);
+            OrientedBox.AxisX = FQuat(ShapeGlobalTransform.q.x, ShapeGlobalTransform.q.y, ShapeGlobalTransform.q.z, ShapeGlobalTransform.q.w).RotateVector(FVector(1, 0, 0));
+            OrientedBox.AxisY = FQuat(ShapeGlobalTransform.q.x, ShapeGlobalTransform.q.y, ShapeGlobalTransform.q.z, ShapeGlobalTransform.q.w).RotateVector(FVector(0, 1, 0));
+            OrientedBox.AxisZ = FQuat(ShapeGlobalTransform.q.x, ShapeGlobalTransform.q.y, ShapeGlobalTransform.q.z, ShapeGlobalTransform.q.w).RotateVector(FVector(0, 0, 1));
+            OrientedBox.ExtentX = GeometryHolder.box().halfExtents.x;
+            OrientedBox.ExtentY = GeometryHolder.box().halfExtents.y;
+            OrientedBox.ExtentZ = GeometryHolder.box().halfExtents.z;
+            OrientedBoxes.Add(TPair<Shape::FOrientedBox, FLinearColor>(OrientedBox, Color));
+            break;
+        }
+        case physx::PxGeometryType::eCAPSULE:
+        {
+            Shape::FCapsule Capsule;
+            Capsule.A = FVector(ShapeGlobalTransform.p.x, ShapeGlobalTransform.p.y, ShapeGlobalTransform.p.z) +
+                FQuat(ShapeGlobalTransform.q.x, ShapeGlobalTransform.q.y, ShapeGlobalTransform.q.z, ShapeGlobalTransform.q.w).RotateVector(FVector(0, 0, -GeometryHolder.capsule().halfHeight));
+            Capsule.B = FVector(ShapeGlobalTransform.p.x, ShapeGlobalTransform.p.y, ShapeGlobalTransform.p.z) +
+                FQuat(ShapeGlobalTransform.q.x, ShapeGlobalTransform.q.y, ShapeGlobalTransform.q.z, ShapeGlobalTransform.q.w).RotateVector(FVector(0, 0, GeometryHolder.capsule().halfHeight));
+            Capsule.Radius = GeometryHolder.capsule().radius;
+            Capsules.Add(TPair<Shape::FCapsule, FLinearColor>(Capsule, Color));
+            break;
+        }
+        }
+
+
+
     }
 }
 
