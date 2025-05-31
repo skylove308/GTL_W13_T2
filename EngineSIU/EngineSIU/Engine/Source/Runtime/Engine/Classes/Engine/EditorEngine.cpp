@@ -568,22 +568,27 @@ void UEditorEngine::BindEssentialObjects()
     ActiveWorld->GetPlayerController()->Possess(ActiveWorld->GetMainCharacter());
     ActiveWorld->GetPlayerController()->BindAction("W",
         [this](float Value) {
-            ActiveWorld->GetMainCharacter()->MoveForward(1.0f);
+            ActiveWorld->GetMainCharacter()->MoveForward(0.1f);
         }
     );
     ActiveWorld->GetPlayerController()->BindAction("S",
         [this](float Value) {
-            ActiveWorld->GetMainCharacter()->MoveForward(-1.0f);
+            ActiveWorld->GetMainCharacter()->MoveForward(-0.1f);
         }
     );
     ActiveWorld->GetPlayerController()->BindAction("A",
         [this](float Value) {
-            ActiveWorld->GetMainCharacter()->MoveRight(-1.0f);
+            ActiveWorld->GetMainCharacter()->MoveRight(-0.1f);
         }
     );
     ActiveWorld->GetPlayerController()->BindAction("D",
         [this](float Value) {
-            ActiveWorld->GetMainCharacter()->MoveRight(1.0f);
+            ActiveWorld->GetMainCharacter()->MoveRight(0.1f);
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("None",
+        [this](float Value) {
+            ActiveWorld->GetMainCharacter()->Speed = 6.0f;
         }
     );
 }

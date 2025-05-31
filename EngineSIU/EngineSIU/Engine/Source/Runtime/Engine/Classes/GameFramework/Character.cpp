@@ -67,15 +67,53 @@ void ACharacter::Tick(float DeltaTime)
 void ACharacter::MoveForward(float Value)
 {
     if (Value == 0.0f) return;
-    FVector Forward = GetActorForwardVector() * Value;
+
+    if (Speed <= MaxSpeed)
+    {
+        Speed += 0.01f;
+    }
+    else
+    {
+        Speed = MaxSpeed;
+    }
+
+    FVector Forward = GetActorForwardVector() * Speed * Value;
     FVector NewLocation = GetActorLocation() + Forward;
     SetActorLocation(NewLocation);
+
+    if (Value >= 0.0f)
+    {
+        MeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
+    }
+    else
+    {
+        MeshComponent->SetRelativeRotation(FRotator(0.0f, 180.0f, 0.0f));
+    }
 }
 
 void ACharacter::MoveRight(float Value)
 {
     if (Value == 0.0f) return;
-    FVector Right = GetActorRightVector() * Value;
+
+    if (Speed <= MaxSpeed)
+    {
+        Speed += 0.01f;
+    }
+    else
+    {
+        Speed = MaxSpeed;
+    }
+
+    FVector Right = GetActorRightVector() * Speed * Value;
     FVector NewLocation = GetActorLocation() + Right;
     SetActorLocation(NewLocation);
+
+    if (Value >= 0.0f)
+    {
+        MeshComponent->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
+    }
+    else
+    {
+        MeshComponent->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+    }
 }
