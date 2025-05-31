@@ -11,6 +11,7 @@
 #include "UnrealEd/SceneManager.h"
 #include "GameFramework/GameMode.h"
 #include "Classes/Components/TextComponent.h"
+#include "GameFramework/Player.h"
 
 class UEditorEngine;
 
@@ -183,39 +184,21 @@ UWorld* UWorld::GetWorld() const
     return const_cast<UWorld*>(this);
 }
 
-ACharacter* UWorld::GetMainPlayer() const
+APlayer* UWorld::GetPlayer(int Index) const
 {
-    if (MainPlayer)
+    if (Players[Index] != nullptr)
     {
-        return MainPlayer;
-    }
-    
-    //메인플레이어 설정안하면 있는거중 한개
-    for (const auto Iter: TObjectRange<ACharacter>())
-    {
-        if (Iter->GetWorld() == GEngine->ActiveWorld)
-        {
-            return Iter;
-        }
+        return Players[Index];
     }
     
     return nullptr;
 }
 
-APlayerController* UWorld::GetPlayerController() const
+APlayerController* UWorld::GetPlayerController(int Index) const
 {
-    if (PlayerController)
+    if (PlayerControllers[Index] != nullptr)
     {
-        return PlayerController;
-    }
-
-    //메인플레이어컨트롤러 설정안하면 있는거중 한개
-    for (const auto Iter: TObjectRange<APlayerController>())
-    {
-        if (Iter->GetWorld() == GEngine->ActiveWorld)
-        {
-            return Iter;
-        }
+        return PlayerControllers[Index];
     }
 
     return nullptr;
@@ -227,5 +210,15 @@ void UWorld::CheckOverlap(const UPrimitiveComponent* Component, TArray<FOverlapR
     {
         CollisionManager->CheckOverlap(this, Component, OutOverlaps);
     }
+}
+
+void UWorld::ConnectedPlayer(int Index)
+{
+    bCurrentlyConnected[Index] = true;
+}
+
+void UWorld::DisconnectedPlayer(int Index)
+{
+    bCurrentlyConnected[Index] = false;
 }
 

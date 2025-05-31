@@ -4,6 +4,11 @@
 
 #include "WindowsCursor.h"
 
+void UInputComponent::CreateXInputController(int PlayerIndex)
+{
+    ControllerID = PlayerIndex;
+}
+
 void UInputComponent::ProcessInput(float DeltaTime)
 {
     if (PressedKeys.Contains(EKeys::W))
@@ -30,7 +35,6 @@ void UInputComponent::ProcessInput(float DeltaTime)
     {
         KeyBindDelegate[FString("E")].Broadcast(DeltaTime);
     }
-
 
     ////////////////// Pad Input ////////////////
     ProcessControllerButton(DeltaTime);
@@ -171,6 +175,7 @@ void UInputComponent::ProcessControllerAnalog(float DeltaTime)
 void UInputComponent::SetPossess()
 {
     BindInputDelegate();
+    
 
     //TODO: Possess일때 기존에 있던거 다시 넣어줘야할수도
 }
@@ -388,7 +393,7 @@ void UInputComponent::InputMouse(const FPointerEvent& InMouseEvent)
 void UInputComponent::InputControllerButton(const FControllerButtonEvent& InButtonEvent)
 {
     // 플레이어 ID 필터링 (필요시)
-    if (InButtonEvent.GetControllerId() != 0) // Player 0만 처리
+    if (InButtonEvent.GetControllerId() != ControllerID) // Player 0만 처리
     {
         return;
     }
@@ -458,48 +463,17 @@ void UInputComponent::InputControllerButton(const FControllerButtonEvent& InButt
     if (InputEvent == IE_Pressed)
     {
         PressedControllerButtons.Add(ButtonMask);
-        
-        // 특별한 처리가 필요한 버튼들
-        switch (Button)
-        {
-        case EXboxButtons::Start:
-            // Start 버튼이 눌렸을 때 특별한 처리 (예: 메뉴 열기)
-            UE_LOG(ELogLevel::Display, "Controller Start button pressed - Opening menu");
-            break;
-        case EXboxButtons::Back:
-            // Back 버튼이 눌렸을 때 특별한 처리 (예: 인벤토리 열기)
-            UE_LOG(ELogLevel::Display, "Controller Back button pressed - Opening inventory");
-            break;
-        default:
-            break;
-        }
     }
     else if (InputEvent == IE_Released)
     {
         PressedControllerButtons.Remove(ButtonMask);
-        
-        // 버튼을 뗐을 때의 특별한 처리
-        switch (Button)
-        {
-        case EXboxButtons::A:
-            UE_LOG(ELogLevel::Display, "A button released");
-            break;
-        default:
-            break;
-        }
-    }
-    else if (InputEvent == IE_Repeat)
-    {
-        // 버튼이 계속 눌려있을 때의 처리 (선택사항)
-        // PressedControllerButtons는 이미 추가되어 있으므로 별도 처리 불필요
-        UE_LOG(ELogLevel::Display, "Controller button repeat: %d", static_cast<int32>(Button));
     }
 }
 
 void UInputComponent::InputControllerAnalog(const FControllerAnalogEvent& InAnalogEvent)
 {
     // 플레이어 ID 필터링 (필요시)
-    if (InAnalogEvent.GetControllerId() != 0) // Player 0만 처리
+    if (InAnalogEvent.GetControllerId() != ControllerID) // Player 0만 처리
     {
         return;
     }
@@ -508,7 +482,11 @@ void UInputComponent::InputControllerAnalog(const FControllerAnalogEvent& InAnal
     float AnalogValue = InAnalogEvent.GetAnalogValue();
     
     // 현재 아날로그 값 저장 (필요시 이전 값과 비교 가능)
-    float* PreviousValue = CurrentAnalogValues.Find(AnalogType);
+    float* PreviousValue = CurrentAnalogValues.Find(AnalogType); // TODO: 파이 모드 진입 후 스틱을 가장 먼저 조작하면 터짐
+    if (PreviousValue == nullptr)
+    {
+        int temp = 0;
+    }
     float PrevValue = PreviousValue ? *PreviousValue : 0.0f;
     CurrentAnalogValues.Add(AnalogType, AnalogValue);
     
@@ -649,5 +627,31 @@ void UInputComponent::BindControllerAnalog(const EXboxAnalog::Type Axis, const s
         {
             float AxisValue = CurrentAnalogValues[Axis];
             Callback(DeltaTime * AxisValue);
+        });
+}
+
+void UInputComponent::BindControllerConnected(int ArrIndex, const std::function<void(int)>& Callback)
+{
+    if (Callback == nullptr)
+    {
+        return;
+    }
+
+    ControllerAnalogBindDelegate[ArrIndex].AddLambda([this, Callback](int Index)
+        {
+            Callback(Index);
+        });
+}
+
+void UInputComponent::BindControllerDisconnected(int ArrIndex, const std::function<void(int)>& Callback)
+{
+    if (Callback == nullptr)
+    {
+        return;
+    }
+
+    ControllerAnalogBindDelegate[ArrIndex].AddLambda([this, Callback](int Index)
+        {
+            Callback(Index);
         });
 }

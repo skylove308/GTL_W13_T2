@@ -1,4 +1,5 @@
 #pragma once
+#pragma comment(lib, "xinput.lib")
 
 #include "RawInput.h"
 #include "Delegates/DelegateCombination.h"
@@ -6,8 +7,7 @@
 #include "InputCore/InputCoreTypes.h"
 #include "Math/Vector.h"
 #include "SlateCore/Input/Events.h"
-
-#include <xinput.h>
+#include "xinput.h"
 
 namespace EMouseButtons
 {

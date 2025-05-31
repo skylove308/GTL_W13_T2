@@ -165,7 +165,7 @@ namespace LuaBindingHelpers
             [](const std::string& Key, const std::function<void(float)>& Callback)
             {
                 //FString 주면 됨
-                GEngine->ActiveWorld->GetPlayerController()->BindAction(FString(Key), Callback);
+                // GEngine->ActiveWorld->GetPlayerController()->BindAction(FString(Key), Callback); // TODO: 주찬님 이 클래스 날렸죠?
             }
         );
     }

@@ -8,6 +8,7 @@
 #include "EngineLoop.h"
 #include "WindowsCursor.h"
 #include "Math/Vector.h"
+#include "World/World.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -29,8 +30,6 @@ FSlateAppMessageHandler::FSlateAppMessageHandler()
     // Xbox 컨트롤러 초기화
     for (uint32 i = 0; i < MaxControllers; ++i)
     {
-        ZeroMemory(&XboxControllerStates[i], sizeof(XINPUT_STATE));
-        ZeroMemory(&XboxPreviousStates[i], sizeof(XINPUT_STATE));
         XboxControllerConnected[i] = false;
     }
 }
@@ -810,7 +809,6 @@ void FSlateAppMessageHandler::OnXboxControllerDisconnected(uint32 ControllerId)
     
     // 진동 정지
     SetXboxControllerVibration(ControllerId, 0.0f, 0.0f);
-    
     OnXboxControllerDisconnectedDelegate.Broadcast(ControllerId);
 }
 

@@ -5,7 +5,7 @@
 #include "Runtime/InputCore/InputCoreTypes.h"
 #include "Components/ActorComponent.h"
 
-class XInputController;
+class FXInputController;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOneFloatDelegate, const float&)
 DECLARE_MULTICAST_DELEGATE_OneParam(FAxisDelegate, const float&)
 
@@ -17,6 +17,8 @@ class UInputComponent : public UActorComponent
 public:
     UInputComponent() = default;
     virtual ~UInputComponent() override = default;
+
+    void CreateXInputController(int PlayerIndex);
     
     void ProcessInput(float DeltaTime);
     void ProcessControllerButton(float DeltaTime);
@@ -29,6 +31,8 @@ public:
     void BindAxis(const FString& Axis, const std::function<void(float)>& Callback);
     void BindControllerButton(const WORD& Button, const std::function<void(float)>& Callback);
     void BindControllerAnalog(const EXboxAnalog::Type Axis, const std::function<void(float)>& Callback);
+    void BindControllerConnected(int ArrIndex, const std::function<void(int)>& Callback);
+    void BindControllerDisconnected(int ArrIndex, const std::function<void(int)>& Callback);
     
     void BindInputDelegate();
     void ClearBindDelegate();
@@ -52,8 +56,7 @@ private:
     FVector2D MousePinPosition;
 
 ////////////////// Pad Input //////////////////////
-private:
-    XInputController* Controller = nullptr;
+    int ControllerID = -1;
 
     TMap<WORD, FOneFloatDelegate> ControllerButtonBindDelegate;
     TMap<WORD, FAxisDelegate> ControllerAnalogBindDelegate;

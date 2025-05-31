@@ -13,6 +13,10 @@ public:
     virtual UObject* Duplicate(UObject* InOuter) override;
     virtual void PostSpawnInitialize() override;
     virtual void Tick(float DeltaTime) override;
+    
+    virtual void SetupInputComponent(UInputComponent* PlayerInputComponent) override;
+    void SetPlayerIndex(int InPlayerIndex) { PlayerIndex = InPlayerIndex; }
+    
 private:
     void MoveForward(float DeltaTime);
     void MoveRight(float DeltaTime);
@@ -21,13 +25,17 @@ private:
     void RotateYaw(float DeltaTime);
     void RotatePitch(float DeltaTime);
 
-    virtual void SetupInputComponent(UInputComponent* PlayerInputComponent) override;
+    void PlayerConnected(int TargetIndex) const;
+    void PlayerDisconnected(int TargetIndex) const;
+
 
     FName Socket = "jx_c_camera";
     
     USkeletalMeshComponent* SkeletalMeshComponent = nullptr;
     UCameraComponent* CameraComponent = nullptr;
 
+    int PlayerIndex = -1;
+    
     float MoveSpeed = 100.0f; // 이동 속도
     float RotationSpeed = 0.1f; // 회전 속도
 };

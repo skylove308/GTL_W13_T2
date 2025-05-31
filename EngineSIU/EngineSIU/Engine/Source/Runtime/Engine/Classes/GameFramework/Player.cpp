@@ -34,6 +34,11 @@ void APlayer::Tick(float DeltaTime)
         SetActorRotation(SocketTransform.GetRotation().Rotator());
         SetActorLocation(SocketTransform.GetTranslation());
     }
+
+    if (CameraComponent)
+    {
+        CameraComponent->FollowPlayer(PlayerIndex);
+    }
 }
 
 void APlayer::SetupInputComponent(UInputComponent* PlayerInputComponent)
@@ -49,8 +54,8 @@ void APlayer::SetupInputComponent(UInputComponent* PlayerInputComponent)
         PlayerInputComponent->BindAction("E", [this](float DeltaTime) { MoveUp(DeltaTime); });
         PlayerInputComponent->BindAction("Q", [this](float DeltaTime) { MoveUp(-DeltaTime); });
 
-        PlayerInputComponent->BindAxis("Turn", [this](float DeltaTime) { RotateYaw(DeltaTime); });
-        PlayerInputComponent->BindAxis("LookUp", [this](float DeltaTime) { RotatePitch(DeltaTime); });
+        // PlayerInputComponent->BindAxis("Turn", [this](float DeltaTime) { RotateYaw(DeltaTime); });
+        // PlayerInputComponent->BindAxis("LookUp", [this](float DeltaTime) { RotatePitch(DeltaTime); });
 
         PlayerInputComponent->BindControllerButton(XINPUT_GAMEPAD_A, [this](float DeltaTime) { MoveUp(DeltaTime); });
         PlayerInputComponent->BindControllerButton(XINPUT_GAMEPAD_B, [this](float DeltaTime) { MoveUp(-DeltaTime); });
@@ -60,6 +65,9 @@ void APlayer::SetupInputComponent(UInputComponent* PlayerInputComponent)
 
         PlayerInputComponent->BindControllerAnalog(EXboxAnalog::Type::RightStickX, [this](float DeltaTime) { RotateYaw(DeltaTime * 1000); });
         PlayerInputComponent->BindControllerAnalog(EXboxAnalog::Type::RightStickY, [this](float DeltaTime) { RotatePitch(-DeltaTime * 1000); });
+
+        PlayerInputComponent->BindControllerConnected(PlayerIndex, [this](int Index){ PlayerConnected(Index); });
+        PlayerInputComponent->BindControllerDisconnected(PlayerIndex, [this](int Index){ PlayerDisconnected(Index); });
     }
 }
 
@@ -93,4 +101,20 @@ void APlayer::RotatePitch(float DeltaTime)
     FRotator NewRotation = GetActorRotation();
     NewRotation.Pitch = FMath::Clamp(NewRotation.Pitch - DeltaTime*RotationSpeed, -89.0f, 89.0f);
     SetActorRotation(NewRotation);
+}
+
+void APlayer::PlayerConnected(int TargetIndex) const
+{
+    if (TargetIndex == PlayerIndex)
+    {
+        GetWorld()->ConnectedPlayer(TargetIndex);
+    }
+}
+
+void APlayer::PlayerDisconnected(int TargetIndex) const
+{
+    if (TargetIndex == PlayerIndex)
+    {
+        GetWorld()->DisconnectedPlayer(TargetIndex);
+    }
 }
