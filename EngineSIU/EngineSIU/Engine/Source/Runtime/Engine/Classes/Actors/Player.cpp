@@ -14,7 +14,7 @@
 #include "UObject/UObjectIterator.h"
 #include "Engine/EditorEngine.h"
 #include "Engine/SkeletalMesh.h"
-#include "Engine/Contents/AnimInstance/MyAnimInstance.h"
+#include "Engine/Contents/AnimInstance/LuaScriptAnimInstance.h"
 
 
 void AEditorPlayer::Tick(float DeltaTime)

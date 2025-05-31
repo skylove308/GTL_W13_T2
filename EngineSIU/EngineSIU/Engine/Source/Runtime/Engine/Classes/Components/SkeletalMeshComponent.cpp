@@ -16,8 +16,7 @@
 #include "UObject/Casts.h"
 #include "UObject/ObjectFactory.h"
 #include "PhysicsEngine/ConstraintInstance.h"
-#include "Engine/Contents/AnimInstance/MyAnimInstance.h"
-#include <Engine/Contents/AnimInstance/LuaScriptAnimInstance.h>
+#include "Engine/Contents/AnimInstance/LuaScriptAnimInstance.h"
 
 bool USkeletalMeshComponent::bIsCPUSkinning = false;
 
@@ -269,7 +268,7 @@ void USkeletalMeshComponent::TickAnimInstances(float DeltaTime)
 {
     if (AnimScriptInstance)
     {
-        AnimScriptInstance->SetAnimState(AnimScriptInstance->GetStateMachine()->GetState());
+        //AnimScriptInstance->SetAnimState(AnimScriptInstance->GetStateMachine()->GetState());
         AnimScriptInstance->UpdateAnimation(DeltaTime, BonePoseContext);
     }
 }
@@ -535,7 +534,7 @@ void USkeletalMeshComponent::InitAnim()
     if (bInitializedAnimInstance)
     {
         // TODO: 애니메이션 포즈 바로 반영하려면 여기에서 진행.
-        AnimScriptInstance->SetAnimState(EAnimState::AS_Idle);
+        /*AnimScriptInstance->SetAnimState(EAnimState::AS_Idle);*/
     }
 }
 

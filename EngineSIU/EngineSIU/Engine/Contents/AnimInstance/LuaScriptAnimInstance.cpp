@@ -1,4 +1,3 @@
-#include "MyAnimInstance.h"
 #include "LuaScriptAnimInstance.h"
 #include "Animation/AnimationAsset.h"
 #include "Animation/AnimationRuntime.h"
@@ -29,12 +28,6 @@ ULuaScriptAnimInstance::ULuaScriptAnimInstance()
     , bIsBlending(false)
 {
     StateMachine = FObjectFactory::ConstructObject<UAnimStateMachine>(this);
-    IDLE = UAssetManager::Get().GetAnimation(FString("Contents/Human/Idle"));
-    Dance = UAssetManager::Get().GetAnimation(FString("Contents/Human/GangnamStyle"));
-    SlowRun = UAssetManager::Get().GetAnimation(FString("Contents/Human/SlowRun"));
-    NarutoRun = UAssetManager::Get().GetAnimation(FString("Contents/Human/NarutoRun"));
-    FastRun = UAssetManager::Get().GetAnimation(FString("Contents/Human/FastRun"));
-
 }
 
 void ULuaScriptAnimInstance::InitializeAnimation()
@@ -56,11 +49,6 @@ void ULuaScriptAnimInstance::NativeUpdateAnimation(float DeltaSeconds, FPoseCont
     
 #pragma region MyAnim
     USkeletalMeshComponent* SkeletalMeshComp = GetSkelMeshComponent();
-
-    if (!PrevAnim)
-    {
-        PrevAnim = Cast<UAnimSequence>(IDLE);
-    }
     
     if (!PrevAnim || !CurrAnim || !SkeletalMeshComp->GetSkeletalMeshAsset() || !SkeletalMeshComp->GetSkeletalMeshAsset()->GetSkeleton() || !bPlaying)
     {
