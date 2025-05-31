@@ -282,6 +282,15 @@ void UPrimitiveComponent::GetProperties(TMap<FString, FString>& OutProperties) c
     OutProperties.Add(TEXT("bSimulate"), bSimulate ? TEXT("true") : TEXT("false"));
     OutProperties.Add(TEXT("bApplyGravity"), bApplyGravity ? TEXT("true") : TEXT("false"));
     OutProperties.Add(TEXT("RigidBodyType"), FString::FromInt(static_cast<uint8>(RigidBodyType)));
+    OutProperties.Add(TEXT("GeomsCount"), FString::FromInt(GeomAttributes.Num()));
+    for (int32 i = 0; i < GeomAttributes.Num(); ++i)
+    {
+        FString GeomKey = FString::Printf(TEXT("Geom_%d"), i);
+        OutProperties.Add(GeomKey + TEXT("Type"), FString::FromInt(static_cast<uint8>(GeomAttributes[i].GeomType)));
+        OutProperties.Add(GeomKey + TEXT("Offset"), GeomAttributes[i].Offset.ToString());
+        OutProperties.Add(GeomKey + TEXT("Rotation"), GeomAttributes[i].Rotation.ToString());
+        OutProperties.Add(GeomKey + TEXT("Extent"), GeomAttributes[i].Extent.ToString());
+    }
 }
 
 void UPrimitiveComponent::SetProperties(const TMap<FString, FString>& InProperties)
@@ -325,6 +334,38 @@ void UPrimitiveComponent::SetProperties(const TMap<FString, FString>& InProperti
     if (InProperties.Contains(TEXT("RigidBodyType")))
     {
         RigidBodyType = static_cast<ERigidBodyType>(FString::ToInt(InProperties[TEXT("RigidBodyType")]));
+    }
+
+    TempStr = InProperties.Find(TEXT("GeomsCount"));
+    if (TempStr)
+    {
+        int32 GeomsCount = FString::ToInt(*TempStr);
+        GeomAttributes.SetNum(GeomsCount);
+        for (int32 i = 0; i < GeomsCount; ++i)
+        {
+            FString GeomKey = FString::Printf(TEXT("Geom_%d"), i);
+            AggregateGeomAttributes& GeomAttribute = GeomAttributes[i];
+            TempStr = InProperties.Find(GeomKey + TEXT("Type"));
+            if (TempStr)
+            {
+                GeomAttribute.GeomType = static_cast<EGeomType>(FString::ToInt(*TempStr));
+            }
+            TempStr = InProperties.Find(GeomKey + TEXT("Offset"));
+            if (TempStr)
+            {
+                GeomAttribute.Offset.InitFromString(*TempStr);
+            }
+            TempStr = InProperties.Find(GeomKey + TEXT("Rotation"));
+            if (TempStr)
+            {
+                GeomAttribute.Rotation.InitFromString(*TempStr);
+            }
+            TempStr = InProperties.Find(GeomKey + TEXT("Extent"));
+            if (TempStr)
+            {
+                GeomAttribute.Extent.InitFromString(*TempStr);
+            }
+        }
     }
 }
 

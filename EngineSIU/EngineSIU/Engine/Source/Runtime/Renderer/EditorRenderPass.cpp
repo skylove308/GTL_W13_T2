@@ -409,9 +409,9 @@ void FEditorRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& Vie
 
     if (ShowFlag & EEngineShowFlags::SF_Collision)
     {
-        RenderBoxInstanced(ShowFlag);
-        RenderSphereInstanced(ShowFlag);
-        RenderCapsuleInstanced(ShowFlag);
+        //RenderBoxInstanced(ShowFlag);
+        //RenderSphereInstanced(ShowFlag);
+        //RenderCapsuleInstanced(ShowFlag);
     }
 
     RenderArrowInstanced();
