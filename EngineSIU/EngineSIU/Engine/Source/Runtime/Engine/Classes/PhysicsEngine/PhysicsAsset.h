@@ -21,6 +21,16 @@ enum class EGeomType : uint8
     MAX,
 };
 
+enum ECollisionGroup
+{
+    GROUP_NONE = 0,
+    GROUP_CHARACTER_CAPSULE = (1 << 0), // 캐릭터 루트 캡슐
+    GROUP_CHARACTER_RAGDOLL = (1 << 1), // 캐릭터 래그돌 본 Shape들
+    GROUP_WORLD_STATIC = (1 << 2), // 정적 환경 (바닥, 벽 등)
+    // 필요에 따라 더 많은 그룹 추가
+    GROUP_ALL = 0xFFFFFFFF
+};
+
 struct FKAggregateGeom
 {
     TArray<physx::PxShape*> SphereElems;
@@ -44,7 +54,9 @@ struct AggregateGeomAttributes
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Offset)
     UPROPERTY_WITH_FLAGS(EditAnywhere, FRotator, Rotation)
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, Extent, = FVector(1,1,1)) // Half Extent
-
+    UPROPERTY_WITH_FLAGS(VisibleAnywhere, ECollisionGroup, CollisionGroup, = ECollisionGroup::GROUP_ALL)
+    ECollisionGroup CollisionGroup = ECollisionGroup::GROUP_ALL;
+    ECollisionGroup NoCollisionGroup = ECollisionGroup::GROUP_NONE;
     friend FArchive& operator<<(FArchive& Ar, AggregateGeomAttributes& Attributes);
 };
 

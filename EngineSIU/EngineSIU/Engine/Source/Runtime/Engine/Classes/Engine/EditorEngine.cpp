@@ -600,10 +600,13 @@ void UEditorEngine::SetPhysXScene(UWorld* World)
 
     for (const auto& Actor : World->GetActiveLevel()->Actors)
     {
-        UPrimitiveComponent* Prim = Actor->GetComponentByClass<UPrimitiveComponent>();
-        if (Prim)
+        TArray< UPrimitiveComponent*> Prims = Actor->GetComponentsByClass<UPrimitiveComponent>();
+        for (UPrimitiveComponent* Prim : Prims)
         {
-            Prim->CreatePhysXGameObject();
+            if (Prim)
+            {
+                Prim->CreatePhysXGameObject();
+            }
         }
     }
 }

@@ -290,6 +290,8 @@ void UPrimitiveComponent::GetProperties(TMap<FString, FString>& OutProperties) c
         OutProperties.Add(GeomKey + TEXT("Offset"), GeomAttributes[i].Offset.ToString());
         OutProperties.Add(GeomKey + TEXT("Rotation"), GeomAttributes[i].Rotation.ToString());
         OutProperties.Add(GeomKey + TEXT("Extent"), GeomAttributes[i].Extent.ToString());
+        OutProperties.Add(TEXT("CollisionGroup"), FString::FromInt(static_cast<uint8>(GeomAttributes[i].CollisionGroup)));
+        OutProperties.Add(TEXT("NoCollisionGroup"), FString::FromInt(static_cast<uint8>(GeomAttributes[i].NoCollisionGroup)));
     }
 }
 
@@ -364,6 +366,14 @@ void UPrimitiveComponent::SetProperties(const TMap<FString, FString>& InProperti
             if (TempStr)
             {
                 GeomAttribute.Extent.InitFromString(*TempStr);
+            }
+            if (TempStr)
+            {
+                GeomAttribute.CollisionGroup = static_cast<ECollisionGroup>(FString::ToInt(*TempStr));
+            }
+            if (TempStr)
+            {
+                GeomAttribute.NoCollisionGroup = static_cast<ECollisionGroup>(FString::ToInt(*TempStr));
             }
         }
     }
