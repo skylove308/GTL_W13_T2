@@ -1649,6 +1649,15 @@
     <ClCompile Include="Engine\Source\Editor\PropertyEditor\LuaUIPanel.cpp">
       <Filter>Engine\Source\Editor\PropertyEditor</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Source\Developer\LuaUtils\LuaButtonUI.cpp">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Source\Developer\LuaUtils\LuaImageUI.cpp">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Source\Developer\LuaUtils\LuaTextUI.cpp">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="EngineSIU.natvis" />
@@ -1779,6 +1788,15 @@
     </ClInclude>
     <ClInclude Include="Engine\Source\Editor\PropertyEditor\LuaUIPanel.h">
       <Filter>Engine\Source\Editor\PropertyEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Developer\LuaUtils\LuaButtonUI.h">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Developer\LuaUtils\LuaImageUI.h">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Developer\LuaUtils\LuaTextUI.h">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

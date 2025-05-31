@@ -31,7 +31,7 @@ void UnrealEd::Initialize()
     Panels["PhysicsAssetViewerPanel"] = PhysicsAssetPanel;
 
     auto LuaUIPanel = std::make_shared<LuaUIViewPanel>();
-    Panels["LuaUIViewPanel"] = LuaUIPanel;
+    PreRenderPanels["LuaUIViewPanel"] = LuaUIPanel;
 }
 
 void UnrealEd::Render() const
@@ -74,6 +74,15 @@ void UnrealEd::Render() const
         break;
         
     }
+
+    for (const auto& Panel : PreRenderPanels)
+    {
+        if (HasFlag(Panel.Value->GetSupportedWorldTypes(), currentMask))
+        {
+            Panel.Value->Render();
+        }
+    }
+
     for (const auto& Panel : Panels)
     {
         if (HasFlag(Panel.Value->GetSupportedWorldTypes(), currentMask))

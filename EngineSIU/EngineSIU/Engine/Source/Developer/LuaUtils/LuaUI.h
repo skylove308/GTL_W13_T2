@@ -41,7 +41,7 @@ public:
         : Name(InName)
     { }
 
-private:
+protected:
     FName Name;
     bool Visible = false;
     RectTransform Rect;

@@ -1,7 +1,7 @@
 #include "LuaUIManager.h"
 #include "Engine/Source/Runtime/Core/Math/Color.h"
 #include "Engine/Engine.h"
-
+#include "Engine/Source/Developer/LuaUtils/LuaTextUI.h"
 
 
 void LuaUIManager::CreateUI(FName InName)
@@ -11,9 +11,13 @@ void LuaUIManager::CreateUI(FName InName)
     UpdateUIArrayForSort();
 }
 
-void LuaUIManager::CreateText(FName InName, FString InText, RectTransform InRectTransform, int InSortOrder, float InFontSize, FColor InFontColor)
+void LuaUIManager::CreateText(FName InName, RectTransform InRectTransform, int InSortOrder, FString InText, FName FontStyleName, float InFontSize, FColor InFontColor)
 {
+    ImFont* FindFont = GetFontStyleByName(FontStyleName);
 
+    LuaTextUI* NewTextUI =  new LuaTextUI(InName, InRectTransform, InText, InSortOrder, FindFont, InFontSize, InFontColor);
+
+    UIMap.Add(InName, NewTextUI);
     UpdateUIArrayForSort();
 }
 
@@ -31,6 +35,24 @@ void LuaUIManager::CreateButton(FName InName, FString LuaFunctionName, RectTrans
 
 void LuaUIManager::DrawLuaUIs()
 {
+    ImGuiIO& io = ImGui::GetIO();
+
+    ImGuiWindowFlags WindowFlags =
+        ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoScrollbar |
+        ImGuiWindowFlags_NoScrollWithMouse |
+        ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoBackground | 
+        ImGuiWindowFlags_NoInputs;  // 일단 입력 가로채는 문제 있어서 추가함 이후에 수정 필요할지도
+
+    ImGui::SetNextWindowPos(ImVec2(-5, -5), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x + 10, io.DisplaySize.y + 10), ImGuiCond_Always);
+
+    ImGui::Begin("LuaUI", nullptr, WindowFlags);
+
+
     for (LuaUI* UI : UIArrayForSort)
     {
         if (UI != nullptr && UI->GetVisible()) 
@@ -39,6 +61,12 @@ void LuaUIManager::DrawLuaUIs()
         }
     }
 
+    ImGui::End();
+}
+
+void LuaUIManager::TestCODE()
+{
+    CreateText("TestTEXT", RectTransform(0, 0, 100, 100, AnchorDirection::MiddleCenter), 10, FString("Chan GOOOD!"), FName("Default"), 30, FColor(1, 0, 0, 1));
 }
 
 void LuaUIManager::UpdateCanvasRectTransform(HWND hWnd)
@@ -53,6 +81,22 @@ void LuaUIManager::UpdateCanvasRectTransform(HWND hWnd)
     CanvasRectTransform.Size.Y = clientRect.bottom - clientRect.top;
 }
 
+ImFont* LuaUIManager::GetFontStyleByName(FName FontName)
+{
+    // 1) Find()를 호출해서 ImFont**(포인터-투-포인터) 얻기
+    ImFont** FoundPtr = FontMap.Find(FontName);
+
+    // 2) null 체크 후, *FoundPtr → ImFont* 자체를 돌려준다.
+    if (FoundPtr != nullptr)
+    {
+        return *FoundPtr;  // 맵에 해당 키가 있으면 ImFont*를 반환
+    }
+    else
+    {
+        return nullptr;    // 없으면 null 반환
+    }
+}
+
 LuaUIManager::LuaUIManager()
 {
     CanvasRectTransform.AnchorDir = TopLeft;
@@ -65,6 +109,16 @@ LuaUIManager::LuaUIManager()
 
     CanvasRectTransform.Size.X = ClientWidth;
     CanvasRectTransform.Size.Y = ClientHeight;
+
+    /* Pre Setup */
+    ImGuiIO& io = ImGui::GetIO();
+
+    /** Font load */
+    ImFont* AddFont = io.Fonts->Fonts[0];
+    
+    FontMap.Add(FName("Default"), AddFont);
+
+    TestCODE();
 }
 
 void LuaUIManager::UpdateUIArrayForSort()
@@ -73,7 +127,7 @@ void LuaUIManager::UpdateUIArrayForSort()
 
     for (auto& Pair : UIMap) 
     {
-        UIArrayForSort.Add(&Pair.Value);
+        UIArrayForSort.Add(Pair.Value);
     }
 
     UIArrayForSort.Sort(
