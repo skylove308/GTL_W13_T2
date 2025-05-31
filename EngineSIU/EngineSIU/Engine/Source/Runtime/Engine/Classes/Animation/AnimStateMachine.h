@@ -4,7 +4,8 @@
 
 #include "sol/sol.hpp"
 
-class UAnimInstance;
+class USkeletalMeshComponent;
+class ULuaScriptAnimInstance;
 class APawn;
 
 class UAnimStateMachine : public UObject
@@ -15,7 +16,7 @@ public:
     UAnimStateMachine();
     virtual ~UAnimStateMachine() override = default;
 
-    virtual void Initialize(APawn* InOwner, UAnimInstance* InAnimInstance);
+    virtual void Initialize(USkeletalMeshComponent* InOwner, ULuaScriptAnimInstance* InAnimInstance);
 
     void ProcessState();
     
@@ -23,8 +24,8 @@ public:
     
     FString GetLuaScriptName() const { return LuaScriptName; }
 
-    APawn* OwnerPawn;
-    UAnimInstance* OwningAnimInstance;
+    USkeletalMeshComponent* OwningComponent;
+    ULuaScriptAnimInstance* OwningAnimInstance;
     
 private:
     UPROPERTY(EditAnywhere, FString, LuaScriptName, = TEXT(""));
