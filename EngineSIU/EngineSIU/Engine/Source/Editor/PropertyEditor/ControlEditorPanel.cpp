@@ -39,6 +39,7 @@
 #include "Renderer/CompositingPass.h"
 #include <Engine/FbxLoader.h>
 #include "Engine/Classes/Engine/AssetManager.h"
+#include "GameFramework/Character.h"
 #include "Particles/ParticleSystemComponent.h"
 
 ControlEditorPanel::ControlEditorPanel()
@@ -371,6 +372,7 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
             { .Label = "CapsuleCol",        .OBJ = OBJ_CAPSULE_COLLISION },
             { .Label = "SkeletalMeshActor", .OBJ = OBJ_SKELETALMESH },
             { .Label = "SequencerPlayer",   .OBJ = OBJ_SEQUENCERPLAYER },
+                { .Label = "Character",   .OBJ = OBJ_CHARACTER },
         };
 
         for (const auto& primitive : primitives)
@@ -482,18 +484,24 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                     break;
                 }
                 case OBJ_SKELETALMESH:
-                    {
-                        SpawnedActor = World->SpawnActor<AActor>();
-                        SpawnedActor->SetActorTickInEditor(true);
-                        auto* MeshComp = SpawnedActor->AddComponent<USkeletalMeshComponent>();
-                        SpawnedActor->SetRootComponent(MeshComp);
-                        SpawnedActor->SetActorLabel(TEXT("OBJ_SKELETALMESH"));
-                    }
-                    break;
+                {
+                    SpawnedActor = World->SpawnActor<AActor>();
+                    SpawnedActor->SetActorTickInEditor(true);
+                    auto* MeshComp = SpawnedActor->AddComponent<USkeletalMeshComponent>();
+                    SpawnedActor->SetRootComponent(MeshComp);
+                    SpawnedActor->SetActorLabel(TEXT("OBJ_SKELETALMESH"));
+                }
+                break;
                 case OBJ_SEQUENCERPLAYER:
                 {
                     SpawnedActor = World->SpawnActor<ASequencerPlayer>();
                     SpawnedActor->SetActorLabel(TEXT("OBJ_SEQUENCERPLAYER"));
+                }
+                case OBJ_CHARACTER:
+                {
+                    SpawnedActor = World->SpawnActor<ACharacter>();
+                    SpawnedActor->SetActorLabel(TEXT("OBJ_CHARACTER"));
+                    break;
                 }
                 case OBJ_CAMERA:
                 case OBJ_PLAYER:

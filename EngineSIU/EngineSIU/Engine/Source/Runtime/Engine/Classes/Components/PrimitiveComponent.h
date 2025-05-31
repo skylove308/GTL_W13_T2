@@ -42,7 +42,7 @@ public:
     bool bGenerateOverlapEvents = true;
     bool bBlockComponent = true;
 
-    FBodyInstance* BodyInstance;
+    FBodyInstance* BodyInstance = nullptr;
 
     FComponentHitSignature OnComponentHit;
 
@@ -52,6 +52,9 @@ public:
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bSimulate, = false)
     UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bApplyGravity, = false)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bLockXRotation, = true)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bLockYRotation, = true)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bLockZRotation, = true)
     UPROPERTY_WITH_FLAGS(EditAnywhere, ERigidBodyType, RigidBodyType, = ERigidBodyType::DYNAMIC)
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, TArray<AggregateGeomAttributes>, GeomAttributes)

@@ -40,6 +40,12 @@ void UCapsuleComponent::GetProperties(TMap<FString, FString>& OutProperties) con
     OutProperties.Add(TEXT("CapsuleRadius"), FString::SanitizeFloat(CapsuleRadius));
 }
 
+void UCapsuleComponent::InitCapsuleSize(float InRadius, float InHalfHeight)
+{
+    CapsuleHalfHeight = FMath::Clamp(InHalfHeight, InRadius, 10000.f);
+    CapsuleRadius     = FMath::Clamp(InRadius, 0.f, CapsuleHalfHeight);
+}
+
 void UCapsuleComponent::GetEndPoints(FVector& OutStart, FVector& OutEnd) const
 {
     const float LineHalfLength = CapsuleHalfHeight - CapsuleRadius;

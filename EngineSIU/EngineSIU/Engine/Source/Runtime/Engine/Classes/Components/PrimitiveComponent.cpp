@@ -172,6 +172,9 @@ UObject* UPrimitiveComponent::Duplicate(UObject* InOuter)
     NewComponent->AABB = AABB;
     NewComponent->bSimulate = bSimulate;
     NewComponent->bApplyGravity = bApplyGravity;
+    NewComponent->bLockXRotation = bLockXRotation;
+    NewComponent->bLockYRotation = bLockYRotation;
+    NewComponent->bLockZRotation = bLockZRotation;
     NewComponent->GeomAttributes = GeomAttributes;
     NewComponent->RigidBodyType = RigidBodyType;
 
@@ -226,7 +229,7 @@ void UPrimitiveComponent::EndPhysicsTickComponent(float DeltaTime)
         FRotator Rotator = MyQuat.Rotator();
         
         // ✅ Unreal Engine에 적용 (라디안 → 도 변환)
-        SetWorldLocation(FVector(pos.x, -pos.y, pos.z));
+        SetWorldLocation(FVector(pos.x, pos.y, pos.z));
         SetWorldRotation(Rotator);
     }
 }
@@ -530,34 +533,58 @@ void UPrimitiveComponent::CreatePhysXGameObject()
     {
         return;
     }
-    
     BodyInstance = new FBodyInstance(this);
 
     ////////////// 테스트 코드
     BodyInstance->bSimulatePhysics = bSimulate;
     BodyInstance->bEnableGravity = bApplyGravity;
+    BodyInstance->bLockXRotation = bLockXRotation;
+    BodyInstance->bLockYRotation = bLockYRotation;
+    BodyInstance->bLockZRotation = bLockZRotation;
     ////////////////////////
     
     FVector Location = GetComponentLocation();
     PxVec3 PPos = PxVec3(Location.X, Location.Y, Location.Z);
-    
     FQuat Quat = GetComponentRotation().Quaternion();
     PxQuat PQuat = PxQuat(Quat.X, Quat.Y, Quat.Z, Quat.W);
 
     if (GeomAttributes.Num() == 0)
     {
-        AggregateGeomAttributes DefaultAttribute;
-        DefaultAttribute.GeomType = EGeomType::EBox;
-        DefaultAttribute.Offset = FVector(AABB.MaxLocation + AABB.MinLocation) / 2;
-        DefaultAttribute.Extent = FVector(AABB.MaxLocation - AABB.MinLocation) / 2 * GetComponentScale3D();
-        GeomAttributes.Add(DefaultAttribute);
+        if (UCapsuleComponent* Capsule = Cast<UCapsuleComponent>(this))
+        {
+            AggregateGeomAttributes Attr;
+            Attr.GeomType = EGeomType::ECapsule;
+            Attr.Offset = FVector::ZeroVector;
+            PxQuat RotateToZ = PxQuat(PxPi / 2.0f, PxVec3(0, 0, 1));
+            FQuat UnrealQuat = FQuat(RotateToZ.x, RotateToZ.y, RotateToZ.z, RotateToZ.w);
+            Attr.Rotation = UnrealQuat.Rotator();
+            Attr.Extent = FVector(Capsule->GetRadius(), Capsule->GetRadius(), Capsule->GetHalfHeight());
+            GeomAttributes.Add(Attr);
+        }
+        else if (USphereComponent* Sphere = Cast<USphereComponent>(this))
+        {
+            AggregateGeomAttributes Attr;
+            Attr.GeomType = EGeomType::ESphere;
+            Attr.Offset = FVector::ZeroVector;
+            Attr.Rotation = FRotator::ZeroRotator;
+            Attr.Extent = FVector(Sphere->GetRadius());
+            GeomAttributes.Add(Attr);
+        }
+        else
+        {
+            AggregateGeomAttributes Attr;
+            Attr.GeomType = EGeomType::EBox;
+            Attr.Offset = FVector(AABB.MaxLocation + AABB.MinLocation) / 2;
+            Attr.Extent = FVector(AABB.MaxLocation - AABB.MinLocation) / 2 * GetComponentScale3D();
+            GeomAttributes.Add(Attr);
+        }
     }
 
     for (const auto& GeomAttribute : GeomAttributes)
     {
-        PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
+        PxVec3 Offset = PxVec3(GeomAttribute.Offset.Y, GeomAttribute.Offset.Z, GeomAttribute.Offset.X);
         FQuat GeomQuat = GeomAttribute.Rotation.Quaternion();
-        PxQuat GeomPQuat = PxQuat(GeomQuat.X, GeomQuat.Y, GeomQuat.Z, GeomQuat.W);
+        PxQuat GeomPQuat = PxQuat(GeomQuat.Y, GeomQuat.Z, GeomQuat.X, GeomQuat.W);
         PxVec3 Extent = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
 
         switch (GeomAttribute.GeomType)
