@@ -21,6 +21,7 @@
 #include "PhysicsEngine/PhysicsAsset.h"
 #include "Particles/ParticleSystem.h"
 #include "GameFramework/Character.h"
+#include "Components/CapsuleComponent.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -564,8 +565,8 @@ void UEditorEngine::BindEssentialObjects()
     PlayerController->SetActorLabel(TEXT("OBJ_PLAYER_CONTROLLER"));
     PlayerController->SetActorTickInEditor(false);
     ActiveWorld->SetPlayerController(PlayerController);
-    
     ActiveWorld->GetPlayerController()->Possess(ActiveWorld->GetMainCharacter());
+    
     ActiveWorld->GetPlayerController()->BindAction("W",
         [this](float Value) {
             ActiveWorld->GetMainCharacter()->MoveForward(0.1f);
@@ -586,11 +587,11 @@ void UEditorEngine::BindEssentialObjects()
             ActiveWorld->GetMainCharacter()->MoveRight(0.1f);
         }
     );
-    ActiveWorld->GetPlayerController()->BindAction("None",
-        [this](float Value) {
-            ActiveWorld->GetMainCharacter()->Speed = 6.0f;
-        }
-    );
+    // ActiveWorld->GetPlayerController()->BindAction("None",
+    //     [this](float Value) {
+    //         ActiveWorld->GetMainCharacter()->Speed = 6.0f;
+    //     }
+    // );
 }
 
 void UEditorEngine::SetPhysXScene(UWorld* World)
@@ -600,10 +601,22 @@ void UEditorEngine::SetPhysXScene(UWorld* World)
 
     for (const auto& Actor : World->GetActiveLevel()->Actors)
     {
-        UPrimitiveComponent* Prim = Actor->GetComponentByClass<UPrimitiveComponent>();
-        if (Prim)
+        // temp
+        if (Actor->IsA<ACharacter>())
         {
-            Prim->CreatePhysXGameObject();
+            UCapsuleComponent* capsule = Actor->GetComponentByClass<UCapsuleComponent>();
+            if (capsule)
+            {
+                capsule->CreatePhysXGameObject();
+            }
+        }
+        else
+        {
+            UPrimitiveComponent* Prim = Actor->GetComponentByClass<UPrimitiveComponent>();
+            if (Prim)
+            {
+                Prim->CreatePhysXGameObject();
+            }
         }
     }
 }

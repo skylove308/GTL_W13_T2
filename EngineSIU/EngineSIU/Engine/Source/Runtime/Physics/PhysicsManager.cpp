@@ -704,10 +704,11 @@ PxShape* FPhysicsManager::CreateCapsuleShape(const FVector& Pos, const FQuat& Qu
     return CreateCapsuleShape(PxPos, PxQuatRot, Radius, HalfHeight);
 }
 
-PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& Pos, const PxQuat& Quat, float Radius, float HalfHeight) const
+PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& Pos, const PxQuat& Quat, float Radius, float HalfHeight, PxMaterial* UseMaterial) const
 {
     // Capsule 모양 생성
-    PxShape* Result = Physics->createShape(PxCapsuleGeometry(Radius, HalfHeight), *Material);
+    PxMaterial* MatToUse = (UseMaterial != nullptr) ? UseMaterial : Material;
+    PxShape* Result = Physics->createShape(PxCapsuleGeometry(Radius, HalfHeight), *MatToUse);
     
     // 위치와 회전을 모두 적용한 Transform 생성
     PxTransform LocalTransform(Pos, Quat);

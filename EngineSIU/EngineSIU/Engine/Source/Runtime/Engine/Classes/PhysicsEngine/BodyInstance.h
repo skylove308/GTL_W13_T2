@@ -26,7 +26,7 @@ struct FBodyInstance
     // ==================== 질량과 관성 ====================
     
     /** 바디의 질량 (킬로그램) */
-    UPROPERTY_WITH_FLAGS(EditAnywhere, float, MassInKg, = 100.0f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, MassInKg, = 20.0f)
     
     /** 질량 중심 오프셋 */
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, COMNudge)
@@ -113,8 +113,8 @@ struct FBodyInstance
     
     
     // PhysX 객체 참조
-    physx::PxRigidActor* RigidActorSync = nullptr;   // 동기 액터
-    physx::PxRigidActor* RigidActorAsync = nullptr;  // 비동기 액터
+    physx::PxRigidActor* RigidActorSync = nullptr;   // 게임 로직 (메인 스레드)
+    physx::PxRigidActor* RigidActorAsync = nullptr;  // 물리 시뮬레이션 (물리 스레드)
 
     GameObject* BIGameObject;
 
