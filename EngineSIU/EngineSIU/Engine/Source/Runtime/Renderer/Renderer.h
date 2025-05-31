@@ -47,6 +47,7 @@ class FEditorRenderPass;
 class FDepthPrePass;
 class FTileLightCullingPass;
 class FGPUTimingManager;
+class FGeometryDebugRenderPass;
 
 class FRenderer
 {
@@ -115,6 +116,7 @@ public:
     FTileLightCullingPass* TileLightCullingPass = nullptr;
 
     FPostProcessRenderPass* PostProcessRenderPass = nullptr;
+    FGeometryDebugRenderPass* GeometryDebugRenderPass = nullptr;
 
     FCompositingPass* CompositingPass = nullptr;
     
