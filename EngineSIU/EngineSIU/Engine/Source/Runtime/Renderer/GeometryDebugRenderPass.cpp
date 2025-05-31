@@ -7,6 +7,7 @@
 #include "Engine/EditorEngine.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Physics/PhysicsManager.h"
 
 FGeometryDebugRenderPass::FGeometryDebugRenderPass()  
 {  
@@ -169,36 +170,29 @@ void FGeometryDebugRenderPass::RenderSkelComp(USkeletalMeshComponent* SkelComp, 
     TArray<FMatrix> BoneGlobalMatrices;
     SkelComp->GetCurrentGlobalBoneMatrices(BoneGlobalMatrices);
 
-    for (UBodySetup* BodySetup : BodySetups)
+    for (FBodyInstance* BodyInstance : BodyInstances)
     {
-        FName BoneName = BodySetup->BoneName;
-        int32 BoneIndex = ReferenceSkeleton.FindBoneIndex(BoneName);
+        if (!BodyInstance->BIGameObject || !BodyInstance->BIGameObject->DynamicRigidBody)
+        {
+            continue; // 해당 BodyInstance가 유효하지 않으면 건너뜀
+        }
+
+        int32 BoneIndex = BodyInstance->BoneIndex;
         if (BoneIndex == INDEX_NONE)
         {
             continue; // 해당 Bone이 없으면 건너뜀
         }
         
-        FMatrix InitialMatrix = BoneGlobalMatrices[BoneIndex];
-        InitialMatrix.GetMatrixWithoutScale();
+        physx::PxRigidDynamic* Actor = BodyInstance->BIGameObject->DynamicRigidBody;
 
-        FVector InitialPosition = InitialMatrix.GetTranslationVector();
-        FQuat InitialRotation = InitialMatrix.ToQuat();
-        InitialRotation.Normalize();
+        TArray<PxShape*> Shapes;
+        int32 ShapeCount = Actor->getNbShapes();
+        Shapes.SetNum(ShapeCount);
+        Actor->getShapes(Shapes.GetData(), ShapeCount);
 
-        FTransform InitialTransform(InitialRotation, InitialPosition);
-
-        FKAggregateGeom AggGeom = BodySetup->AggGeom;
-        TArray<physx::PxShape*> AllElems;
-        AllElems.Append(AggGeom.SphereElems);
-        AllElems.Append(AggGeom.BoxElems);
-        AllElems.Append(AggGeom.CapsuleElems);
-
-        for (physx::PxShape* Shape : AllElems)
+        for (physx::PxShape* Shape : Shapes)
         {
-            if (!Shape->getActor())
-                continue;
-
-            physx::PxTransform ShapeGlobalTransform = Shape->getActor()->getGlobalPose() * Shape->getLocalPose();
+            physx::PxTransform ShapeGlobalTransform = Actor->getGlobalPose() * Shape->getLocalPose();
             physx::PxGeometryHolder GeometryHolder = Shape->getGeometry();
             physx::PxGeometryType::Enum GeometryType = GeometryHolder.getType();
 
