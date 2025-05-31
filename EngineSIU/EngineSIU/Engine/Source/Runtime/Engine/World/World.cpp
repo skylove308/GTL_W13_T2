@@ -10,6 +10,7 @@
 #include "UnrealEd/SceneManager.h"
 #include "GameFramework/GameMode.h"
 #include "Classes/Components/TextComponent.h"
+#include "GameFramework/Character.h"
 
 class UEditorEngine;
 
@@ -198,6 +199,24 @@ APlayer* UWorld::GetMainPlayer() const
         }
     }
     
+    return nullptr;
+}
+
+ACharacter* UWorld::GetMainCharacter() const
+{
+    if(MainCharacter)
+    {
+        return MainCharacter;
+    }
+
+    for(const auto Iter: TObjectRange<ACharacter>())
+    {
+        if (Iter->GetWorld() == GEngine->ActiveWorld)
+        {
+            return Iter;
+        }
+    }
+
     return nullptr;
 }
 

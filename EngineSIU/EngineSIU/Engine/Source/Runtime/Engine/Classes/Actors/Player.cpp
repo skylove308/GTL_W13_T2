@@ -639,7 +639,7 @@ void ASequencerPlayer::PostSpawnInitialize()
     APlayer::PostSpawnInitialize();
     
     SkeletalMeshComponent = AddComponent<USkeletalMeshComponent>("SkeletalMeshComponent_Player");
-    SkeletalMeshComponent->SetAnimClass(UClass::FindClass(FName("UMyAnimInstance")));
+    SkeletalMeshComponent->SetAnimClass(UClass::FindClass(FName("UMyAnimInstance"))); 
     RootComponent = SkeletalMeshComponent;
 
     CameraComponent = AddComponent<UCameraComponent>("CameraComponent_Player");

@@ -1,10 +1,11 @@
-﻿#include "Character.h"
+#include "Character.h"
 
 #include "Engine/Engine.h"
 #include "PhysicsManager.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/CharacterMovementComponent.h"
+#include "Camera/CameraComponent.h"
 
 ACharacter::ACharacter()
 {
@@ -16,9 +17,13 @@ ACharacter::ACharacter()
 
     MeshComponent = AddComponent<USkeletalMeshComponent>("SkeletalMeshComponent");
     MeshComponent->SetupAttachment(RootComponent);
+    MeshComponent->SetAnimClass(UClass::FindClass(FName("UMyAnimInstance")));
 
     MovementComponent = AddComponent<UCharacterMovementComponent>("CharacterMovementComponent");
     MovementComponent->UpdatedComponent = CapsuleComponent;
+
+    CameraComponent = AddComponent<UCameraComponent>("CameraComponent");
+    CameraComponent->SetupAttachment(RootComponent);
 }
 
 void ACharacter::BeginPlay()
@@ -34,6 +39,7 @@ UObject* ACharacter::Duplicate(UObject* InOuter)
     NewActor->CapsuleComponent = NewActor->GetComponentByClass<UCapsuleComponent>();
     NewActor->MeshComponent = NewActor->GetComponentByClass<USkeletalMeshComponent>();
     NewActor->MovementComponent = NewActor->GetComponentByClass<UCharacterMovementComponent>();
+    NewActor->CameraComponent = NewActor->GetComponentByClass<UCameraComponent>();
 
     if (NewActor->MovementComponent && NewActor->CapsuleComponent)
     {
@@ -56,4 +62,20 @@ void ACharacter::Tick(float DeltaTime)
     //
     //     cation(FVector(PxTr.p.x, PxTr.p.y, PxTr.p.z));
     // }
+}
+
+void ACharacter::MoveForward(float Value)
+{
+    if (Value == 0.0f) return;
+    FVector Forward = GetActorForwardVector() * Value;
+    FVector NewLocation = GetActorLocation() + Forward;
+    SetActorLocation(NewLocation);
+}
+
+void ACharacter::MoveRight(float Value)
+{
+    if (Value == 0.0f) return;
+    FVector Right = GetActorRightVector() * Value;
+    FVector NewLocation = GetActorLocation() + Right;
+    SetActorLocation(NewLocation);
 }

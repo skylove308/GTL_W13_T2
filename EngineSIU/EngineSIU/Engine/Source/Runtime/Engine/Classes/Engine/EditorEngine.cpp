@@ -20,6 +20,7 @@
 #include "SkeletalMesh.h"
 #include "PhysicsEngine/PhysicsAsset.h"
 #include "Particles/ParticleSystem.h"
+#include "GameFramework/Character.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -540,22 +541,22 @@ void UEditorEngine::StartPhysicsAssetViewer(FName PreviewMeshKey, FName PhysicsA
 
 void UEditorEngine::BindEssentialObjects()
 {
-    for (const auto Iter: TObjectRange<APlayer>())
+    for (const auto Iter: TObjectRange<ACharacter>())
     {
         if (Iter->GetWorld() == ActiveWorld)
         {
-            ActiveWorld->SetMainPlayer(Iter);
+            ActiveWorld->SetMainCharacter(Iter);
             break;
         }
     }
     
     //실수로 안만들면 넣어주기
-    if (ActiveWorld->GetMainPlayer() == nullptr)
+    if (ActiveWorld->GetMainCharacter() == nullptr)
     {
-        APlayer* TempPlayer = ActiveWorld->SpawnActor<APlayer>();
-        TempPlayer->SetActorLabel(TEXT("OBJ_PLAYER"));
-        TempPlayer->SetActorTickInEditor(false);
-        ActiveWorld->SetMainPlayer(TempPlayer);
+        ACharacter* TempCharacter = ActiveWorld->SpawnActor<ACharacter>();
+        TempCharacter->SetActorLabel(TEXT("OBJ_PLAYER"));
+        TempCharacter->SetActorTickInEditor(false);
+        ActiveWorld->SetMainCharacter(TempCharacter);
     }
     
     //무조건 PIE들어갈때 만들어주기
@@ -564,25 +565,25 @@ void UEditorEngine::BindEssentialObjects()
     PlayerController->SetActorTickInEditor(false);
     ActiveWorld->SetPlayerController(PlayerController);
     
-    ActiveWorld->GetPlayerController()->Possess(ActiveWorld->GetMainPlayer());
+    ActiveWorld->GetPlayerController()->Possess(ActiveWorld->GetMainCharacter());
     ActiveWorld->GetPlayerController()->BindAction("W",
         [this](float Value) {
-            Cast<ASequencerPlayer>(ActiveWorld->GetMainPlayer())->MoveForward(1.0f);
+            ActiveWorld->GetMainCharacter()->MoveForward(1.0f);
         }
     );
     ActiveWorld->GetPlayerController()->BindAction("S",
         [this](float Value) {
-            Cast<ASequencerPlayer>(ActiveWorld->GetMainPlayer())->MoveForward(-1.0f);
+            ActiveWorld->GetMainCharacter()->MoveForward(-1.0f);
         }
     );
     ActiveWorld->GetPlayerController()->BindAction("A",
         [this](float Value) {
-            Cast<ASequencerPlayer>(ActiveWorld->GetMainPlayer())->MoveRight(-1.0f);
+            ActiveWorld->GetMainCharacter()->MoveRight(-1.0f);
         }
     );
     ActiveWorld->GetPlayerController()->BindAction("D",
         [this](float Value) {
-            Cast<ASequencerPlayer>(ActiveWorld->GetMainPlayer())->MoveRight(1.0f);
+            ActiveWorld->GetMainCharacter()->MoveRight(1.0f);
         }
     );
 }
