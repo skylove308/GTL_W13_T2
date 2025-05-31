@@ -56,6 +56,8 @@ public:
         float GetLeftStickX()
     {
         SHORT rawValue = CurrentState.Gamepad.sThumbLX;
+
+        UE_LOG(ELogLevel::Display, "%d", rawValue);
         
         if (abs(rawValue) < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
             return 0.0f;
