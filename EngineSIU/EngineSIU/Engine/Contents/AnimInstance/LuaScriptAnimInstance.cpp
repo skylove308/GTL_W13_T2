@@ -35,10 +35,7 @@ void ULuaScriptAnimInstance::InitializeAnimation()
     UAnimInstance::InitializeAnimation();
     
     StateMachine = FObjectFactory::ConstructObject<UAnimStateMachine>(this);
-
-    UE_LOG(ELogLevel::Display, TEXT("Owner :%s"), *GetOuter()->GetName());
-
-    StateMachine->Initialize( Cast<APawn>(GetOuter()), this);
+    StateMachine->Initialize(Cast<USkeletalMeshComponent>(GetOuter()), this);
 }
 
 void ULuaScriptAnimInstance::NativeInitializeAnimation()
@@ -68,6 +65,7 @@ void ULuaScriptAnimInstance::NativeUpdateAnimation(float DeltaSeconds, FPoseCont
         if (BlendAlpha >= 1.f)
         {
             bIsBlending = false;
+            PrevAnim = CurrAnim;
         }
     }
     else
@@ -104,4 +102,35 @@ void ULuaScriptAnimInstance::NativeUpdateAnimation(float DeltaSeconds, FPoseCont
 #pragma endregion
 }
 
+void ULuaScriptAnimInstance::SetAnimation(UAnimSequence* NewAnim, float BlendingTime, float LoopAnim, bool ReverseAnim)
+{
+    if (CurrAnim == NewAnim)
+    {
+        return; // 이미 같은 애니메이션이 설정되어 있다면 아무 작업도 하지 않음.
+    }
 
+    if (!PrevAnim && !CurrAnim)
+    {
+        PrevAnim = NewAnim;
+        CurrAnim = NewAnim;
+    }
+    else if (PrevAnim == nullptr)
+    {
+        PrevAnim = CurrAnim; // 이전 애니메이션이 없으면 현재 애니메이션을 이전으로 설정.
+    }
+    else if (CurrAnim)
+    {
+        PrevAnim = CurrAnim; // 현재 애니메이션이 있으면 현재를 이전으로 설정.
+    }
+
+    CurrAnim = NewAnim;
+    BlendDuration = BlendingTime;
+    bLooping = LoopAnim;
+    bReverse = ReverseAnim;
+    
+    //ElapsedTime = 0.0f;
+    BlendStartTime = ElapsedTime;
+    BlendAlpha = 0.0f;
+    bIsBlending = true;
+    bPlaying = true;
+}

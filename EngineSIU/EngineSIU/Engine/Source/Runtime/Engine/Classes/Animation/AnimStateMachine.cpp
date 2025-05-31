@@ -1,16 +1,22 @@
 #include "AnimStateMachine.h"
 
+#include "Components/SkeletalMeshComponent.h"
+#include "Engine/Contents/AnimInstance/LuaScriptAnimInstance.h"
 #include "Lua/LuaScriptManager.h"
+#include "Animation/AnimSequence.h"
 
 UAnimStateMachine::UAnimStateMachine()
 {
     
 }
 
-void UAnimStateMachine::Initialize(APawn* InOwner, UAnimInstance* InAnimInstance)
+void UAnimStateMachine::Initialize(USkeletalMeshComponent* InOwner, ULuaScriptAnimInstance* InAnimInstance)
 {
-    OwnerPawn = InOwner;
+    OwningComponent = InOwner;
     OwningAnimInstance = InAnimInstance;
+
+    LuaScriptName = OwningComponent->StateMachineFileName;
+    InitLuaStateMachine();
 }
 
 void UAnimStateMachine::ProcessState()
@@ -31,33 +37,15 @@ void UAnimStateMachine::ProcessState()
     FString StateName = StateInfo["anim"].get_or(std::string("")).c_str();
     float Blend = StateInfo["blend"].get_or(0.f);
 
-
-    UE_LOG(ELogLevel::Display, TEXT("Lua Test %s", *GetOuter()->GetName()));
-
-    // if (!StateName.IsEmpty() && StateName != LastStateName)
-    // {
-    //     LastStateName = StateName;
-    //
-    //     // 애니메이션 이름을 AnimInstance에 전달
-    //     if (OwnedAnimInstance)
-    //     {
-    //         UAnimSequence* Sequence = FResourceManager::LoadAnimationSequence(StateName);
-    //         if (Sequence)
-    //         {   
-    //             OwnedAnimInstance->SetTargetSequence(Sequence, Blend);
-    //         }
-    //         else
-    //         {
-    //             UE_LOG(ELogLevel::Display, TEXT("AnimSequence not found for state: %s"), *StateName);
-    //         }
-    //     }
-    // }
-    
+    if (OwningAnimInstance)
+    {
+        UAnimSequence* NewAnim = Cast<UAnimSequence>(UAssetManager::Get().GetAnimation(StateName));
+        OwningAnimInstance->SetAnimation(NewAnim, Blend, false, false);
+    }
 }
 
 void UAnimStateMachine::InitLuaStateMachine()
 {
-
     if (LuaScriptName.IsEmpty())
     {
         return;
