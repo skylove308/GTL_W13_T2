@@ -268,7 +268,6 @@ void USkeletalMeshComponent::TickAnimInstances(float DeltaTime)
 {
     if (AnimScriptInstance)
     {
-        //AnimScriptInstance->SetAnimState(AnimScriptInstance->GetStateMachine()->GetState());
         AnimScriptInstance->UpdateAnimation(DeltaTime, BonePoseContext);
     }
 }
