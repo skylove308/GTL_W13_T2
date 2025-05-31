@@ -14,6 +14,7 @@
 #include "UObject/UObjectIterator.h"
 #include "Engine/EditorEngine.h"
 #include "Engine/SkeletalMesh.h"
+#include "Engine/Contents/AnimInstance/MyAnimInstance.h"
 
 
 void AEditorPlayer::Tick(float DeltaTime)
@@ -637,9 +638,11 @@ void ASequencerPlayer::PostSpawnInitialize()
 {
     APlayer::PostSpawnInitialize();
     
-    RootComponent = AddComponent<USceneComponent>();
+    SkeletalMeshComponent = AddComponent<USkeletalMeshComponent>("SkeletalMeshComponent_Player");
+    SkeletalMeshComponent->SetAnimClass(UClass::FindClass(FName("UMyAnimInstance")));
+    RootComponent = SkeletalMeshComponent;
 
-    CameraComponent = AddComponent<UCameraComponent>();
+    CameraComponent = AddComponent<UCameraComponent>("CameraComponent_Player");
     CameraComponent->SetupAttachment(RootComponent);
 }
 
@@ -663,4 +666,21 @@ UObject* ASequencerPlayer::Duplicate(UObject* InOuter)
     NewActor->SkeletalMeshComponent = nullptr;
 
     return NewActor;
+}
+
+
+void ASequencerPlayer::MoveForward(float Value)
+{
+    if (Value == 0.0f) return;
+    FVector Forward = GetActorForwardVector() * Value;
+    FVector NewLocation = GetActorLocation() + Forward;
+    SetActorLocation(NewLocation);
+}
+
+void ASequencerPlayer::MoveRight(float Value)
+{
+    if (Value == 0.0f) return;
+    FVector Right = GetActorRightVector() * Value;
+    FVector NewLocation = GetActorLocation() + Right;
+    SetActorLocation(NewLocation);
 }

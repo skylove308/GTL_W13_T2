@@ -565,6 +565,26 @@ void UEditorEngine::BindEssentialObjects()
     ActiveWorld->SetPlayerController(PlayerController);
     
     ActiveWorld->GetPlayerController()->Possess(ActiveWorld->GetMainPlayer());
+    ActiveWorld->GetPlayerController()->BindAction("W",
+        [this](float Value) {
+            Cast<ASequencerPlayer>(ActiveWorld->GetMainPlayer())->MoveForward(1.0f);
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("S",
+        [this](float Value) {
+            Cast<ASequencerPlayer>(ActiveWorld->GetMainPlayer())->MoveForward(-1.0f);
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("A",
+        [this](float Value) {
+            Cast<ASequencerPlayer>(ActiveWorld->GetMainPlayer())->MoveRight(-1.0f);
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("D",
+        [this](float Value) {
+            Cast<ASequencerPlayer>(ActiveWorld->GetMainPlayer())->MoveRight(1.0f);
+        }
+    );
 }
 
 void UEditorEngine::SetPhysXScene(UWorld* World)
@@ -575,7 +595,7 @@ void UEditorEngine::SetPhysXScene(UWorld* World)
     for (const auto& Actor : World->GetActiveLevel()->Actors)
     {
         UPrimitiveComponent* Prim = Actor->GetComponentByClass<UPrimitiveComponent>();
-        if (Prim && Prim->bSimulate)
+        if (Prim)
         {
             Prim->CreatePhysXGameObject();
         }

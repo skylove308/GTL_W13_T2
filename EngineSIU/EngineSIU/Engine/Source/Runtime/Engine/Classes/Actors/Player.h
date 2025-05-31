@@ -81,8 +81,10 @@ public:
     virtual UObject* Duplicate(UObject* InOuter) override;
 
     FName Socket = "jx_c_camera";
-    USkeletalMeshComponent* SkeletalMeshComponent = nullptr;
+    void MoveForward(float Value);
+    void MoveRight(float Value);
 
+    USkeletalMeshComponent* SkeletalMeshComponent = nullptr;
 private:
     UCameraComponent* CameraComponent = nullptr;
 };
