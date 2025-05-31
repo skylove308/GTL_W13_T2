@@ -81,7 +81,8 @@ PxScene* FPhysicsManager::CreateScene(UWorld* World)
     Dispatcher = PxDefaultCpuDispatcherCreate(hc-2);
     SceneDesc.cpuDispatcher = Dispatcher;
     
-    SceneDesc.filterShader = PxDefaultSimulationFilterShader;
+    //SceneDesc.filterShader = PxDefaultSimulationFilterShader;
+    SceneDesc.filterShader = FilterShader;
     
     // sceneDesc.simulationEventCallback = gMyCallback; // TODO: 이벤트 핸들러 등록(옵저버 or component 별 override)
     
@@ -717,6 +718,43 @@ PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& Pos, const PxQuat& Qu
     Result->setLocalPose(LocalTransform);
     
     return Result;
+}
+
+PxFilterFlags FPhysicsManager::FilterShader(
+    PxFilterObjectAttributes attributes0,
+    PxFilterData filterData0,
+    PxFilterObjectAttributes attributes1,
+    PxFilterData filterData1,
+    PxPairFlags& pairFlags,
+    const void* constantBlock,
+    PxU32 constantBlockSize)
+{
+    if (PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1))
+    {
+        pairFlags = PxPairFlag::eTRIGGER_DEFAULT;
+        return PxFilterFlag::eDEFAULT;
+    }
+
+    if (((filterData0.word0 & static_cast<int>(ECollisionGroup::GROUP_CHARACTER_BODY)) && (filterData1.word0 & static_cast<int>(ECollisionGroup::GROUP_CHARACTER_RAGDOLL))) ||
+        ((filterData1.word0 & static_cast<int>(ECollisionGroup::GROUP_CHARACTER_BODY)) && (filterData0.word0 & static_cast<int>(ECollisionGroup::GROUP_CHARACTER_RAGDOLL))))
+    {
+        return PxFilterFlag::eSUPPRESS; // 충돌 응답을 하지 않음 (서로 통과)
+    }
+
+    // 일반적인 충돌 규칙:
+    // (Shape0이 Shape1과 충돌하기를 원하고) AND (Shape1이 Shape0과 충돌하기를 원하면) 충돌 발생
+    if ((filterData0.word0 & filterData1.word1) && (filterData1.word0 & filterData0.word1))
+    {
+        pairFlags = PxPairFlag::eCONTACT_DEFAULT; // 기본 충돌 응답
+        pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;    // 처음 접촉 시 알림
+        pairFlags |= PxPairFlag::eNOTIFY_TOUCH_LOST;     // 접촉 해제 시 알림
+        pairFlags |= PxPairFlag::eNOTIFY_CONTACT_POINTS; // 접촉점 정보 요청
+
+        return PxFilterFlag::eDEFAULT;
+    }
+
+    return PxFilterFlag::eDEFAULT; // 또는 PxFilterFlag::eKILL;
+
 }
 
 void FPhysicsManager::Simulate(float DeltaTime)

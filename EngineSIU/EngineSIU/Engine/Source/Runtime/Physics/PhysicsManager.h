@@ -66,6 +66,16 @@ public:
     PxShape* CreateCapsuleShape(const PxVec3& Pos, const PxQuat& Quat, float Radius, float HalfHeight) const;
     PxQuat EulerToQuat(const PxVec3& EulerAngles) const;
 
+    //filter shader
+    static PxFilterFlags FilterShader(
+        PxFilterObjectAttributes attributes0,
+        PxFilterData filterData0,
+        PxFilterObjectAttributes attributes1,
+        PxFilterData filterData1,
+        PxPairFlags& pairFlags,
+        const void* constantBlock,
+        PxU32 constantBlockSize);
+
     PxPhysics* GetPhysics() { return Physics; }
     PxMaterial* GetMaterial() const { return Material; }
     

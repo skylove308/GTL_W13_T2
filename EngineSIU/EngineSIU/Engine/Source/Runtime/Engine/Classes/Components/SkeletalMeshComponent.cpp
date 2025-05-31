@@ -552,33 +552,45 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
     {
         FBodyInstance* NewBody = new FBodyInstance(this);
 
-        for (const auto& GeomAttribute : BodySetups[i]->GeomAttributes)
+        for (auto& GeomAttribute : BodySetups[i]->GeomAttributes)
         {
             PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
             FQuat GeomQuat = GeomAttribute.Rotation.Quaternion();
             PxQuat GeomPQuat = PxQuat(GeomQuat.X, GeomQuat.Y, GeomQuat.Z, GeomQuat.W);
             PxVec3 Extent = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
 
+            GeomAttribute.CollisionGroup = ECollisionGroup::GROUP_CHARACTER_RAGDOLL;
+            //GeomAttribute.CollisionWithGroup = static_cast<ECollisionGroup>((uint32)ECollisionGroup::GROUP_ALL & ~(uint32)ECollisionGroup::GROUP_CHARACTER_BODY);
+            GeomAttribute.CollisionWithGroup = static_cast<ECollisionGroup>((uint32)ECollisionGroup::GROUP_WORLD_STATIC);
+
+            PxShape* Shape = nullptr;
             switch (GeomAttribute.GeomType)
             {
             case EGeomType::ESphere:
             {
-                PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, GeomPQuat, Extent.x);
-                BodySetups[i]->AggGeom.SphereElems.Add(PxSphere);
+                Shape = GEngine->PhysicsManager->CreateSphereShape(Offset, GeomPQuat, Extent.x);
+                BodySetups[i]->AggGeom.SphereElems.Add(Shape);
                 break;
             }
             case EGeomType::EBox:
             {
-                PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, GeomPQuat, Extent);
-                BodySetups[i]->AggGeom.BoxElems.Add(PxBox);
+                Shape = GEngine->PhysicsManager->CreateBoxShape(Offset, GeomPQuat, Extent);
+                BodySetups[i]->AggGeom.BoxElems.Add(Shape);
                 break;
             }
             case EGeomType::ECapsule:
             {
-                PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z);
-                BodySetups[i]->AggGeom.SphereElems.Add(PxCapsule);
+                Shape = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z);
+                BodySetups[i]->AggGeom.SphereElems.Add(Shape);
                 break;
             }
+            }
+            if (Shape)
+            {
+                PxFilterData FilterData;
+                FilterData.word0 = static_cast<uint32>(GeomAttribute.CollisionGroup);
+                FilterData.word1 = static_cast<uint32>(GeomAttribute.CollisionWithGroup);
+                Shape->setSimulationFilterData(FilterData);
             }
         }
 
