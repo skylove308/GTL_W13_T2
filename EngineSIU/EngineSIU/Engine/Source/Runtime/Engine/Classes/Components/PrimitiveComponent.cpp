@@ -229,7 +229,7 @@ void UPrimitiveComponent::EndPhysicsTickComponent(float DeltaTime)
         FRotator Rotator = MyQuat.Rotator();
         
         // ✅ Unreal Engine에 적용 (라디안 → 도 변환)
-        SetWorldLocation(FVector(pos.x, -pos.y, pos.z));
+        SetWorldLocation(FVector(pos.x, pos.y, pos.z));
         SetWorldRotation(Rotator);
     }
 }
@@ -533,7 +533,6 @@ void UPrimitiveComponent::CreatePhysXGameObject()
     {
         return;
     }
-    
     BodyInstance = new FBodyInstance(this);
 
     ////////////// 테스트 코드
@@ -555,8 +554,8 @@ void UPrimitiveComponent::CreatePhysXGameObject()
         {
             AggregateGeomAttributes Attr;
             Attr.GeomType = EGeomType::ECapsule;
-            Attr.Offset = FVector(Capsule->GetComponentLocation().X, Capsule->GetComponentLocation().Y, Capsule->GetComponentLocation().Z);
-            PxQuat RotateToZ = PxQuat(PxPi / 2.0f, PxVec3(0, 1, 0));
+            Attr.Offset = FVector::ZeroVector;
+            PxQuat RotateToZ = PxQuat(PxPi / 2.0f, PxVec3(0, 0, 1));
             FQuat UnrealQuat = FQuat(RotateToZ.x, RotateToZ.y, RotateToZ.z, RotateToZ.w);
             Attr.Rotation = UnrealQuat.Rotator();
             Attr.Extent = FVector(Capsule->GetRadius(), Capsule->GetRadius(), Capsule->GetHalfHeight());
@@ -566,8 +565,8 @@ void UPrimitiveComponent::CreatePhysXGameObject()
         {
             AggregateGeomAttributes Attr;
             Attr.GeomType = EGeomType::ESphere;
-            Attr.Offset = FVector(Capsule->GetComponentLocation().X, Capsule->GetComponentLocation().Y, Capsule->GetComponentLocation().Z);
-            Attr.Rotation = FQuat(Capsule->GetComponentRotation().Quaternion()).Rotator();
+            Attr.Offset = FVector::ZeroVector;
+            Attr.Rotation = FRotator::ZeroRotator;
             Attr.Extent = FVector(Sphere->GetRadius());
             GeomAttributes.Add(Attr);
         }
@@ -583,9 +582,9 @@ void UPrimitiveComponent::CreatePhysXGameObject()
 
     for (const auto& GeomAttribute : GeomAttributes)
     {
-        PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
+        PxVec3 Offset = PxVec3(GeomAttribute.Offset.Y, GeomAttribute.Offset.Z, GeomAttribute.Offset.X);
         FQuat GeomQuat = GeomAttribute.Rotation.Quaternion();
-        PxQuat GeomPQuat = PxQuat(GeomQuat.X, GeomQuat.Y, GeomQuat.Z, GeomQuat.W);
+        PxQuat GeomPQuat = PxQuat(GeomQuat.Y, GeomQuat.Z, GeomQuat.X, GeomQuat.W);
         PxVec3 Extent = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
 
         switch (GeomAttribute.GeomType)
