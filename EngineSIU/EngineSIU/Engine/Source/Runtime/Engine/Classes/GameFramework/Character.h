@@ -21,6 +21,7 @@ public:
 
     void MoveForward(float Value);
     void MoveRight(float Value);
+    void RunFast(bool bInIsRunning);
 
     virtual void RegisterLuaType(sol::state& Lua) override; // Lua에 클래스 등록해주는 함수.
     virtual bool BindSelfLuaProperties() override; // LuaEnv에서 사용할 멤버 변수 등록 함수.
@@ -35,6 +36,7 @@ public:
     float VelocityZ = 0.0f;
 
     float MaxSpeed = 12.0f;
+    bool bIsRunning = false;
 
 private:
     virtual void BeginPlay() override;
