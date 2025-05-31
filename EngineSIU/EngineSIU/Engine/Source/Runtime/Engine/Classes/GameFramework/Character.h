@@ -22,6 +22,15 @@ public:
     void MoveForward(float Value);
     void MoveRight(float Value);
 
+    virtual void RegisterLuaType(sol::state& Lua) override; // Lua에 클래스 등록해주는 함수.
+    virtual bool BindSelfLuaProperties() override; // LuaEnv에서 사용할 멤버 변수 등록 함수.
+
+    float GetSpeed() const { return Speed; }
+    void SetSpeed(float NewSpeed) { Speed = NewSpeed; }
+
+    float GetMaxSpeed() const { return MaxSpeed; }
+    void SetMaxSpeed(float NewMaxSpeed) { MaxSpeed = NewMaxSpeed; }
+
     float Speed = 6.0f;
     float VelocityZ = 0.0f;
 
