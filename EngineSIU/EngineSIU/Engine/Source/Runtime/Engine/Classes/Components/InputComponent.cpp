@@ -6,21 +6,30 @@ void UInputComponent::ProcessInput(float DeltaTime)
     {
         KeyBindDelegate[FString("W")].Broadcast(DeltaTime);
     }
-    else if (PressedKeys.Contains(EKeys::A))
+    if (PressedKeys.Contains(EKeys::A))
     {
         KeyBindDelegate[FString("A")].Broadcast(DeltaTime);
     }
-    else if (PressedKeys.Contains(EKeys::S))
+    if (PressedKeys.Contains(EKeys::S))
     {
         KeyBindDelegate[FString("S")].Broadcast(DeltaTime);
     }
-    else if (PressedKeys.Contains(EKeys::D))
+    if (PressedKeys.Contains(EKeys::D))
     {
         KeyBindDelegate[FString("D")].Broadcast(DeltaTime);
     }
-    else
+    if (PressedKeys.Contains(EKeys::SpaceBar))
     {
-        KeyBindDelegate[FString("None")].Broadcast(DeltaTime);
+        KeyBindDelegate[FString("Run")].Broadcast(DeltaTime);
+    }
+    if (!PressedKeys.Contains(EKeys::SpaceBar))
+    {
+        KeyBindDelegate[FString("RunRelease")].Broadcast(DeltaTime);
+    }
+    if (!PressedKeys.Contains(EKeys::W) && !PressedKeys.Contains(EKeys::A) 
+        && !PressedKeys.Contains(EKeys::S) && !PressedKeys.Contains(EKeys::D))
+    {
+        KeyBindDelegate[FString("Idle")].Broadcast(DeltaTime);
     }
 }
 
@@ -120,6 +129,18 @@ void UInputComponent::InputKey(const FKeyEvent& InKeyEvent)
             else if (InKeyEvent.GetInputEvent() == IE_Released)
             {
                 PressedKeys.Remove(EKeys::D);
+            }
+            break;
+        }
+    case 32: // SpaceBar
+        {
+            if (InKeyEvent.GetInputEvent() == IE_Pressed)
+            {
+                PressedKeys.Add(EKeys::SpaceBar);
+            }
+            else if (InKeyEvent.GetInputEvent() == IE_Released)
+            {
+                PressedKeys.Remove(EKeys::SpaceBar);
             }
             break;
         }

@@ -98,13 +98,22 @@ void ACharacter::MoveForward(float Value)
 {
     if (Value == 0.0f) return;
 
-    if (Speed <= MaxSpeed)
+    //if (Speed <= MaxSpeed)
+    //{
+    //    Speed += 0.01f;
+    //}
+    //else
+    //{
+    //    Speed = MaxSpeed;
+    //}
+
+    if (bIsRunning)
     {
-        Speed += 0.01f;
+        Speed = 12.0f;
     }
     else
     {
-        Speed = MaxSpeed;
+        Speed = 7.0f;
     }
 
     FVector Forward = GetActorForwardVector() * Speed * Value;
@@ -125,13 +134,22 @@ void ACharacter::MoveRight(float Value)
 {
     if (Value == 0.0f) return;
 
-    if (Speed <= MaxSpeed)
+    //if (Speed <= MaxSpeed)
+    //{
+    //    Speed += 0.01f;
+    //}
+    //else
+    //{
+    //    Speed = MaxSpeed;
+    //}
+
+    if (bIsRunning)
     {
-        Speed += 0.01f;
+        Speed = 12.0f;
     }
     else
     {
-        Speed = MaxSpeed;
+        Speed = 7.0f;
     }
 
     FVector Right = GetActorRightVector() * Speed * Value;
@@ -145,5 +163,17 @@ void ACharacter::MoveRight(float Value)
     else
     {
         MeshComponent->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+    }
+}
+
+void ACharacter::RunFast(bool bInIsRunning)
+{
+    if (bInIsRunning)
+    {
+        Speed = MaxSpeed * 2.0f; // 빠르게 달리기
+    }
+    else
+    {
+        Speed = MaxSpeed; // 일반 속도로 돌아가기
     }
 }
