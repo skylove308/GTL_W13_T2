@@ -290,6 +290,8 @@ void UPrimitiveComponent::GetProperties(TMap<FString, FString>& OutProperties) c
         OutProperties.Add(GeomKey + TEXT("Offset"), GeomAttributes[i].Offset.ToString());
         OutProperties.Add(GeomKey + TEXT("Rotation"), GeomAttributes[i].Rotation.ToString());
         OutProperties.Add(GeomKey + TEXT("Extent"), GeomAttributes[i].Extent.ToString());
+        OutProperties.Add(GeomKey + TEXT("CollisionGroup"), FString::FromInt(static_cast<uint8>(GeomAttributes[i].CollisionGroup)));
+        OutProperties.Add(GeomKey + TEXT("CollisionWithGroup"), FString::FromInt(static_cast<uint8>(GeomAttributes[i].CollisionWithGroup)));
     }
 }
 
@@ -364,6 +366,16 @@ void UPrimitiveComponent::SetProperties(const TMap<FString, FString>& InProperti
             if (TempStr)
             {
                 GeomAttribute.Extent.InitFromString(*TempStr);
+            }
+            TempStr = InProperties.Find(GeomKey + TEXT("CollisionGroup"));
+            if (TempStr)
+            {
+                GeomAttribute.CollisionGroup = static_cast<ECollisionGroup>(FString::ToInt(*TempStr));
+            }
+            TempStr = InProperties.Find(GeomKey + TEXT("CollisionWithGroup"));
+            if (TempStr)
+            {
+                GeomAttribute.CollisionWithGroup = static_cast<ECollisionGroup>(FString::ToInt(*TempStr));
             }
         }
     }
@@ -591,15 +603,17 @@ void UPrimitiveComponent::CreatePhysXGameObject()
 
     if (GeomAttributes.Num() == 0)
     {
+        AggregateGeomAttributes Attr;
+
         if (UCapsuleComponent* Capsule = Cast<UCapsuleComponent>(this))
         {
-            AggregateGeomAttributes Attr;
             Attr.GeomType = EGeomType::ECapsule;
             Attr.Offset = FVector::ZeroVector;
             PxQuat RotateToZ = PxQuat(PxPi / 2.0f, PxVec3(0, 0, 1));
             FQuat UnrealQuat = FQuat(RotateToZ.x, RotateToZ.y, RotateToZ.z, RotateToZ.w);
             Attr.Rotation = UnrealQuat.Rotator();
             Attr.Extent = FVector(Capsule->GetRadius(), Capsule->GetRadius(), Capsule->GetHalfHeight());
+
             GeomAttributes.Add(Attr);
         }
         else if (USphereComponent* Sphere = Cast<USphereComponent>(this))
@@ -619,6 +633,8 @@ void UPrimitiveComponent::CreatePhysXGameObject()
             Attr.Extent = FVector(AABB.MaxLocation - AABB.MinLocation) / 2 * GetComponentScale3D();
             GeomAttributes.Add(Attr);
         }
+        Attr.CollisionGroup = ECollisionGroup::GROUP_CHARACTER_BODY;
+        Attr.CollisionWithGroup = static_cast<ECollisionGroup>((uint32)ECollisionGroup::GROUP_ALL & ~(uint32)ECollisionGroup::GROUP_CHARACTER_RAGDOLL);
     }
 
     for (const auto& GeomAttribute : GeomAttributes)
@@ -628,26 +644,35 @@ void UPrimitiveComponent::CreatePhysXGameObject()
         PxQuat GeomPQuat = PxQuat(GeomQuat.X, GeomQuat.Y, GeomQuat.Z, GeomQuat.W);
         PxVec3 Extent = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
 
+        PxShape* PxShape = nullptr;
         switch (GeomAttribute.GeomType)
         {
         case EGeomType::ESphere:
         {
-            PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, GeomPQuat, Extent.x);
-            BodySetup->AggGeom.SphereElems.Add(PxSphere);
+            PxShape = GEngine->PhysicsManager->CreateSphereShape(Offset, GeomPQuat, Extent.x);
+            BodySetup->AggGeom.SphereElems.Add(PxShape);
             break;
         }
         case EGeomType::EBox:
         {
-            PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, GeomPQuat, Extent);
-            BodySetup->AggGeom.BoxElems.Add(PxBox);
+            PxShape = GEngine->PhysicsManager->CreateBoxShape(Offset, GeomPQuat, Extent);
+            BodySetup->AggGeom.BoxElems.Add(PxShape);
             break;
         }
         case EGeomType::ECapsule:
         {
-            PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z);
-            BodySetup->AggGeom.SphereElems.Add(PxCapsule);
+            PxShape = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z);
+            BodySetup->AggGeom.SphereElems.Add(PxShape);
             break;
         }
+        }
+
+        if (PxShape)
+        {
+            PxFilterData FilterData;
+            FilterData.word0 = static_cast<uint32>(GeomAttribute.CollisionGroup);
+            FilterData.word1 = static_cast<uint32>(GeomAttribute.CollisionWithGroup);
+            PxShape->setSimulationFilterData(FilterData);
         }
     }
     
