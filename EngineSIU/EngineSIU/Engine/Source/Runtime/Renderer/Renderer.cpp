@@ -68,7 +68,8 @@ void FRenderer::Initialize(FGraphicsDevice* InGraphics, FDXDBufferManager* InBuf
     CompositingPass = AddRenderPass<FCompositingPass>();
     SlateRenderPass = AddRenderPass<FSlateRenderPass>();
 
-    assert(ShadowManager->Initialize(Graphics, BufferManager) && "ShadowManager Initialize Failed");
+    const bool bShadowManagerInitialized = ShadowManager->Initialize(Graphics, BufferManager);
+    assert(bShadowManagerInitialized);
 
     for (IRenderPass* RenderPass : RenderPasses)
     {
@@ -228,6 +229,13 @@ void FRenderer::PrepareRender(FViewportResource* ViewportResource) const
     ViewportResource->ClearRenderTargets(Graphics->DeviceContext);
 
     PrepareRenderPass();
+
+    Graphics->DeviceContext->PSSetSamplers(0, 1, &Graphics->SamplerState_LinearWrap);
+    Graphics->DeviceContext->PSSetSamplers(1, 1, &Graphics->SamplerState_LinearClamp);
+    Graphics->DeviceContext->PSSetSamplers(2, 1, &Graphics->SamplerState_PointWrap);
+    Graphics->DeviceContext->PSSetSamplers(3, 1, &Graphics->SamplerState_PointClamp);
+
+    Graphics->DeviceContext->VSSetSamplers(0, 1, &Graphics->SamplerState_LinearWrap);
 }
 
 void FRenderer::PrepareRenderPass() const
@@ -384,6 +392,8 @@ void FRenderer::RenderOpaque(const std::shared_ptr<FEditorViewportClient>& Viewp
             ParticleMeshRenderPass->Render(Viewport);
         }
     }
+
+
 }
 
 void FRenderer::RenderEditorDepthElement(const std::shared_ptr<FEditorViewportClient>& Viewport) const

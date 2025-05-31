@@ -62,6 +62,7 @@ public:
 
     PxShape* CreateBoxShape(const PxVec3& Pos, const PxQuat& Quat, const PxVec3& HalfExtents) const;
     PxShape* CreateSphereShape(const PxVec3& Pos, const PxQuat& Quat, float Radius) const;
+    PxShape* CreateCapsuleShape(const FVector& Pos, const FQuat& Quat, float Radius, float HalfHeight) const;
     PxShape* CreateCapsuleShape(const PxVec3& Pos, const PxQuat& Quat, float Radius, float HalfHeight) const;
     PxQuat EulerToQuat(const PxVec3& EulerAngles) const;
 

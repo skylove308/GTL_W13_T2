@@ -27,4 +27,7 @@ public:
 
 protected:
     EShapeType ShapeType = EShapeType::Max;
+
+public:
+    class UBodySetup* ShapeBodySetup = nullptr;
 };
