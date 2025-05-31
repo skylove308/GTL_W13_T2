@@ -40,21 +40,21 @@ public:
     }
     
     // 버튼 입력 확인
-    bool IsButtonPressed(WORD Button)
+    bool IsButtonPressed(WORD Button) const
     {
         return (CurrentState.Gamepad.wButtons & Button) != 0;
     }
     
     // 버튼이 방금 눌렸는지 확인 (이전 프레임에는 안 눌렸고 현재 프레임에 눌림)
-    bool IsButtonJustPressed(WORD Button)
+    bool IsButtonJustPressed(WORD Button) const
     {
         return (CurrentState.Gamepad.wButtons & Button) != 0 &&
                (PreviousState.Gamepad.wButtons & Button) == 0;
     }
     
         // 아날로그 스틱 값 가져오기 (-1.0f ~ 1.0f 범위로 정규화)
-        float GetLeftStickX()
-    {
+        float GetLeftStickX() const
+        {
         SHORT rawValue = CurrentState.Gamepad.sThumbLX;
 
         UE_LOG(ELogLevel::Display, "%d", rawValue);
@@ -70,7 +70,7 @@ public:
                    static_cast<float>(32768 - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
     }
 
-    float GetLeftStickY()
+    float GetLeftStickY() const
     {
         SHORT rawValue = CurrentState.Gamepad.sThumbLY;
         
@@ -85,7 +85,7 @@ public:
                    static_cast<float>(32768 - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
     }
 
-    float GetRightStickX()
+    float GetRightStickX() const
     {
         SHORT rawValue = CurrentState.Gamepad.sThumbRX;
         
@@ -100,7 +100,7 @@ public:
                    static_cast<float>(32768 - XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
     }
 
-    float GetRightStickY()
+    float GetRightStickY() const
     {
         SHORT rawValue = CurrentState.Gamepad.sThumbRY;
         
@@ -116,7 +116,7 @@ public:
     }
     
     // 트리거 값 가져오기 (0.0f ~ 1.0f)
-    float GetLeftTrigger()
+    float GetLeftTrigger() const
     {
         BYTE trigger = CurrentState.Gamepad.bLeftTrigger;
         if (trigger < XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
@@ -124,7 +124,7 @@ public:
         return (trigger - XINPUT_GAMEPAD_TRIGGER_THRESHOLD) / (255.0f - XINPUT_GAMEPAD_TRIGGER_THRESHOLD);
     }
     
-    float GetRightTrigger()
+    float GetRightTrigger() const
     {
         BYTE trigger = CurrentState.Gamepad.bRightTrigger;
         if (trigger < XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
@@ -133,7 +133,7 @@ public:
     }
     
     // 진동 설정 (0.0f ~ 1.0f)
-    void SetVibration(float leftMotor, float rightMotor)
+    void SetVibration(float leftMotor, float rightMotor) const
     {
         XINPUT_VIBRATION vibration;
         ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));

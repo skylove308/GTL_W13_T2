@@ -71,7 +71,9 @@ protected:
     void OnMouseWheel(const float Delta, const FVector2D CursorPos);
     void OnMouseMove();
 
-    // Xbox 컨트롤러 관련 함수들
+    // Xbox 컨트롤러 함수
+    bool IsXboxControllerConnected(uint32 ControllerId) const;
+    
     void OnXboxControllerButtonDown(uint32 ControllerId, EXboxButtons::Type Button, bool bIsRepeat = false);
     void OnXboxControllerButtonUp(uint32 ControllerId, EXboxButtons::Type Button);
     void OnXboxControllerAnalogInput(uint32 ControllerId, EXboxAnalog::Type AnalogType, float Value);
@@ -79,10 +81,8 @@ protected:
     void OnXboxControllerDisconnected(uint32 ControllerId);
     void SetXboxControllerVibration(uint32 ControllerId, float LeftMotor, float RightMotor);
 
-    bool IsXboxControllerConnected(uint32 ControllerId) const;
-    bool IsXboxControllerButtonPressed(uint32 ControllerId, EXboxButtons::Type Button) const;
-    float GetXboxControllerAnalogValue(uint32 ControllerId, EXboxAnalog::Type AnalogType) const;
 
+    // Raw Input
     void OnRawMouseInput(const RAWMOUSE& RawMouseInput);
     void OnRawKeyboardInput(const RAWKEYBOARD& RawKeyboardInput);
 

@@ -510,18 +510,22 @@ void FSlateAppMessageHandler::ProcessXboxControllerAnalogInputs(uint32 Controlle
 
 float FSlateAppMessageHandler::NormalizeThumbstick(SHORT Value, SHORT DeadZone) const
 {
-    if (FMath::Abs(Value) < DeadZone)
+    // Promote everything to int to avoid overflow
+    const int32 IntValue = static_cast<int32>(Value);
+    const int32 IntDeadZone = static_cast<int32>(DeadZone);
+    
+    if (FMath::Abs(IntValue) < IntDeadZone)
     {
         return 0.0f;
     }
-    
-    if (Value > 0)
+
+    if (IntValue > 0)
     {
-        return static_cast<float>(Value - DeadZone) / static_cast<float>(32767 - DeadZone);
+        return static_cast<float>(IntValue - IntDeadZone) / static_cast<float>(32767 - IntDeadZone);
     }
-    else
+    else // IntValue < 0
     {
-        return static_cast<float>(Value + DeadZone) / static_cast<float>(32768 - DeadZone);
+        return static_cast<float>(IntValue + IntDeadZone) / static_cast<float>(32768 - IntDeadZone);
     }
 }
 
@@ -829,82 +833,6 @@ void FSlateAppMessageHandler::SetXboxControllerVibration(uint32 ControllerId, fl
 bool FSlateAppMessageHandler::IsXboxControllerConnected(uint32 ControllerId) const
 {
     return ControllerId < MaxControllers && XboxControllerConnected[ControllerId];
-}
-
-bool FSlateAppMessageHandler::IsXboxControllerButtonPressed(uint32 ControllerId, EXboxButtons::Type Button) const
-{
-    if (ControllerId >= MaxControllers || !XboxControllerConnected[ControllerId])
-    {
-        return false;
-    }
-    
-    const XINPUT_GAMEPAD& Gamepad = XboxControllerStates[ControllerId].Gamepad;
-    
-    switch (Button)
-    {
-    case EXboxButtons::A:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0;
-    case EXboxButtons::B:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_B) != 0;
-    case EXboxButtons::X:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_X) != 0;
-    case EXboxButtons::Y:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_Y) != 0;
-    case EXboxButtons::LeftBumper:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) != 0;
-    case EXboxButtons::RightBumper:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) != 0;
-    case EXboxButtons::Back:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_BACK) != 0;
-    case EXboxButtons::Start:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0;
-    case EXboxButtons::LeftThumbstick:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB) != 0;
-    case EXboxButtons::RightThumbstick:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB) != 0;
-    case EXboxButtons::DPadUp:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP) != 0;
-    case EXboxButtons::DPadDown:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN) != 0;
-    case EXboxButtons::DPadLeft:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) != 0;
-    case EXboxButtons::DPadRight:
-        return (Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) != 0;
-    case EXboxButtons::LeftTrigger:
-        return Gamepad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
-    case EXboxButtons::RightTrigger:
-        return Gamepad.bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
-    default:
-        return false;
-    }
-}
-
-float FSlateAppMessageHandler::GetXboxControllerAnalogValue(uint32 ControllerId, EXboxAnalog::Type AnalogType) const
-{
-    if (ControllerId >= MaxControllers || !XboxControllerConnected[ControllerId])
-    {
-        return 0.0f;
-    }
-    
-    const XINPUT_GAMEPAD& Gamepad = XboxControllerStates[ControllerId].Gamepad;
-    
-    switch (AnalogType)
-    {
-    case EXboxAnalog::LeftStickX:
-        return NormalizeThumbstick(Gamepad.sThumbLX, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
-    case EXboxAnalog::LeftStickY:
-        return NormalizeThumbstick(Gamepad.sThumbLY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
-    case EXboxAnalog::RightStickX:
-        return NormalizeThumbstick(Gamepad.sThumbRX, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
-    case EXboxAnalog::RightStickY:
-        return NormalizeThumbstick(Gamepad.sThumbRY, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
-    case EXboxAnalog::LeftTriggerAxis:
-        return NormalizeTrigger(Gamepad.bLeftTrigger);
-    case EXboxAnalog::RightTriggerAxis:
-        return NormalizeTrigger(Gamepad.bRightTrigger);
-    default:
-        return 0.0f;
-    }
 }
 
 void FSlateAppMessageHandler::OnRawMouseInput(const RAWMOUSE& RawMouseInput)
