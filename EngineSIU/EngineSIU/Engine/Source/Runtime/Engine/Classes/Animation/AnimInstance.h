@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "AnimStateMachine.h"
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
@@ -18,7 +18,7 @@ class UAnimInstance : public UObject
 public:
     UAnimInstance() = default;
 
-    void InitializeAnimation();
+    virtual void InitializeAnimation();
 
     void UpdateAnimation(float DeltaSeconds, FPoseContext& OutPose);
 

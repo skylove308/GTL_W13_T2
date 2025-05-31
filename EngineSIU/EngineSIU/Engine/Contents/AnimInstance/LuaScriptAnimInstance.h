@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Animation/Animinstance.h"
 #include "Animation/AnimStateMachine.h"
 #include "UObject/ObjectMacros.h"
@@ -12,7 +12,8 @@ class ULuaScriptAnimInstance : public UAnimInstance
 
 public:
     ULuaScriptAnimInstance();
-    
+
+    virtual void InitializeAnimation() override;
     virtual void NativeInitializeAnimation() override;
 
     virtual void NativeUpdateAnimation(float DeltaSeconds, FPoseContext& OutPose) override;
@@ -47,8 +48,6 @@ public:
         return bLooping;
     }
 
-    void SetTargetAnimation(UAnimSequence* InAnimation, float InBlendingTime);
-
 private:
     float ElapsedTime;
     float PlayRate;
@@ -72,8 +71,6 @@ private:
     
     bool bIsBlending;
     
-    UAnimStateMachine* StateMachine;
-
-
+    UPROPERTY(EditAnywhere, UAnimStateMachine*, StateMachine, = nullptr)
     
 };
