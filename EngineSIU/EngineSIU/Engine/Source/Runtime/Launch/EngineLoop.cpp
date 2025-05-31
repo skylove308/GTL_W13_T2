@@ -1,5 +1,6 @@
 #include "EngineLoop.h"
 #include "ImGuiManager.h"
+#include "PadInputTest.h"
 #include "UnrealClient.h"
 #include "WindowsPlatformTime.h"
 #include "D3D11RHI/GraphicDevice.h"
@@ -170,6 +171,8 @@ void FEngineLoop::Tick()
         }
 
         const float DeltaTime = static_cast<float>(ElapsedTime / 1000.f);
+
+        GEngineLoop.AppMessageHandler->UpdateXboxControllers(DeltaTime);
 
         GEngine->Tick(DeltaTime);
         LevelEditor->Tick(DeltaTime);
