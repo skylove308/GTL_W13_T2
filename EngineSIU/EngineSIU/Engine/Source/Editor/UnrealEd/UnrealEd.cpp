@@ -7,6 +7,7 @@
 #include "PropertyEditor/PropertyEditorPanel.h"
 #include "PropertyEditor/SkeletalMeshViewerPanel.h"
 #include "PropertyEditor/PhysicsAssetViewerPanel.h"
+#include "PropertyEditor/LuaUIPanel.h"
 #include "World/World.h"
 void UnrealEd::Initialize()
 {
@@ -28,6 +29,9 @@ void UnrealEd::Initialize()
 
     auto PhysicsAssetPanel = std::make_shared<PhysicsAssetViewerPanel>();
     Panels["PhysicsAssetViewerPanel"] = PhysicsAssetPanel;
+
+    auto LuaUIPanel = std::make_shared<LuaUIViewPanel>();
+    Panels["LuaUIViewPanel"] = LuaUIPanel;
 }
 
 void UnrealEd::Render() const
