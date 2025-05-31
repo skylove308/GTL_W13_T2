@@ -1,11 +1,13 @@
 #include "Character.h"
-
 #include "Engine/Engine.h"
 #include "PhysicsManager.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Lua/LuaUtils/LuaTypeMacros.h"
+#include "Lua/LuaScriptComponent.h"
+#include "Lua/LuaScriptManager.h"
 
 ACharacter::ACharacter()
 {
@@ -62,6 +64,34 @@ void ACharacter::Tick(float DeltaTime)
     //
     //     cation(FVector(PxTr.p.x, PxTr.p.y, PxTr.p.z));
     // }
+}
+
+void ACharacter::RegisterLuaType(sol::state& Lua)
+{
+    DEFINE_LUA_TYPE_WITH_PARENT(ACharacter, sol::bases<AActor>(),
+        "Speed", sol::property(&ThisClass::GetSpeed, &ThisClass::SetSpeed),
+        "MaxSpeed", sol::property(&ThisClass::GetMaxSpeed, &ThisClass::SetMaxSpeed)
+    )
+}
+
+bool ACharacter::BindSelfLuaProperties()
+{
+    Super::BindSelfLuaProperties();
+
+    sol::table& LuaTable = LuaScriptComponent->GetLuaSelfTable();
+    if (!LuaTable.valid())
+    {
+        return false;
+    }
+
+    // 자기 자신 등록.
+    // self에 this를 하게 되면 내부에서 임의로 Table로 바꿔버리기 때문에 self:함수() 형태의 호출이 불가능.
+    // 자기 자신 객체를 따로 넘겨주어야만 AActor:GetName() 같은 함수를 실행시켜줄 수 있다.
+    LuaTable["this"] = this;
+    LuaTable["Name"] = *GetName(); // FString 해결되기 전까지 임시로 Table로 전달.
+    // 이 아래에서 또는 하위 클래스 함수에서 멤버 변수 등록.
+
+    return true;
 }
 
 void ACharacter::MoveForward(float Value)
