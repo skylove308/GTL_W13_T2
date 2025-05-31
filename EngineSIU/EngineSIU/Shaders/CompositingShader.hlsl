@@ -6,6 +6,7 @@ Texture2D EditorTexture : register(t103);
 Texture2D EditorOverlayTexture : register(t104);
 Texture2D DebugTexture : register(t106);
 Texture2D CameraEffectTexture : register(t107);
+Texture2D ShapeOverlayTexture : register(t108);
 
 SamplerState CompositingSampler : register(s1); // Linear Clamp
 
@@ -48,6 +49,7 @@ float4 main(PS_Input Input) : SV_TARGET
     float4 EditorOverlay = EditorOverlayTexture.Sample(CompositingSampler, Input.UV);
     float4 Debug = DebugTexture.Sample(CompositingSampler, Input.UV);
     float4 CameraEffect = CameraEffectTexture.Sample(CompositingSampler, Input.UV);
+    float4 ShapeOverlay = ShapeOverlayTexture.Sample(CompositingSampler, Input.UV);
     
     float4 FinalColor = Scene;
     if (ViewMode == VMI_LightHeatMap)
@@ -64,6 +66,7 @@ float4 main(PS_Input Input) : SV_TARGET
         FinalColor = lerp(FinalColor, Translucent, Translucent.a);
         FinalColor = lerp(FinalColor, EditorOverlay, EditorOverlay.a);
         FinalColor = lerp(FinalColor, CameraEffect, CameraEffect.a);
+        FinalColor = lerp(FinalColor, ShapeOverlay, ShapeOverlay.a);
     }
 
     return FinalColor;

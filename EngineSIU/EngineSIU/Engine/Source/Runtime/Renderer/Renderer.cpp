@@ -31,6 +31,7 @@
 #include "PropertyEditor/ShowFlags.h"
 #include "Stats/Stats.h"
 #include "Stats/GPUTimingManager.h"
+#include "GeometryDebugRenderPass.h"
 
 //------------------------------------------------------------------------------
 // 초기화 및 해제 관련 함수
@@ -62,6 +63,7 @@ void FRenderer::Initialize(FGraphicsDevice* InGraphics, FDXDBufferManager* InBuf
     
     DepthPrePass = AddRenderPass<FDepthPrePass>();
     TileLightCullingPass = AddRenderPass<FTileLightCullingPass>();
+    GeometryDebugRenderPass = AddRenderPass<FGeometryDebugRenderPass>();
 
     PostProcessRenderPass = AddRenderPass<FPostProcessRenderPass>();
     
@@ -450,6 +452,11 @@ void FRenderer::RenderTranslucent(const std::shared_ptr<FEditorViewportClient>& 
             QUICK_GPU_SCOPE_CYCLE_COUNTER(EditorBillboardPass_GPU, *GPUTimingManager)
             EditorBillboardRenderPass->Render(Viewport);
         }
+    }
+
+    if (ShowFlag & EEngineShowFlags::SF_PhysicsPreview)
+    {
+        GeometryDebugRenderPass->Render(Viewport);
     }
 }
 
