@@ -1,10 +1,11 @@
-﻿#pragma once
+#pragma once
 #include <PxRigidDynamic.h>
 #include "Pawn.h"
 
 class UCapsuleComponent;
 class USkeletalMeshComponent;
 class UCharacterMovementComponent;
+class UCameraComponent;
 
 class ACharacter : public APawn
 {
@@ -13,9 +14,18 @@ class ACharacter : public APawn
 public:
     ACharacter();
 
-    UCapsuleComponent* CapsuleComponent;
-    USkeletalMeshComponent* MeshComponent;
-    UCharacterMovementComponent* MovementComponent;
+    UCapsuleComponent* CapsuleComponent = nullptr;
+    USkeletalMeshComponent* MeshComponent = nullptr;
+    UCharacterMovementComponent* MovementComponent = nullptr;
+    UCameraComponent* CameraComponent = nullptr;
+
+    void MoveForward(float Value);
+    void MoveRight(float Value);
+
+    float Speed = 6.0f;
+    float VelocityZ = 0.0f;
+
+    float MaxSpeed = 12.0f;
 
 private:
     virtual void BeginPlay() override;

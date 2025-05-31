@@ -20,6 +20,7 @@
 #include "SkeletalMesh.h"
 #include "PhysicsEngine/PhysicsAsset.h"
 #include "Particles/ParticleSystem.h"
+#include "GameFramework/Character.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -540,22 +541,22 @@ void UEditorEngine::StartPhysicsAssetViewer(FName PreviewMeshKey, FName PhysicsA
 
 void UEditorEngine::BindEssentialObjects()
 {
-    for (const auto Iter: TObjectRange<APlayer>())
+    for (const auto Iter: TObjectRange<ACharacter>())
     {
         if (Iter->GetWorld() == ActiveWorld)
         {
-            ActiveWorld->SetMainPlayer(Iter);
+            ActiveWorld->SetMainCharacter(Iter);
             break;
         }
     }
     
     //실수로 안만들면 넣어주기
-    if (ActiveWorld->GetMainPlayer() == nullptr)
+    if (ActiveWorld->GetMainCharacter() == nullptr)
     {
-        APlayer* TempPlayer = ActiveWorld->SpawnActor<APlayer>();
-        TempPlayer->SetActorLabel(TEXT("OBJ_PLAYER"));
-        TempPlayer->SetActorTickInEditor(false);
-        ActiveWorld->SetMainPlayer(TempPlayer);
+        ACharacter* TempCharacter = ActiveWorld->SpawnActor<ACharacter>();
+        TempCharacter->SetActorLabel(TEXT("OBJ_PLAYER"));
+        TempCharacter->SetActorTickInEditor(false);
+        ActiveWorld->SetMainCharacter(TempCharacter);
     }
     
     //무조건 PIE들어갈때 만들어주기
@@ -564,7 +565,32 @@ void UEditorEngine::BindEssentialObjects()
     PlayerController->SetActorTickInEditor(false);
     ActiveWorld->SetPlayerController(PlayerController);
     
-    ActiveWorld->GetPlayerController()->Possess(ActiveWorld->GetMainPlayer());
+    ActiveWorld->GetPlayerController()->Possess(ActiveWorld->GetMainCharacter());
+    ActiveWorld->GetPlayerController()->BindAction("W",
+        [this](float Value) {
+            ActiveWorld->GetMainCharacter()->MoveForward(0.1f);
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("S",
+        [this](float Value) {
+            ActiveWorld->GetMainCharacter()->MoveForward(-0.1f);
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("A",
+        [this](float Value) {
+            ActiveWorld->GetMainCharacter()->MoveRight(-0.1f);
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("D",
+        [this](float Value) {
+            ActiveWorld->GetMainCharacter()->MoveRight(0.1f);
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("None",
+        [this](float Value) {
+            ActiveWorld->GetMainCharacter()->Speed = 6.0f;
+        }
+    );
 }
 
 void UEditorEngine::SetPhysXScene(UWorld* World)
@@ -575,7 +601,7 @@ void UEditorEngine::SetPhysXScene(UWorld* World)
     for (const auto& Actor : World->GetActiveLevel()->Actors)
     {
         UPrimitiveComponent* Prim = Actor->GetComponentByClass<UPrimitiveComponent>();
-        if (Prim && Prim->bSimulate)
+        if (Prim)
         {
             Prim->CreatePhysXGameObject();
         }

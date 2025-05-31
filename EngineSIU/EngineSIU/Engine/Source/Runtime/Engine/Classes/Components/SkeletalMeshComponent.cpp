@@ -16,6 +16,7 @@
 #include "UObject/Casts.h"
 #include "UObject/ObjectFactory.h"
 #include "PhysicsEngine/ConstraintInstance.h"
+#include "Engine/Contents/AnimInstance/MyAnimInstance.h"
 
 bool USkeletalMeshComponent::bIsCPUSkinning = false;
 
@@ -160,10 +161,10 @@ void USkeletalMeshComponent::TickComponent(float DeltaTime)
 {
     Super::TickComponent(DeltaTime);
 
-    TickPose(DeltaTime);
-    UpdateBoneTransformToPhysScene();
     if(!bSimulate)
     {
+        TickPose(DeltaTime);
+        UpdateBoneTransformToPhysScene();
     }
     else
     {
@@ -239,29 +240,6 @@ void USkeletalMeshComponent::EndPhysicsTickComponent(float DeltaTime)
             BonePoseContext.Pose[i] = FTransform(CurrentLocalMatrix);
         }
         
-        //for (FBodyInstance* BI : Bodies)
-        //{
-        //    if (RigidBodyType != ERigidBodyType::STATIC)
-        //    {
-        //        BI->BIGameObject->UpdateFromPhysics(GEngine->PhysicsManager->GetScene(GEngine->ActiveWorld));
-        //        XMMATRIX DXMatrix = BI->BIGameObject->WorldMatrix;
-        //        XMFLOAT4X4 dxMat;
-        //        XMStoreFloat4x4(&dxMat, DXMatrix);
-
-        //        FMatrix WorldMatrix;
-        //        for (int32 Row = 0; Row < 4; ++Row)
-        //        {
-        //            for (int32 Col = 0; Col < 4; ++Col)
-        //            {
-        //                WorldMatrix.M[Row][Col] = *(&dxMat._11 + Row * 4 + Col);
-        //            }
-        //        }
-
-        //        BonePoseContext.Pose[BI->BoneIndex] = FTransform(WorldMatrix) * GetComponentTransform().Inverse();
-
-        //    }
-        //}
-        
         CPUSkinning();
     }
 }
@@ -290,6 +268,7 @@ void USkeletalMeshComponent::TickAnimInstances(float DeltaTime)
 {
     if (AnimScriptInstance)
     {
+        AnimScriptInstance->SetAnimState(AnimScriptInstance->GetStateMachine()->GetState());
         AnimScriptInstance->UpdateAnimation(DeltaTime, BonePoseContext);
     }
 }
@@ -555,6 +534,7 @@ void USkeletalMeshComponent::InitAnim()
     if (bInitializedAnimInstance)
     {
         // TODO: 애니메이션 포즈 바로 반영하려면 여기에서 진행.
+        AnimScriptInstance->SetAnimState(EAnimState::AS_Idle);
     }
 }
 

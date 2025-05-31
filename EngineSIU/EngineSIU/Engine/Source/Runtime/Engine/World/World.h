@@ -20,6 +20,7 @@ class USceneComponent;
 class FCollisionManager;
 class AGameMode;
 class UTextComponent;
+class ACharacter;
 
 class UWorld : public UObject
 {
@@ -72,6 +73,9 @@ public:
     void SetMainPlayer(APlayer* InPlayer){ MainPlayer = InPlayer; }
     APlayer* GetMainPlayer() const;
 
+    void SetMainCharacter(ACharacter* InCharacter) { MainCharacter = InCharacter; }
+    ACharacter* GetMainCharacter() const;
+
     void SetPlayerController(APlayerController* InPlayerController){ PlayerController = InPlayerController; }
     APlayerController* GetPlayerController() const;
 
@@ -99,6 +103,8 @@ private:
     APlayerController* PlayerController = nullptr;
 
     APlayer* MainPlayer = nullptr;
+
+    ACharacter* MainCharacter = nullptr;
 
     UTextComponent* MainTextComponent = nullptr;
 
