@@ -1,4 +1,4 @@
-﻿#include "LuaScriptAnimInstance.h"
+#include "LuaScriptAnimInstance.h"
 
 #include "Animation/AnimationAsset.h"
 #include "Animation/AnimationRuntime.h"
@@ -10,6 +10,7 @@
 #include "Animation/AnimStateMachine.h"
 #include "UObject/Casts.h"
 #include "UObject/ObjectFactory.h"
+#include "GameFramework/Pawn.h"
 
 ULuaScriptAnimInstance::ULuaScriptAnimInstance()
     : PrevAnim(nullptr)
@@ -27,7 +28,17 @@ ULuaScriptAnimInstance::ULuaScriptAnimInstance()
     , BlendDuration(0.2f)
     , bIsBlending(false)
 {
+}
+
+void ULuaScriptAnimInstance::InitializeAnimation()
+{
+    UAnimInstance::InitializeAnimation();
+    
     StateMachine = FObjectFactory::ConstructObject<UAnimStateMachine>(this);
+
+    UE_LOG(ELogLevel::Display, TEXT("Owner :%s"), *GetOuter()->GetName());
+
+    StateMachine->Initialize( Cast<APawn>(GetOuter()), this);
 }
 
 void ULuaScriptAnimInstance::NativeInitializeAnimation()
@@ -93,9 +104,4 @@ void ULuaScriptAnimInstance::NativeUpdateAnimation(float DeltaSeconds, FPoseCont
 #pragma endregion
 }
 
-void ULuaScriptAnimInstance::SetTargetAnimation(UAnimSequence* InAnimation, float InBlendingTime)
-{
-    CurrAnim = InAnimation;
-    BlendDuration = InBlendingTime;
-}
 

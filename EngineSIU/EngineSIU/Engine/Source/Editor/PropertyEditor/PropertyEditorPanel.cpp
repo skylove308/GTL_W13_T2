@@ -480,7 +480,7 @@ void PropertyEditorPanel::RenderForSkeletalMesh(USkeletalMeshComponent* Skeletal
             {
                 SkeletalMeshComp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
                 CurrentAnimationMode = EAnimationMode::AnimationBlueprint;
-                SkeletalMeshComp->SetAnimClass(UClass::FindClass(FName("UMyAnimInstance")));
+                SkeletalMeshComp->SetAnimClass(UClass::FindClass(FName("ULuaScriptAnimInstance")));
             }
             if (ImGui::Selectable("Animation Asset", CurrentAnimationMode == EAnimationMode::AnimationSingleNode))
             {
