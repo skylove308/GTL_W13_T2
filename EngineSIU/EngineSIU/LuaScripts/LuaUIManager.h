@@ -5,6 +5,8 @@
 #include "Engine/Source/Runtime/Core/Container/Map.h"
 #include "Engine/Source/ThirdParty/ImGui/include/ImGui/imgui.h"
 
+struct FTexture;
+
 class LuaUIManager 
 {
 public:
@@ -17,8 +19,8 @@ public:
 
     void CreateUI(FName InName);
     // Text의 경우 크기는 FontSize에만 따라가도록 일단 구현
-    void CreateText(FName InName, RectTransform InRectTransform, int InSortOrder, FString InText, FName FontStyleName, float InFontSize, FColor InFontColor);
-    void CreateImage(FName InName, FString TexturePath, RectTransform InRectTransform, int InSortOrder);
+    void CreateText(FName InName, RectTransform InRectTransform, int InSortOrder, FString InText, FName FontStyleName, float InFontSize, FLinearColor InFontColor);
+    void CreateImage(FName InName, RectTransform InRectTransform, int InSortOrder, FName TextureName, FLinearColor InTextureColor);
     void CreateButton(FName InName, FString LuaFunctionName, RectTransform InRectTransform, int InSortOrder);
 
     
@@ -32,6 +34,7 @@ public:
     RectTransform GetCanvasRectTransform() { return CanvasRectTransform; }
 
     ImFont* GetFontStyleByName(FName FontName);
+    FTexture* GetTextureByName(FName TextureName);
 
 private:
     LuaUIManager();
@@ -39,6 +42,7 @@ private:
     LuaUIManager(const LuaUIManager&) = delete;
     LuaUIManager& operator=(const LuaUIManager&) = delete;
 
+    void GenerateResource();
     void UpdateUIArrayForSort();    // Create 하거나 SortOrder 바꿀 때에 호출 필요
 
     TMap<FName, LuaUI*> UIMap;
@@ -47,4 +51,5 @@ private:
     RectTransform CanvasRectTransform;
 
     TMap<FName, ImFont*> FontMap;
+    TMap<FName, std::shared_ptr<FTexture>> TextureMap;
 };

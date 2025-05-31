@@ -38,7 +38,7 @@ class LuaUI
 {
 public:
     LuaUI(FName InName) 
-        : Name(InName)
+        : Name(InName), Visible(true)
     { }
 
 protected:

@@ -1,11 +1,11 @@
 #include "LuaTextUI.h"
 
 LuaTextUI::LuaTextUI(FName InName)
-    :LuaUI(InName), Text(FString("Default Text")), FontSytle(ImGui::GetFont()), FontSize(18.0f), FontColor(FColor(1.0f))
+    :LuaUI(InName), Text(FString("Default Text")), FontSytle(ImGui::GetFont()), FontSize(18.0f), FontColor(FLinearColor(1.0f))
 {
 }
 
-LuaTextUI::LuaTextUI(FName InName, RectTransform InRectTransform, FString& InText, int InSortOrder, ImFont* InFontStyle, float InFontSize, FColor InFontColor)
+LuaTextUI::LuaTextUI(FName InName, RectTransform InRectTransform, FString& InText, int InSortOrder, ImFont* InFontStyle, float InFontSize, FLinearColor InFontColor)
     :LuaUI(InName), Text(InText), FontSytle(InFontStyle), FontSize(InFontSize), FontColor(InFontColor)
 {
     Visible = true;
@@ -46,7 +46,7 @@ void LuaTextUI::SetFontSize(float InFontSize)
     FontSize = InFontSize;
 }
 
-void LuaTextUI::SetFontColor(FColor InFontColor)
+void LuaTextUI::SetFontColor(FLinearColor InFontColor)
 {
     FontColor = InFontColor;
 }

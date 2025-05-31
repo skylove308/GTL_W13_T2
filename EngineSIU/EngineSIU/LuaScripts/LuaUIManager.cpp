@@ -2,7 +2,10 @@
 #include "Engine/Source/Runtime/Core/Math/Color.h"
 #include "Engine/Engine.h"
 #include "Engine/Source/Developer/LuaUtils/LuaTextUI.h"
-
+#include "Engine/Source/Developer/LuaUtils/LuaImageUI.h"
+#include "Engine/Classes/Engine/Texture.h"
+#include "Engine/EditorEngine.h"
+#include "Engine/Engine.h"
 
 void LuaUIManager::CreateUI(FName InName)
 {
@@ -11,7 +14,7 @@ void LuaUIManager::CreateUI(FName InName)
     UpdateUIArrayForSort();
 }
 
-void LuaUIManager::CreateText(FName InName, RectTransform InRectTransform, int InSortOrder, FString InText, FName FontStyleName, float InFontSize, FColor InFontColor)
+void LuaUIManager::CreateText(FName InName, RectTransform InRectTransform, int InSortOrder, FString InText, FName FontStyleName, float InFontSize, FLinearColor InFontColor)
 {
     ImFont* FindFont = GetFontStyleByName(FontStyleName);
 
@@ -21,9 +24,13 @@ void LuaUIManager::CreateText(FName InName, RectTransform InRectTransform, int I
     UpdateUIArrayForSort();
 }
 
-void LuaUIManager::CreateImage(FName InName, FString TexturePath, RectTransform InRectTransform, int InSortOrder)
+void LuaUIManager::CreateImage(FName InName, RectTransform InRectTransform, int InSortOrder, FName TextureName, FLinearColor InTextureColor)
 {
+    FTexture* FindTexture = GetTextureByName(TextureName);
+    
+    LuaImageUI* NewImageUI = new LuaImageUI(InName, InRectTransform, InSortOrder, FindTexture, InTextureColor);
 
+    UIMap.Add(InName, NewImageUI);
     UpdateUIArrayForSort();
 }
 
@@ -66,7 +73,8 @@ void LuaUIManager::DrawLuaUIs()
 
 void LuaUIManager::TestCODE()
 {
-    CreateText("TestTEXT", RectTransform(0, 0, 100, 100, AnchorDirection::MiddleCenter), 10, FString("Chan GOOOD!"), FName("Default"), 30, FColor(1, 0, 0, 1));
+    CreateText("TestTEXT", RectTransform(0, 0, 100, 100, AnchorDirection::MiddleCenter), 10, FString("Chan GOOOD!"), FName("Default"), 30, FLinearColor(1, 0, 0, 1));
+    CreateImage("TestImage", RectTransform(-100, -100, 200, 200, AnchorDirection::MiddleCenter), 3, FName("ExplosionColor"), FLinearColor(1, 1, 1, 1));
 }
 
 void LuaUIManager::UpdateCanvasRectTransform(HWND hWnd)
@@ -83,18 +91,33 @@ void LuaUIManager::UpdateCanvasRectTransform(HWND hWnd)
 
 ImFont* LuaUIManager::GetFontStyleByName(FName FontName)
 {
-    // 1) Find()를 호출해서 ImFont**(포인터-투-포인터) 얻기
     ImFont** FoundPtr = FontMap.Find(FontName);
 
-    // 2) null 체크 후, *FoundPtr → ImFont* 자체를 돌려준다.
     if (FoundPtr != nullptr)
     {
-        return *FoundPtr;  // 맵에 해당 키가 있으면 ImFont*를 반환
+        return *FoundPtr;  
     }
     else
     {
-        return nullptr;    // 없으면 null 반환
+        return nullptr; 
     }
+}
+
+FTexture* LuaUIManager::GetTextureByName(FName TextureName)
+{
+    auto SharedPtrToTexture = TextureMap.Find(TextureName);
+    if (SharedPtrToTexture == nullptr)
+    {
+        return nullptr;
+    }
+
+    FTexture* RawPtr = SharedPtrToTexture->get();
+    if (RawPtr != nullptr)
+    {
+        return RawPtr;
+    }
+
+    return nullptr;
 }
 
 LuaUIManager::LuaUIManager()
@@ -110,15 +133,26 @@ LuaUIManager::LuaUIManager()
     CanvasRectTransform.Size.X = ClientWidth;
     CanvasRectTransform.Size.Y = ClientHeight;
 
+    GenerateResource();
+    TestCODE();
+}
+
+void LuaUIManager::GenerateResource()
+{
     /* Pre Setup */
     ImGuiIO& io = ImGui::GetIO();
 
     /** Font load */
     ImFont* AddFont = io.Fonts->Fonts[0];
-    
+
     FontMap.Add(FName("Default"), AddFont);
 
-    TestCODE();
+    /* Texture Setup*/
+    
+    auto TEstt = FEngineLoop::ResourceManager.GetTexture(L"Assets/Texture/T_Explosion_SubUV.png");
+    
+    TextureMap.Add(FName("ExplosionColor"), FEngineLoop::ResourceManager.GetTexture(L"Assets/Texture/T_Explosion_SubUV.png"));
+
 }
 
 void LuaUIManager::UpdateUIArrayForSort()

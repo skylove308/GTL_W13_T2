@@ -9,7 +9,7 @@ class LuaTextUI : public LuaUI
 {
 public:
     LuaTextUI(FName InName);
-    LuaTextUI(FName InName, RectTransform InRectTransform, FString& InText, int InSortOrder, ImFont* InFontStyle, float InFontSize, FColor InFontColor);
+    LuaTextUI(FName InName, RectTransform InRectTransform, FString& InText, int InSortOrder, ImFont* InFontStyle, float InFontSize, FLinearColor InFontColor);
 
     virtual void DrawImGuiUI() override;
 
@@ -17,11 +17,11 @@ private:
     FString Text;
     ImFont* FontSytle;
     float FontSize;
-    FColor FontColor;
+    FLinearColor FontColor;
 
 public:
     void SetText(FString& InText);
     void SetFont(ImFont* InFontStyle);
     void SetFontSize(float InFontSize);
-    void SetFontColor(FColor InFontColor);
+    void SetFontColor(FLinearColor InFontColor);
 };
