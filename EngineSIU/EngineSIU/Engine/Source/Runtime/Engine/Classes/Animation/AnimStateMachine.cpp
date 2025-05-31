@@ -1,4 +1,7 @@
 #include "AnimStateMachine.h"
+#include "Engine/Engine.h"
+#include "World/World.h"
+#include "GameFramework/Character.h"
 
 UAnimStateMachine::UAnimStateMachine()
 {
@@ -51,36 +54,36 @@ void UAnimStateMachine::ProcessState()
 {
     if (CurrentState == EAnimState::AS_Idle)
     {
-        if (MoveSpeed > 0)
+        if (GEngine->ActiveWorld->GetMainCharacter()->Speed > 6.0f)
         {
             CurrentState = EAnimState::AS_SlowRun;
         }
     }
     else if (CurrentState == EAnimState::AS_SlowRun)
     {
-        if (MoveSpeed == 0)
+        if (GEngine->ActiveWorld->GetMainCharacter()->Speed == 6.0f)
         {
             CurrentState = EAnimState::AS_Idle;
         }
-        else if (MoveSpeed == 2)
+        else if (GEngine->ActiveWorld->GetMainCharacter()->Speed > 8.0f)
         {
             CurrentState = EAnimState::AS_NarutoRun;
         }
     }
     else if (CurrentState == EAnimState::AS_NarutoRun)
     {
-        if (MoveSpeed == 1)
+        if (GEngine->ActiveWorld->GetMainCharacter()->Speed < 8.0f)
         {
             CurrentState = EAnimState::AS_SlowRun;
         }
-        else if (MoveSpeed == 3)
+        else if (GEngine->ActiveWorld->GetMainCharacter()->Speed > 10.0f)
         {
             CurrentState = EAnimState::AS_FastRun;
         }
     }
     else if (CurrentState == EAnimState::AS_FastRun)
     {
-        if (MoveSpeed == 2)
+        if (GEngine->ActiveWorld->GetMainCharacter()->Speed < 10.0f)
         {
             CurrentState = EAnimState::AS_NarutoRun;
         }

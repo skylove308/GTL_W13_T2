@@ -6,17 +6,21 @@ void UInputComponent::ProcessInput(float DeltaTime)
     {
         KeyBindDelegate[FString("W")].Broadcast(DeltaTime);
     }
-    if (PressedKeys.Contains(EKeys::A))
+    else if (PressedKeys.Contains(EKeys::A))
     {
         KeyBindDelegate[FString("A")].Broadcast(DeltaTime);
     }
-    if (PressedKeys.Contains(EKeys::S))
+    else if (PressedKeys.Contains(EKeys::S))
     {
         KeyBindDelegate[FString("S")].Broadcast(DeltaTime);
     }
-    if (PressedKeys.Contains(EKeys::D))
+    else if (PressedKeys.Contains(EKeys::D))
     {
         KeyBindDelegate[FString("D")].Broadcast(DeltaTime);
+    }
+    else
+    {
+        KeyBindDelegate[FString("None")].Broadcast(DeltaTime);
     }
 }
 

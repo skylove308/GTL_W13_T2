@@ -1,4 +1,4 @@
-﻿#include "MyAnimInstance.h"
+#include "MyAnimInstance.h"
 
 #include "Animation/AnimationAsset.h"
 #include "Animation/AnimationRuntime.h"
@@ -28,11 +28,12 @@ UMyAnimInstance::UMyAnimInstance()
     , bIsBlending(false)
 {
     StateMachine = FObjectFactory::ConstructObject<UAnimStateMachine>(this);
-    IDLE = UAssetManager::Get().GetAnimation(FString("Contents/Asset/Idle"));
-    Dance = UAssetManager::Get().GetAnimation(FString("Contents/Asset/GangnamStyle"));
-    SlowRun = UAssetManager::Get().GetAnimation(FString("Contents/Asset/SlowRun"));
-    NarutoRun = UAssetManager::Get().GetAnimation(FString("Contents/Asset/NarutoRun"));
-    FastRun = UAssetManager::Get().GetAnimation(FString("Contents/Asset/FastRun"));
+    IDLE = UAssetManager::Get().GetAnimation(FString("Contents/Human/Idle"));
+    Dance = UAssetManager::Get().GetAnimation(FString("Contents/Human/GangnamStyle"));
+    SlowRun = UAssetManager::Get().GetAnimation(FString("Contents/Human/SlowRun"));
+    NarutoRun = UAssetManager::Get().GetAnimation(FString("Contents/Human/NarutoRun"));
+    FastRun = UAssetManager::Get().GetAnimation(FString("Contents/Human/FastRun"));
+
 }
 
 void UMyAnimInstance::NativeInitializeAnimation()
@@ -46,6 +47,11 @@ void UMyAnimInstance::NativeUpdateAnimation(float DeltaSeconds, FPoseContext& Ou
     
 #pragma region MyAnim
     USkeletalMeshComponent* SkeletalMeshComp = GetSkelMeshComponent();
+
+    if (!PrevAnim)
+    {
+        PrevAnim = Cast<UAnimSequence>(IDLE);
+    }
     
     if (!PrevAnim || !CurrAnim || !SkeletalMeshComp->GetSkeletalMeshAsset() || !SkeletalMeshComp->GetSkeletalMeshAsset()->GetSkeleton() || !bPlaying)
     {
@@ -90,7 +96,7 @@ void UMyAnimInstance::NativeUpdateAnimation(float DeltaSeconds, FPoseContext& Ou
     
     FAnimExtractContext ExtractA(GetElapsedTime(), false);
     FAnimExtractContext ExtractB(GetElapsedTime(), false);
-
+     
     PrevAnim->GetAnimationPose(PrevPose, ExtractA);
     CurrAnim->GetAnimationPose(CurrPose, ExtractB);
 
