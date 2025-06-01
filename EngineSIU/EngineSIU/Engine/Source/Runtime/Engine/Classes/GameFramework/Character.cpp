@@ -63,6 +63,7 @@ void ACharacter::Tick(float DeltaTime)
 {
     APawn::Tick(DeltaTime);
 
+    DoCameraEffect(DeltaTime);
     // 물리 결과 동기화
     // if (bPhysXInitialized &&  PhysXActor)
     // {
@@ -72,31 +73,38 @@ void ACharacter::Tick(float DeltaTime)
     //
     //     cation(FVector(PxTr.p.x, PxTr.p.y, PxTr.p.z));
     // }
-    if (DeathCameraTransitionTime <= 0.0f)
+}
+
+void ACharacter::DoCameraEffect(float DeltaTime)
+{
+    if (!bCameraEffect) return;
+
+    if (CurrentDeathCameraTransitionTime <= 0.0f)
     {
-        if (DeathLetterBoxTransitionTime > 0.0f)
+        if (CurrentDeathLetterBoxTransitionTime > 0.0f)
         {
             std::shared_ptr<FEditorViewportClient> ViewportClient = GEngineLoop.GetLevelEditor()->GetActiveViewportClient();
             float Width = ViewportClient->GetViewport()->GetD3DViewport().Width;
             float Height = ViewportClient->GetViewport()->GetD3DViewport().Height;
 
             float LetterBoxWidth = Width;
-            float LetterBoxHeight = (Height - Width * 0.5f) * (DeathLetterBoxTransitionTime / 2.0f) + (Width * 0.5f);
+            float LetterBoxHeight = (Height - Width * 0.5f) * (CurrentDeathLetterBoxTransitionTime / DeathLetterBoxTransitionTime) + (Width * 0.5f);
 
             GEngine->ActiveWorld->GetPlayerController()->SetLetterBoxWidthHeight(LetterBoxWidth, LetterBoxHeight);
             GEngine->ActiveWorld->GetPlayerController()->ClientCameraVignetteColor(FLinearColor(0.0f, 0.0f, 0.0f, 0.7f));
             GEngine->ActiveWorld->GetPlayerController()->ClientStartCameraVignetteAnimation(1.0f, 0.5f, 0.5f);
             GEngine->ActiveWorld->GetPlayerController()->SetLetterBoxColor(FLinearColor(0.2f, 0.2f, 0.2f, 1.0f));
 
-            DeathLetterBoxTransitionTime -= DeltaTime;
+            CurrentDeathLetterBoxTransitionTime -= DeltaTime;
         }
         else
         {
-            DeathCameraTransitionTime = 3.0f; // 카메라 전환 시간 초기화
+            CurrentDeathCameraTransitionTime = DeathCameraTransitionTime; // 카메라 전환 시간 초기화
+            bCameraEffect = false; // 카메라 효과 종료
         }
     }
 
-    if (GetActorLocation().X > 100 && !bSwitchCamera)
+    if (!bSwitchCamera)
     {
         for (auto Actor : GEngine->ActiveWorld->GetActiveLevel()->Actors)
         {
@@ -116,9 +124,9 @@ void ACharacter::Tick(float DeltaTime)
         }
     }
 
-    if(bSwitchCamera && DeathCameraTransitionTime > 0.0f)
+    if (bSwitchCamera && CurrentDeathCameraTransitionTime > 0.0f)
     {
-        DeathCameraTransitionTime -= DeltaTime;
+        CurrentDeathCameraTransitionTime -= DeltaTime;
     }
 
 }
@@ -165,21 +173,13 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
 
         // !TODO : 차랑 부딪혔을 때 추가적인 로직 구현
         // 힘을 준다던지, 캡슐을 비활성화하고 SkeletalMeshComp를 루트컴포넌트로 한다던지, 등등..
+        bCameraEffect = true;
     }
 }
 
 void ACharacter::MoveForward(float Value)
 {
     if (Value == 0.0f) return;
-
-    //if (Speed <= MaxSpeed)
-    //{
-    //    Speed += 0.01f;
-    //}
-    //else
-    //{
-    //    Speed = MaxSpeed;
-    //}
 
     if (bIsRunning)
     {
@@ -207,15 +207,6 @@ void ACharacter::MoveForward(float Value)
 void ACharacter::MoveRight(float Value)
 {
     if (Value == 0.0f) return;
-
-    //if (Speed <= MaxSpeed)
-    //{
-    //    Speed += 0.01f;
-    //}
-    //else
-    //{
-    //    Speed = MaxSpeed;
-    //}
 
     if (bIsRunning)
     {
