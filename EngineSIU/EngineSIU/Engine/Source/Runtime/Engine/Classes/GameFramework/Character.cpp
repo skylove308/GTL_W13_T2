@@ -51,6 +51,7 @@ UObject* ACharacter::Duplicate(UObject* InOuter)
     {
         NewActor->MovementComponent->UpdatedComponent = NewActor->CapsuleComponent;
     }
+    NewActor->ImpulseScale = ImpulseScale;
     
     return NewActor;
 }
@@ -126,6 +127,11 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
     {
         MeshComponent->RigidBodyType = ERigidBodyType::DYNAMIC; // 충돌 시 동적 물리로 변경
         MeshComponent->OnChangeRigidBodyFlag();
+
+        //FVector ImpulseDirection = Hit.ImpactNormal + FVector(0.0f, 0.0f, 1.0f); // 충돌 방향 + 위쪽 방향
+        //ImpulseDirection.Normalize(); // 방향 벡터 정규화
+        float i = ImpulseScale;
+        MeshComponent->AddImpulseToBones(Hit.ImpactNormal, ImpulseScale); // 임펄스 추가 (힘을 주는 효과)
 
         // !TODO : 차랑 부딪혔을 때 추가적인 로직 구현
         // 힘을 준다던지, 캡슐을 비활성화하고 SkeletalMeshComp를 루트컴포넌트로 한다던지, 등등..

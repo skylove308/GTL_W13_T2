@@ -47,4 +47,5 @@ private:
     virtual void BeginPlay() override;
     virtual UObject* Duplicate(UObject* InOuter) override;
     virtual void Tick(float DeltaTime) override;
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, ImpulseScale, = 100000.f)
 };

@@ -143,29 +143,15 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
-                    "ComponentClass": "USkeletalMeshComponent",
-                    "ComponentID": "SkeletalMeshComponent",
+                    "ComponentClass": "UCharacterMovementComponent",
+                    "ComponentID": "CharacterMovementComponent",
                     "Properties": {
-                        "AABB_max": "X=17.174 Y=90.257 Z=180.888",
-                        "AABB_min": "X=-14.896 Y=-90.257 Z=-0.035",
-                        "AnimClass": "None",
-                        "AnimationMode": "0",
-                        "AttachParentID": "CapsuleComponent",
-                        "ComponentClass": "USkeletalMeshComponent",
-                        "ComponentName": "SkeletalMeshComponent",
+                        "ComponentClass": "UCharacterMovementComponent",
+                        "ComponentName": "CharacterMovementComponent",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
-                        "GeomsCount": "0",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "RigidBodyType": "2",
-                        "SkeletalMeshKey": "Contents/Human/Human",
-                        "bApplyGravity": "true",
                         "bAutoActive": "true",
-                        "bIsActive": "true",
-                        "bSimulate": "true",
-                        "m_Type": ""
+                        "bIsActive": "true"
                     }
                 },
                 {
@@ -200,15 +186,29 @@
                     }
                 },
                 {
-                    "ComponentClass": "UCharacterMovementComponent",
-                    "ComponentID": "CharacterMovementComponent",
+                    "ComponentClass": "USkeletalMeshComponent",
+                    "ComponentID": "SkeletalMeshComponent",
                     "Properties": {
-                        "ComponentClass": "UCharacterMovementComponent",
-                        "ComponentName": "CharacterMovementComponent",
+                        "AABB_max": "X=17.174 Y=90.257 Z=180.888",
+                        "AABB_min": "X=-14.896 Y=-90.257 Z=-0.035",
+                        "AnimClass": "None",
+                        "AnimationMode": "0",
+                        "AttachParentID": "CapsuleComponent",
+                        "ComponentClass": "USkeletalMeshComponent",
+                        "ComponentName": "SkeletalMeshComponent",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
+                        "GeomsCount": "0",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "RigidBodyType": "2",
+                        "SkeletalMeshKey": "Contents/Human/Human",
+                        "bApplyGravity": "true",
                         "bAutoActive": "true",
-                        "bIsActive": "true"
+                        "bIsActive": "true",
+                        "bSimulate": "true",
+                        "m_Type": ""
                     }
                 },
                 {
