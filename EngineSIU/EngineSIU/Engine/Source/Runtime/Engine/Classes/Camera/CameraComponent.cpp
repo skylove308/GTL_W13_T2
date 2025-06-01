@@ -3,6 +3,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "UObject/Casts.h"
 #include "World/World.h"
+#include "GameFramework/Character.h"
 
 UObject* UCameraComponent::Duplicate(UObject* InOuter)
 {
@@ -34,15 +35,16 @@ void UCameraComponent::TickComponent(float DeltaTime)
         FollowMainPlayer();
     }
     
-    ProceedFInterp(DeltaTime);
+
     */
+    //ProceedFInterp(DeltaTime);
 }
 
 void UCameraComponent::FollowMainPlayer()
 {
-    FVector PlayerLocation = GEngine->ActiveWorld->GetMainPlayer()->GetActorLocation();
+    FVector PlayerLocation = GEngine->ActiveWorld->GetMainCharacter()->GetActorLocation();
     
-    FVector PlayerBackward = -GEngine->ActiveWorld->GetMainPlayer()->GetActorForwardVector();
+    FVector PlayerBackward = -GEngine->ActiveWorld->GetMainCharacter()->GetActorForwardVector();
 
     FVector CameraOffset = PlayerBackward * DistanceBehind + FVector(0, 0, CameraHeight);
     
@@ -69,8 +71,8 @@ void UCameraComponent::ProceedFInterp(float DeltaTime)
 
         FVector Lookat = LookTarget;
     
-        CurrentCameraZ = FMath::FInterpTo(CurrentCameraZ, CameraZ, DeltaTime, 0.05f);
-        Lookat.Z = CurrentCameraZ + CameraZOffset;
+        //CurrentCameraZ = FMath::FInterpTo(CurrentCameraZ, CameraZ, DeltaTime, 0.05f);
+        //Lookat.Z = CurrentCameraZ + CameraZOffset;
     
         FRotator TargetRotation = FRotator::MakeLookAtRotation(MoveLocation, Lookat);
     
