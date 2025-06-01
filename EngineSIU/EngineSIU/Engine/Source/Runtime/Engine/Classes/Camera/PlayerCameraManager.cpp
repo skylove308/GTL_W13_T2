@@ -244,7 +244,7 @@ void APlayerCameraManager::DoUpdateCamera(float DeltaTime)
 
             BlendTimeToGo = 0;
 
-            NewPOV = PendingViewTarget.POV;
+            ViewTarget.POV = PendingViewTarget.POV;
 
             OnBlendCompleteEvent.Broadcast();
         }
