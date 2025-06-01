@@ -136,3 +136,36 @@ void APlayerController::ClientStopCameraShake(UClass* Shake, bool bImmediately)
         PlayerCameraManager->StopAllInstancesOfCameraShake(Shake, bImmediately);
     }
 }
+
+void APlayerController::ClientStartCameraVignetteAnimation(float FromIntensity, float ToIntensity, float Duration)
+{
+    if (PlayerCameraManager != nullptr)
+    {
+        PlayerCameraManager->StartVignetteAnimation(FromIntensity, ToIntensity, Duration);
+    }
+}
+
+void APlayerController::ClientCameraVignetteColor(FLinearColor InColor)
+{
+    if (PlayerCameraManager != nullptr)
+    {
+        PlayerCameraManager->SetCameraVignetteColor(InColor);
+    }
+}
+
+void APlayerController::SetLetterBoxWidthHeight(float Width, float Height)
+{
+    if( PlayerCameraManager != nullptr)
+    {
+        PlayerCameraManager->LetterBoxWidth = Width;
+        PlayerCameraManager->LetterBoxHeight = Height;
+    }
+}
+
+void APlayerController::SetLetterBoxColor(const FLinearColor& Color)
+{
+    if (PlayerCameraManager != nullptr)
+    {
+        PlayerCameraManager->LetterBoxColor = Color;
+    }
+}

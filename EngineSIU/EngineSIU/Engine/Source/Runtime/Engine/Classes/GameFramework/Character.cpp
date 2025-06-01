@@ -10,6 +10,11 @@
 #include "Lua/LuaScriptManager.h"
 #include "World/World.h"
 #include "Actors/Car.h"
+#include "Engine/Contents/Objects/DamageCameraShake.h"
+#include "LevelEditor/SLevelEditor.h"
+#include "UnrealEd/EditorViewportClient.h"
+#include "UnrealClient.h"
+#include "Components/StaticMeshComponent.h"
 
 ACharacter::ACharacter()
 {
@@ -59,6 +64,7 @@ void ACharacter::Tick(float DeltaTime)
 {
     APawn::Tick(DeltaTime);
 
+    DoCameraEffect(DeltaTime);
     // 물리 결과 동기화
     // if (bPhysXInitialized &&  PhysXActor)
     // {
@@ -68,15 +74,53 @@ void ACharacter::Tick(float DeltaTime)
     //
     //     cation(FVector(PxTr.p.x, PxTr.p.y, PxTr.p.z));
     // }
-    if (GetActorLocation().X > 100 && !bSwitchCamera)
+}
+
+void ACharacter::DoCameraEffect(float DeltaTime)
+{
+    if (!bCameraEffect) return;
+
+    if (CurrentDeathCameraTransitionTime <= 0.0f)
+    {
+        if (CurrentDeathLetterBoxTransitionTime > 0.0f)
+        {
+            std::shared_ptr<FEditorViewportClient> ViewportClient = GEngineLoop.GetLevelEditor()->GetActiveViewportClient();
+            float Width = ViewportClient->GetViewport()->GetD3DViewport().Width;
+            float Height = ViewportClient->GetViewport()->GetD3DViewport().Height;
+
+            float LetterBoxWidth = Width;
+            float LetterBoxHeight = (Height - Width * 0.5f) * (CurrentDeathLetterBoxTransitionTime / DeathLetterBoxTransitionTime) + (Width * 0.5f);
+
+            GEngine->ActiveWorld->GetPlayerController()->SetLetterBoxWidthHeight(LetterBoxWidth, LetterBoxHeight);
+            GEngine->ActiveWorld->GetPlayerController()->ClientCameraVignetteColor(FLinearColor(0.0f, 0.0f, 0.0f, 0.7f));
+            GEngine->ActiveWorld->GetPlayerController()->ClientStartCameraVignetteAnimation(1.0f, 0.5f, 0.5f);
+            GEngine->ActiveWorld->GetPlayerController()->SetLetterBoxColor(FLinearColor(0.2f, 0.2f, 0.2f, 1.0f));
+
+            CurrentDeathLetterBoxTransitionTime -= DeltaTime;
+        }
+        else
+        {
+            CurrentDeathCameraTransitionTime = DeathCameraTransitionTime; // 카메라 전환 시간 초기화
+            bCameraEffect = false; // 카메라 효과 종료
+        }
+    }
+
+    if (!bSwitchCamera)
     {
         for (auto Actor : GEngine->ActiveWorld->GetActiveLevel()->Actors)
         {
             if (ACar* Car = Cast<ACar>(Actor))
             {
                 FViewTargetTransitionParams Params;
-                Params.BlendTime = 3.0f; // 카메라 전환 시간
+                Params.BlendTime = DeathCameraTransitionTime; // 카메라 전환 시간
                 {
+                    auto* RigidDynamic = Cast<UStaticMeshComponent>(Car->GetRootComponent())->BodyInstance->BIGameObject->DynamicRigidBody;
+                    PxVec3 CurVelocity = RigidDynamic->getLinearVelocity();
+                    CurVelocity *= 0.1f;
+                    RigidDynamic->setLinearVelocity(CurVelocity);
+
+                    UClass* CameraShakeClass = UDamageCameraShake::StaticClass();
+                    GEngine->ActiveWorld->GetPlayerController()->ClientStartCameraShake(CameraShakeClass);
                     GEngine->ActiveWorld->GetPlayerController()->SetViewTarget(Car, Params);
                     GEngine->ActiveWorld->GetPlayerController()->Possess(Car);
                 }
@@ -85,6 +129,12 @@ void ACharacter::Tick(float DeltaTime)
             }
         }
     }
+
+    if (bSwitchCamera && CurrentDeathCameraTransitionTime > 0.0f)
+    {
+        CurrentDeathCameraTransitionTime -= DeltaTime;
+    }
+
 }
 
 void ACharacter::RegisterLuaType(sol::state& Lua)
@@ -129,21 +179,13 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
 
         // !TODO : 차랑 부딪혔을 때 추가적인 로직 구현
         // 힘을 준다던지, 캡슐을 비활성화하고 SkeletalMeshComp를 루트컴포넌트로 한다던지, 등등..
+        bCameraEffect = true;
     }
 }
 
 void ACharacter::MoveForward(float Value)
 {
     if (Value == 0.0f) return;
-
-    //if (Speed <= MaxSpeed)
-    //{
-    //    Speed += 0.01f;
-    //}
-    //else
-    //{
-    //    Speed = MaxSpeed;
-    //}
 
     if (bIsRunning)
     {
@@ -171,15 +213,6 @@ void ACharacter::MoveForward(float Value)
 void ACharacter::MoveRight(float Value)
 {
     if (Value == 0.0f) return;
-
-    //if (Speed <= MaxSpeed)
-    //{
-    //    Speed += 0.01f;
-    //}
-    //else
-    //{
-    //    Speed = MaxSpeed;
-    //}
 
     if (bIsRunning)
     {

@@ -41,10 +41,18 @@ public:
     float MaxSpeed = 12.0f;
     bool bIsRunning = false;
 
+    bool bCameraEffect = false;
     bool bSwitchCamera = false;
+    float CurrentDeathCameraTransitionTime = 3.0f;
+    float CurrentDeathLetterBoxTransitionTime = 2.0f;
+
+    const float DeathCameraTransitionTime = 3.0f;
+    const float DeathLetterBoxTransitionTime = 2.0f;
 
 private:
     virtual void BeginPlay() override;
     virtual UObject* Duplicate(UObject* InOuter) override;
     virtual void Tick(float DeltaTime) override;
+
+    void DoCameraEffect(float DeltaTime);
 };
