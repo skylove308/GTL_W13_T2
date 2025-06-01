@@ -8,9 +8,9 @@ UDamageCameraShake::UDamageCameraShake()
 {
     //UWaveOscillatorCameraShakePattern* Pattern = new UWaveOscillatorCameraShakePattern();
     UPerlinNoiseCameraShakePattern* Pattern = new UPerlinNoiseCameraShakePattern();
-    Pattern->Duration = 0.5f;
+    Pattern->Duration = 2.0f;
     Pattern->BlendInTime = 0.f;
-    Pattern->BlendOutTime = 0.f;
+    Pattern->BlendOutTime = 0.5f;
 
     // Rotation
     Pattern->RotationAmplitudeMultiplier = 1.f;

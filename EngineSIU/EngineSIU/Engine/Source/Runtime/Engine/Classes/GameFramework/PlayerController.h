@@ -47,7 +47,14 @@ public:
 
     void ClientStopCameraShake(UClass* Shake, bool bImmediately = true);
 
+    void ClientStartCameraVignetteAnimation(float FromIntensity, float ToIntensity, float Duration);
+
+    void ClientCameraVignetteColor(FLinearColor InColor);
+
     APlayerCameraManager* PlayerCameraManager = nullptr;
+
+    void SetLetterBoxWidthHeight(float Width, float Height);
+    void SetLetterBoxColor(const FLinearColor& Color);
     
 protected:
     UPROPERTY(UInputComponent*, InputComponent, = nullptr)
