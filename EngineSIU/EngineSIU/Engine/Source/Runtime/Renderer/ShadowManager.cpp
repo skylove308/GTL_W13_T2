@@ -556,6 +556,7 @@ void FShadowManager::ReleaseDirectionalShadowResources()
         DirectionalShadowCascadeDepthRHI = nullptr;
     }
 }
+
 void FShadowManager::UpdateCascadeMatrices(const std::shared_ptr<FEditorViewportClient>& Viewport, UDirectionalLightComponent* DirectionalLight)
 {
     if (!Viewport || !DirectionalLight || NumCascades == 0)

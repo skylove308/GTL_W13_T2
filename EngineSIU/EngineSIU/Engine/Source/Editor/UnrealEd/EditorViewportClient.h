@@ -91,7 +91,8 @@ public:
     void Initialize(EViewScreenLocation InViewportIndex, const FRect& InRect);
     void Tick(float DeltaTime);
     void Release() const;
-    
+
+    void Input();
     void UpdateEditorCameraMovement(float DeltaTime);
     void InputKey(const FKeyEvent& InKeyEvent);
     void MouseMove(const FPointerEvent& InMouseEvent);
