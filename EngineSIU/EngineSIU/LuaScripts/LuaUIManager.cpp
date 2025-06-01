@@ -43,6 +43,19 @@ void LuaUIManager::CreateButton(FName InName,  RectTransform InRectTransform, in
     UpdateUIArrayForSort();
 }
 
+void LuaUIManager::DeleteUI(FName InName)
+{
+    LuaUI** FoundPtr = UIMap.Find(InName);
+    if (FoundPtr != nullptr && *FoundPtr != nullptr)
+    {
+        delete* FoundPtr;
+    }
+
+    UIMap.Remove(InName);
+
+    UpdateUIArrayForSort();
+}
+
 void LuaUIManager::DrawLuaUIs()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -79,6 +92,10 @@ void LuaUIManager::TestCODE()
     CreateText("TestTEXT", RectTransform(0, 0, 100, 100, AnchorDirection::MiddleCenter), 10, FString("Chan GOOOD!"), FName("Default"), 30, FLinearColor(1, 0, 0, 1));
     CreateImage("TestImage", RectTransform(-100, -100, 200, 200, AnchorDirection::MiddleCenter), 3, FName("ExplosionColor"), FLinearColor(1, 1, 1, 1));
     CreateButton("TestButton", RectTransform(-100, -100, 200, 200, AnchorDirection::MiddleCenter), 15, FString("TEstbutonFUn"));
+
+    DeleteUI("TestTEXT");
+    DeleteUI("TestImage");
+    DeleteUI("TestButton");
 }
 
 void LuaUIManager::UpdateCanvasRectTransform(HWND hWnd)

@@ -23,6 +23,7 @@ public:
     void CreateImage(FName InName, RectTransform InRectTransform, int InSortOrder, FName TextureName, FLinearColor InTextureColor);
     void CreateButton(FName InName, RectTransform InRectTransform, int InSortOrder, FString LuaFunctionName);
 
+    void DeleteUI(FName InName);
     
     void DrawLuaUIs();
 
