@@ -8,6 +8,8 @@
 #include "Lua/LuaUtils/LuaTypeMacros.h"
 #include "Lua/LuaScriptComponent.h"
 #include "Lua/LuaScriptManager.h"
+#include "World/World.h"
+#include "Actors/Car.h"
 
 ACharacter::ACharacter()
 {
@@ -31,6 +33,8 @@ ACharacter::ACharacter()
 void ACharacter::BeginPlay()
 {
     APawn::BeginPlay();
+
+    CameraComponent->FollowMainPlayer();
 }
 
 UObject* ACharacter::Duplicate(UObject* InOuter)
@@ -64,6 +68,23 @@ void ACharacter::Tick(float DeltaTime)
     //
     //     cation(FVector(PxTr.p.x, PxTr.p.y, PxTr.p.z));
     // }
+    if (GetActorLocation().X > 100 && !bSwitchCamera)
+    {
+        for (auto Actor : GEngine->ActiveWorld->GetActiveLevel()->Actors)
+        {
+            if (ACar* Car = Cast<ACar>(Actor))
+            {
+                FViewTargetTransitionParams Params;
+                Params.BlendTime = 3.0f; // 카메라 전환 시간
+                {
+                    GEngine->ActiveWorld->GetPlayerController()->SetViewTarget(Car, Params);
+                    GEngine->ActiveWorld->GetPlayerController()->Possess(Car);
+                }
+                bSwitchCamera = true;
+                break;
+            }
+        }
+    }
 }
 
 void ACharacter::RegisterLuaType(sol::state& Lua)

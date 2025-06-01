@@ -38,6 +38,8 @@ public:
     float MaxSpeed = 12.0f;
     bool bIsRunning = false;
 
+    bool bSwitchCamera = false;
+
 private:
     virtual void BeginPlay() override;
     virtual UObject* Duplicate(UObject* InOuter) override;
