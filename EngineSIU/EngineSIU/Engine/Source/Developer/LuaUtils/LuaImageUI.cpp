@@ -1,6 +1,7 @@
 #include "LuaImageUI.h"
 #include "Engine/Classes/Engine/Texture.h"
 #include "Engine/Source/ThirdParty/ImGui/include/ImGui/imgui.h"
+#include "LuaScripts/LuaUIManager.h"
 
 
 LuaImageUI::LuaImageUI(FName InName)
@@ -47,5 +48,15 @@ void LuaImageUI::SetTexture(FTexture* InTexture)
 void LuaImageUI::SetColor(FLinearColor& InColor)
 {
     Color = InColor;
+}
+
+void LuaImageUI::SetTextureByName(FString TextureName)
+{
+    FTexture* FindTexture = LuaUIManager::Get().GetTextureByName(TextureName);
+
+    if (FindTexture != nullptr) 
+    {
+        Texture = FindTexture;
+    }
 }
 

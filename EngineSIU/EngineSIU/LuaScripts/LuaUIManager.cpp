@@ -89,6 +89,12 @@ LuaButtonUI* LuaUIManager::GetButtonUI(FName FindName)
     return static_cast<LuaButtonUI*>(*FoundPtr);
 }
 
+void LuaUIManager::ClearLuaUI()
+{
+    UIMap.Empty();
+    UIArrayForSort.Empty();
+}
+
 void LuaUIManager::DrawLuaUIs()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -130,9 +136,9 @@ void LuaUIManager::TestCODE()
     auto GotsImage = GetImageUI("TestImage");
     auto GotsButton = GetButtonUI("TestButton");
 
-    DeleteUI("TestTEXT");
+    /*DeleteUI("TestTEXT");
     DeleteUI("TestImage");
-    DeleteUI("TestButton");
+    DeleteUI("TestButton");*/
 
     auto GotText = GetTextUI("TestTEXT");
     auto GotImage = GetImageUI("TestImage");

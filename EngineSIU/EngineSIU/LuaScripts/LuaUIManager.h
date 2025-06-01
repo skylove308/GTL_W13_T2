@@ -33,6 +33,8 @@ public:
     LuaImageUI* GetImageUI(FName FindName);
     LuaButtonUI* GetButtonUI(FName FindName);
     
+    void ClearLuaUI();
+
     void DrawLuaUIs();
 
     /////////////// TEST CODE 꼭 지우기

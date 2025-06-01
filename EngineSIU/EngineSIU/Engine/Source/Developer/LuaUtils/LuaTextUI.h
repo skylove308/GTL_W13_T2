@@ -13,7 +13,7 @@ public:
 
     virtual void DrawImGuiUI() override;
 
-private:
+public:
     FString Text;
     ImFont* FontSytle;
     float FontSize;

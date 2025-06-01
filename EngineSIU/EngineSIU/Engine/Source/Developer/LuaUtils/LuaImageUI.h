@@ -13,11 +13,12 @@ public:
 
     virtual void DrawImGuiUI() override;
 
-private:
+public:
     FTexture* Texture;
     FLinearColor Color;
 
 public:
     void SetTexture(FTexture* InTexture);
     void SetColor(FLinearColor& InColor);
+    void SetTextureByName(FString TextureName);
 };
