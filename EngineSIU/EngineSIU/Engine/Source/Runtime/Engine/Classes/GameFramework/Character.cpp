@@ -14,6 +14,7 @@
 #include "LevelEditor/SLevelEditor.h"
 #include "UnrealEd/EditorViewportClient.h"
 #include "UnrealClient.h"
+#include "Components/StaticMeshComponent.h"
 
 ACharacter::ACharacter()
 {
@@ -113,6 +114,11 @@ void ACharacter::DoCameraEffect(float DeltaTime)
                 FViewTargetTransitionParams Params;
                 Params.BlendTime = DeathCameraTransitionTime; // 카메라 전환 시간
                 {
+                    auto* RigidDynamic = Cast<UStaticMeshComponent>(Car->GetRootComponent())->BodyInstance->BIGameObject->DynamicRigidBody;
+                    PxVec3 CurVelocity = RigidDynamic->getLinearVelocity();
+                    CurVelocity *= 0.1f;
+                    RigidDynamic->setLinearVelocity(CurVelocity);
+
                     UClass* CameraShakeClass = UDamageCameraShake::StaticClass();
                     GEngine->ActiveWorld->GetPlayerController()->ClientStartCameraShake(CameraShakeClass);
                     GEngine->ActiveWorld->GetPlayerController()->SetViewTarget(Car, Params);
