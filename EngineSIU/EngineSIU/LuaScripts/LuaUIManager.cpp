@@ -3,6 +3,7 @@
 #include "Engine/Engine.h"
 #include "Engine/Source/Developer/LuaUtils/LuaTextUI.h"
 #include "Engine/Source/Developer/LuaUtils/LuaImageUI.h"
+#include "Engine/Source/Developer/LuaUtils/LuaButtonUI.h"
 #include "Engine/Classes/Engine/Texture.h"
 #include "Engine/EditorEngine.h"
 #include "Engine/Engine.h"
@@ -34,9 +35,11 @@ void LuaUIManager::CreateImage(FName InName, RectTransform InRectTransform, int 
     UpdateUIArrayForSort();
 }
 
-void LuaUIManager::CreateButton(FName InName, FString LuaFunctionName, RectTransform InRectTransform, int InSortOrder)
+void LuaUIManager::CreateButton(FName InName,  RectTransform InRectTransform, int InSortOrder, FString LuaFunctionName)
 {
+    LuaButtonUI* NewButtonUI = new LuaButtonUI(InName, InRectTransform, InSortOrder, LuaFunctionName);
 
+    UIMap.Add(InName, NewButtonUI);
     UpdateUIArrayForSort();
 }
 
@@ -75,6 +78,7 @@ void LuaUIManager::TestCODE()
 {
     CreateText("TestTEXT", RectTransform(0, 0, 100, 100, AnchorDirection::MiddleCenter), 10, FString("Chan GOOOD!"), FName("Default"), 30, FLinearColor(1, 0, 0, 1));
     CreateImage("TestImage", RectTransform(-100, -100, 200, 200, AnchorDirection::MiddleCenter), 3, FName("ExplosionColor"), FLinearColor(1, 1, 1, 1));
+    CreateButton("TestButton", RectTransform(-100, -100, 200, 200, AnchorDirection::MiddleCenter), 15, FString("TEstbutonFUn"));
 }
 
 void LuaUIManager::UpdateCanvasRectTransform(HWND hWnd)
@@ -134,6 +138,9 @@ LuaUIManager::LuaUIManager()
     CanvasRectTransform.Size.Y = ClientHeight;
 
     GenerateResource();
+
+
+
     TestCODE();
 }
 
