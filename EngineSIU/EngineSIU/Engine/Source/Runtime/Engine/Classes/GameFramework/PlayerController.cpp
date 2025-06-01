@@ -6,13 +6,6 @@
 #include "World/World.h"
 
 
-UObject* APlayerController::Duplicate(UObject* InOuter)
-{
-    ThisClass* NewActor = Cast<ThisClass>(Super::Duplicate(InOuter));
-
-    return NewActor;
-}
-
 void APlayerController::PostSpawnInitialize()
 {
     AActor::PostSpawnInitialize();
@@ -38,6 +31,7 @@ void APlayerController::Tick(float DeltaTime)
     {
         PlayerCameraManager->UpdateCamera(DeltaTime);
     }
+
 }
 
 void APlayerController::ProcessInput(float DeltaTime) const
@@ -66,7 +60,7 @@ void APlayerController::SetViewTarget(class AActor* NewViewTarget, struct FViewT
     }
 }
 
-void APlayerController::Possess(APawn* InActor)
+void APlayerController::Possess(AActor* InActor)
 {
     PossessedActor = InActor;
     bHasPossessed = true;

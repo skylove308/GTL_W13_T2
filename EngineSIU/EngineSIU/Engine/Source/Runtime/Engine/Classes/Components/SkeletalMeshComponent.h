@@ -1,6 +1,6 @@
 #pragma once
 #include "SkinnedMeshComponent.h"
-#include "Actors/EditorPlayer.h"
+#include "Actors/Player.h"
 #include "Engine/AssetManager.h"
 #include "Engine/Asset/SkeletalMeshAsset.h"
 #include "Template/SubclassOf.h"

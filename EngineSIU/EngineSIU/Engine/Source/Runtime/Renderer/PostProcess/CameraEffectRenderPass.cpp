@@ -32,7 +32,7 @@ void FCameraEffectRenderPass::UpdateCameraEffectConstant(const std::shared_ptr<F
 
     if (UWorld* World = GEngine->ActiveWorld)
     {
-        if (APlayerController* PC = World->GetPlayerController(Viewport->ViewportIndex))
+        if (APlayerController* PC = World->GetPlayerController())
         {
             if (APlayerCameraManager* PCM = PC->PlayerCameraManager)
             {

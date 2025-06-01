@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Actors/EditorPlayer.h"
+#include "Actors/Player.h"
 #include "Components/ActorComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SceneComponent.h"
@@ -9,7 +9,6 @@
 #include "Math/Rotator.h"
 #include "UObject/Casts.h"
 
-class ACharacter;
 class UParticleSystemComponent;
 class USkeletalMeshComponent;
 class USpringArmComponent;
@@ -60,6 +59,7 @@ private:
 
     void RenderForSceneComponent(USceneComponent* SceneComponent, AEditorPlayer* Player) const;
     void RenderForCameraComponent(UCameraComponent* InCameraComponent);
+    void RenderForPlayerActor(APlayer* InPlayerActor);
     void RenderForActor(AActor* SelectedActor, USceneComponent* TargetComponent) const;
     
     /* Static Mesh Settings */

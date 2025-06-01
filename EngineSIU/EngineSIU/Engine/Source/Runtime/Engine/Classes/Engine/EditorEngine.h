@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine.h"
-#include "Actors/EditorPlayer.h"
+#include "Actors/Player.h"
 #include "World/SkeletalViewerWorld.h"
 #include "World/PhysicsViewerWorld.h"
 
@@ -49,15 +49,13 @@ public:
     void StartPhysicsAssetViewer(FName PreviewMeshKey, FName PhysicsAssetName);
 
     void BindEssentialObjects();
-    void CreatePlayer(int PlayerIndex) const;
-    APlayerController* CreatePlayerController(int PlayerIndex) const;
 
     void EndPIE();
     void EndSkeletalMeshViewer();
     void EndParticleViewer();
     void EndPhysicsAssetViewer();
 
-    void SetPhysXScene(UWorld* World) const;
+    void SetPhysXScene(UWorld* World);
 
     // 주석은 UE에서 사용하던 매개변수.
     FWorldContext& GetEditorWorldContext(/*bool bEnsureIsGWorld = false*/);

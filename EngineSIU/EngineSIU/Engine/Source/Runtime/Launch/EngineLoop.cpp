@@ -170,8 +170,6 @@ void FEngineLoop::Tick()
 
         const float DeltaTime = static_cast<float>(ElapsedTime / 1000.f);
 
-        GEngineLoop.AppMessageHandler->UpdateXboxControllers(DeltaTime);
-
         GEngine->Tick(DeltaTime);
         LevelEditor->Tick(DeltaTime);
         Render();

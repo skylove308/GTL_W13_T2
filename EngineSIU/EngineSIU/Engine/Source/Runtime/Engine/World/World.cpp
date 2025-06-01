@@ -2,8 +2,7 @@
 
 #include "CollisionManager.h"
 #include "PhysicsManager.h"
-#include "Actors/EditorPlayer.h"
-#include "GameFramework/Character.h"
+#include "Actors/Player.h"
 #include "BaseGizmos/TransformGizmo.h"
 #include "Classes/Components/StaticMeshComponent.h"
 #include "Engine/FObjLoader.h"
@@ -11,7 +10,6 @@
 #include "UnrealEd/SceneManager.h"
 #include "GameFramework/GameMode.h"
 #include "Classes/Components/TextComponent.h"
-#include "GameFramework/Player.h"
 
 class UEditorEngine;
 
@@ -184,21 +182,39 @@ UWorld* UWorld::GetWorld() const
     return const_cast<UWorld*>(this);
 }
 
-APlayer* UWorld::GetPlayer(int Index) const
+APlayer* UWorld::GetMainPlayer() const
 {
-    if (Players[Index] != nullptr)
+    if (MainPlayer)
     {
-        return Players[Index];
+        return MainPlayer;
+    }
+    
+    //메인플레이어 설정안하면 있는거중 한개
+    for (const auto Iter: TObjectRange<APlayer>())
+    {
+        if (Iter->GetWorld() == GEngine->ActiveWorld)
+        {
+            return Iter;
+        }
     }
     
     return nullptr;
 }
 
-APlayerController* UWorld::GetPlayerController(int Index) const
+APlayerController* UWorld::GetPlayerController() const
 {
-    if (PlayerControllers[Index] != nullptr)
+    if (PlayerController)
     {
-        return PlayerControllers[Index];
+        return PlayerController;
+    }
+
+    //메인플레이어컨트롤러 설정안하면 있는거중 한개
+    for (const auto Iter: TObjectRange<APlayerController>())
+    {
+        if (Iter->GetWorld() == GEngine->ActiveWorld)
+        {
+            return Iter;
+        }
     }
 
     return nullptr;
@@ -210,15 +226,5 @@ void UWorld::CheckOverlap(const UPrimitiveComponent* Component, TArray<FOverlapR
     {
         CollisionManager->CheckOverlap(this, Component, OutOverlaps);
     }
-}
-
-void UWorld::ConnectedPlayer(int Index)
-{
-    bCurrentlyConnected[Index] = true;
-}
-
-void UWorld::DisconnectedPlayer(int Index)
-{
-    bCurrentlyConnected[Index] = false;
 }
 
