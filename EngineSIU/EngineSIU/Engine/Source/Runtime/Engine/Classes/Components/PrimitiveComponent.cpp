@@ -634,7 +634,7 @@ void UPrimitiveComponent::CreatePhysXGameObject()
             GeomAttributes.Add(Attr);
         }
         Attr.CollisionGroup = ECollisionGroup::GROUP_CHARACTER_BODY;
-        Attr.CollisionWithGroup = static_cast<ECollisionGroup>((uint32)ECollisionGroup::GROUP_ALL & ~(uint32)ECollisionGroup::GROUP_CHARACTER_RAGDOLL);
+        Attr.CollisionWithGroup = static_cast<ECollisionGroup>((uint32)ECollisionGroup::GROUP_MAX & ~(uint32)ECollisionGroup::GROUP_CHARACTER_RAGDOLL);
     }
 
     for (const auto& GeomAttribute : GeomAttributes)
@@ -682,6 +682,24 @@ void UPrimitiveComponent::CreatePhysXGameObject()
 void UPrimitiveComponent::BeginPlay()
 {
     USceneComponent::BeginPlay();
+}
+
+void UPrimitiveComponent::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
+{
+    if (AActor* Actor = GetOwner())
+    {
+        UE_LOG(ELogLevel::Warning, "OnCollisionEnter %s, %s", HitComponent->GetName().ToAnsiString(), OtherComp->GetName().ToAnsiString());
+        Actor->OnCollisionEnter(HitComponent, OtherComp, Hit);
+    }
+}
+
+void UPrimitiveComponent::OnCollisionExit(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp)
+{
+
+}
+
+void UPrimitiveComponent::OnCollisionStay(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
+{
 }
 
 void UPrimitiveComponent::UpdateOverlapsImpl(const TArray<FOverlapInfo>* NewPendingOverlaps, bool bDoNotifies, const TArray<const FOverlapInfo>* OverlapsAtEndLocation)
