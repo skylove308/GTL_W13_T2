@@ -23,7 +23,7 @@ void ACar::BeginPlay()
     }
 
     auto* RigidDynamic = CarMeshComp->BodyInstance->BIGameObject->DynamicRigidBody;
-    RigidDynamic->setMass(1000.0f); // 질량 설정
+    RigidDynamic->setMass(1000000.0f); // 질량 설정
     RigidDynamic->setLinearDamping(0.1f); // 선형 댐핑 설정
     RigidDynamic->setAngularDamping(0.1f); // 각속도 댐핑 설정
     RigidDynamic->setLinearVelocity(PxVec3(0, -1000.0f, 0.f));

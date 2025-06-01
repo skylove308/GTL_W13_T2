@@ -8,6 +8,7 @@
 #include "Lua/LuaUtils/LuaTypeMacros.h"
 #include "Lua/LuaScriptComponent.h"
 #include "Lua/LuaScriptManager.h"
+#include <Actors/Car.h>
 
 ACharacter::ACharacter()
 {
@@ -92,6 +93,23 @@ bool ACharacter::BindSelfLuaProperties()
     // 이 아래에서 또는 하위 클래스 함수에서 멤버 변수 등록.
 
     return true;
+}
+
+void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
+{
+    if (HitComponent && 
+        OtherComp && 
+        MeshComponent && 
+        HitComponent == CapsuleComponent && 
+        OtherComp->GetOwner() &&
+        OtherComp->GetOwner()->IsA<ACar>())
+    {
+        MeshComponent->RigidBodyType = ERigidBodyType::DYNAMIC; // 충돌 시 동적 물리로 변경
+        MeshComponent->OnChangeRigidBodyFlag();
+
+        // !TODO : 차랑 부딪혔을 때 추가적인 로직 구현
+        // 힘을 준다던지, 캡슐을 비활성화하고 SkeletalMeshComp를 루트컴포넌트로 한다던지, 등등..
+    }
 }
 
 void ACharacter::MoveForward(float Value)

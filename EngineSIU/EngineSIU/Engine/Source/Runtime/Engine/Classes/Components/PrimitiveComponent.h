@@ -119,6 +119,23 @@ public:
     virtual void CreatePhysXGameObject();
 
     virtual void BeginPlay() override;
+
+    // physx collision event
+
+    void OnCollisionEnter(
+        UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp,
+        const FHitResult& Hit
+    );
+
+    void OnCollisionExit(
+        UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp
+    );
+
+    void OnCollisionStay(
+        UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+        const FHitResult& Hit
+    );
+
     
 protected:
     TArray<FOverlapInfo> OverlappingComponents;

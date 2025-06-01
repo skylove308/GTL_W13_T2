@@ -6,6 +6,7 @@
 #include "Lua/LuaScriptComponent.h"
 #include "Lua/LuaScriptManager.h"
 #include "Lua/LuaUtils/LuaTypeMacros.h"
+#include "Engine/HitResult.h"
 
 AActor::AActor()
 {
@@ -378,6 +379,18 @@ bool AActor::AddActorScale(const FVector& DeltaScale)
         return true;
     }
     return false;
+}
+
+void AActor::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
+{
+}
+
+void AActor::OnCollisionExit(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp)
+{
+}
+
+void AActor::OnCollisionStay(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
+{
 }
 
 void AActor::SetActorTickInEditor(bool InbInTickInEditor)
