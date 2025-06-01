@@ -17,6 +17,7 @@
 #include "UObject/ObjectFactory.h"
 #include "PhysicsEngine/ConstraintInstance.h"
 #include "Engine/Contents/AnimInstance/LuaScriptAnimInstance.h"
+#include <Actors/Car.h>
 
 bool USkeletalMeshComponent::bIsCPUSkinning = false;
 
@@ -161,13 +162,22 @@ void USkeletalMeshComponent::TickComponent(float DeltaTime)
 {
     Super::TickComponent(DeltaTime);
 
-    if(!bSimulate)
+    if(RigidBodyType != ERigidBodyType::DYNAMIC)
     {
         TickPose(DeltaTime);
         UpdateBoneTransformToPhysScene();
     }
     else
     {
+        // bone[0]의 월드 트랜스폼을 Root컴포넌트의 월드로 적용
+        if (AttachParent)
+        {
+            if (BonePoseContext.Pose.GetNumBones() > 0)
+            {
+                BonePoseContext.Pose[0] = AttachParent->GetComponentTransform();
+                //AttachParent->SetWorldLocation(BonePoseContext.Pose[0].GetTranslation());
+            }
+        }
     }
 }
 
@@ -240,7 +250,7 @@ void USkeletalMeshComponent::EndPhysicsTickComponent(float DeltaTime)
             BonePoseContext.Pose[i] = FTransform(CurrentLocalMatrix);
         }
         
-        CPUSkinning();
+        //CPUSkinning();
     }
 }
 
@@ -713,7 +723,6 @@ void USkeletalMeshComponent::UpdateBoneTransformToPhysScene()
 
 void USkeletalMeshComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-    int i = 1;
     OnChangeRigidBodyFlag();
 }
 
@@ -731,6 +740,7 @@ void USkeletalMeshComponent::OnChangeRigidBodyFlag()
         }
     }
 }
+
 
 bool USkeletalMeshComponent::NeedToSpawnAnimScriptInstance() const
 {

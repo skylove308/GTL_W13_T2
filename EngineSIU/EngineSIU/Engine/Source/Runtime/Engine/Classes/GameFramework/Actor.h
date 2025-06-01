@@ -13,6 +13,8 @@ DECLARE_MULTICAST_DELEGATE_FourParams(FActorHitSignature, AActor* /* SelfActor *
 
 class UActorComponent;
 class ULuaScriptComponent;
+class UPrimitiveComponent;
+struct FHitResult;
 
 namespace sol
 {
@@ -110,6 +112,23 @@ public:
     bool AddActorRotation(const FRotator& DeltaRotation);
     bool AddActorRotation(const FQuat& DeltaRotation);
     bool AddActorScale(const FVector& DeltaScale);
+
+public:
+    // physx simulation callback
+    virtual void OnCollisionEnter(
+        UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp,
+        const FHitResult& Hit
+    );
+
+    virtual void OnCollisionExit(
+        UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp
+    );
+
+    virtual void OnCollisionStay(
+        UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+        const FHitResult& Hit
+    );
+
 
 protected:
     UPROPERTY

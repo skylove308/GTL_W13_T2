@@ -6,6 +6,8 @@
 
 #include "World/World.h"
 #include <thread>
+#include "Physics/SimulationEventCallback.h"
+
 
 
 void GameObject::SetRigidBodyType(ERigidBodyType RigidBodyType) const
@@ -89,6 +91,8 @@ PxScene* FPhysicsManager::CreateScene(UWorld* World)
     SceneDesc.flags |= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
     SceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
     SceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
+
+    SceneDesc.simulationEventCallback = new FSimulationEventCallback(); // 충돌 이벤트 콜백 설정
     
     PxScene* NewScene = Physics->createScene(SceneDesc);
     SceneMap.Add(World, NewScene);
@@ -729,32 +733,50 @@ PxFilterFlags FPhysicsManager::FilterShader(
     const void* constantBlock,
     PxU32 constantBlockSize)
 {
+    // 트리거는 따로 처리
     if (PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1))
     {
         pairFlags = PxPairFlag::eTRIGGER_DEFAULT;
         return PxFilterFlag::eDEFAULT;
     }
 
-    if (((filterData0.word0 & static_cast<int>(ECollisionGroup::GROUP_CHARACTER_BODY)) && (filterData1.word0 & static_cast<int>(ECollisionGroup::GROUP_CHARACTER_RAGDOLL))) ||
-        ((filterData1.word0 & static_cast<int>(ECollisionGroup::GROUP_CHARACTER_BODY)) && (filterData0.word0 & static_cast<int>(ECollisionGroup::GROUP_CHARACTER_RAGDOLL))))
+    const auto IsRagdoll = [](PxFilterData data) {
+        return (data.word0 & static_cast<int>(ECollisionGroup::GROUP_CHARACTER_RAGDOLL)) != 0;
+        };
+
+    const auto IsBody = [](PxFilterData data) {
+        return (data.word0 & static_cast<int>(ECollisionGroup::GROUP_CHARACTER_BODY)) != 0;
+        };
+
+    const bool AIsRagdoll = IsRagdoll(filterData0);
+    const bool BIsRagdoll = IsRagdoll(filterData1);
+    const bool AIsBody = IsBody(filterData0);
+    const bool BIsBody = IsBody(filterData1);
+
+    // ✅ CASE 1: Ragdoll ↔ Body → 완전 무시
+    if ((AIsRagdoll && BIsBody) || (BIsRagdoll && AIsBody))
     {
-        return PxFilterFlag::eSUPPRESS; // 충돌 응답을 하지 않음 (서로 통과)
+        return PxFilterFlag::eSUPPRESS; // 충돌, 콜백 모두 없음
     }
 
-    // 일반적인 충돌 규칙:
-    // (Shape0이 Shape1과 충돌하기를 원하고) AND (Shape1이 Shape0과 충돌하기를 원하면) 충돌 발생
-    if ((filterData0.word0 & filterData1.word1) && (filterData1.word0 & filterData0.word1))
+    // ✅ CASE 2: Ragdoll ↔ Other → 충돌은 함, 콜백은 없음
+    if (AIsRagdoll || BIsRagdoll)
     {
-        pairFlags = PxPairFlag::eCONTACT_DEFAULT; // 기본 충돌 응답
-        pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;    // 처음 접촉 시 알림
-        pairFlags |= PxPairFlag::eNOTIFY_TOUCH_LOST;     // 접촉 해제 시 알림
-        pairFlags |= PxPairFlag::eNOTIFY_CONTACT_POINTS; // 접촉점 정보 요청
-
+        pairFlags = PxPairFlag::eCONTACT_DEFAULT; // 충돌 응답만
         return PxFilterFlag::eDEFAULT;
     }
 
-    return PxFilterFlag::eDEFAULT; // 또는 PxFilterFlag::eKILL;
+    // ✅ 기본 충돌 로직 (Ragdoll도 아님)
+    if ((filterData0.word0 & filterData1.word1) && (filterData1.word0 & filterData0.word1))
+    {
+        pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+        pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
+        pairFlags |= PxPairFlag::eNOTIFY_TOUCH_LOST;
+        pairFlags |= PxPairFlag::eNOTIFY_CONTACT_POINTS;
+        return PxFilterFlag::eDEFAULT;
+    }
 
+    return PxFilterFlag::eDEFAULT;
 }
 
 void FPhysicsManager::Simulate(float DeltaTime)
