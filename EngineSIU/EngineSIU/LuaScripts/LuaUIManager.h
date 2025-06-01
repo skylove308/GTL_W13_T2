@@ -7,6 +7,10 @@
 
 struct FTexture;
 
+class LuaTextUI;
+class LuaImageUI;
+class LuaButtonUI;
+
 class LuaUIManager 
 {
 public:
@@ -24,6 +28,10 @@ public:
     void CreateButton(FName InName, RectTransform InRectTransform, int InSortOrder, FString LuaFunctionName);
 
     void DeleteUI(FName InName);
+    
+    LuaTextUI* GetTextUI(FName FindName);
+    LuaImageUI* GetImageUI(FName FindName);
+    LuaButtonUI* GetButtonUI(FName FindName);
     
     void DrawLuaUIs();
 

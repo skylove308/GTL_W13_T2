@@ -56,6 +56,39 @@ void LuaUIManager::DeleteUI(FName InName)
     UpdateUIArrayForSort();
 }
 
+LuaTextUI* LuaUIManager::GetTextUI(FName FindName)
+{
+    LuaUI** FoundPtr = UIMap.Find(FindName);
+    if (FoundPtr == nullptr || *FoundPtr == nullptr)
+    {
+        return nullptr;
+    }
+
+    return static_cast<LuaTextUI*>(*FoundPtr);
+}
+
+LuaImageUI* LuaUIManager::GetImageUI(FName FindName)
+{
+    LuaUI** FoundPtr = UIMap.Find(FindName);
+    if (FoundPtr == nullptr || *FoundPtr == nullptr)
+    {
+        return nullptr;
+    }
+
+    return static_cast<LuaImageUI*>(*FoundPtr);
+}
+
+LuaButtonUI* LuaUIManager::GetButtonUI(FName FindName)
+{
+    LuaUI** FoundPtr = UIMap.Find(FindName);
+    if (FoundPtr == nullptr || *FoundPtr == nullptr)
+    {
+        return nullptr;
+    }
+
+    return static_cast<LuaButtonUI*>(*FoundPtr);
+}
+
 void LuaUIManager::DrawLuaUIs()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -93,9 +126,18 @@ void LuaUIManager::TestCODE()
     CreateImage("TestImage", RectTransform(-100, -100, 200, 200, AnchorDirection::MiddleCenter), 3, FName("ExplosionColor"), FLinearColor(1, 1, 1, 1));
     CreateButton("TestButton", RectTransform(-100, -100, 200, 200, AnchorDirection::MiddleCenter), 15, FString("TEstbutonFUn"));
 
+    auto GotsText = GetTextUI("TestTEXT");
+    auto GotsImage = GetImageUI("TestImage");
+    auto GotsButton = GetButtonUI("TestButton");
+
     DeleteUI("TestTEXT");
     DeleteUI("TestImage");
     DeleteUI("TestButton");
+
+    auto GotText = GetTextUI("TestTEXT");
+    auto GotImage = GetImageUI("TestImage");
+    auto GotButton = GetButtonUI("TestButton");
+
 }
 
 void LuaUIManager::UpdateCanvasRectTransform(HWND hWnd)
