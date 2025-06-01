@@ -13,10 +13,20 @@ local FString = EngineTypes.FString
 local AnchorDirection = EngineTypes.AnchorDirection
 local FLinearColor = EngineTypes.FLinearColor
 
+local LuaTextUI = EngineTypes.LuaTextUI
+local LuaImageUI = EngineTypes.LuaImageUI
+
 -- BeginPlay: Actor가 처음 활성화될 때 호출
 function ReturnTable:BeginPlay()
 
     print("BeginPlay ", self.Name) -- Table에 등록해 준 Name 출력.
+
+    print("BeginPlay ", self.Name) -- Table에 등록해 준 Name 출력.
+
+    self.ManagedTextUI = nil
+    self.ManagedImageUI = nil
+    self.ElapsedTime = 0 -- 시간 누적용
+
 
     local uiName = FString.new("MyDynamicTextUI")
     local textContent = FString.new("Hello from Lua with Dynamic Rect!")
@@ -52,6 +62,20 @@ function ReturnTable:BeginPlay()
 
     LuaUIBind.CreateImage(imageName, TextureRect, TextureSortOrder, textureName, TextureColor)
 
+
+    -- 생성된 UI 객체 가져오기 (Tick에서 사용하기 위해)
+    -- LuaUIBind.GetTextUI/GetImageUI는 포인터를 반환하므로, Lua에서 객체로 다뤄짐
+    self.ManagedTextUI = LuaUIBind.GetTextUI(uiName) -- **중요: CreateText의 첫번째 인자(고유 이름)로 Get 해야함**
+    self.ManagedImageUI = LuaUIBind.GetImageUI(imageName)
+
+    -- 객체를 제대로 가져왔는지 확인 (nil 체크)
+    if not self.ManagedTextUI then
+        print("Error: Could not get ManagedTextUI with name: " .. uiName:ToAnsiString())
+    end
+    if not self.ManagedImageUI then
+        print("Error: Could not get ManagedImageUI with name: " .. imageName:ToAnsiString())
+    end
+
 end
 
 -- Tick: 매 프레임마다 호출
@@ -62,7 +86,44 @@ function ReturnTable:Tick(DeltaTime)
     -- 바로 등록된 경우에는 PropertyName() 과 같이 함수 형태로 호출되어야 함.
     local this = self.this
     -- this.ActorLocation = this.ActorLocation + FVector(1.0, 0.0, 0.0) * DeltaTime -- X 방향으로 이동하도록 선언.
+    self.ElapsedTime = self.ElapsedTime + DeltaTime
 
+    -- Alpha 값을 0에서 1 사이로 부드럽게 변화 (sin 함수 사용)
+    -- (math.sin(x) + 1) / 2  => 결과 범위 [0, 1]
+    -- self.ElapsedTime * speed_multiplier 로 속도 조절 가능
+    local speed = 1.0 -- Alpha 변화 속도 (값이 클수록 빠름)
+    local calculatedAlpha = (math.sin(self.ElapsedTime * speed) + 1.0) / 2.0
+
+    -- Text UI Alpha 업데이트
+    if self.ManagedTextUI then
+        local currentTextColor = self.ManagedTextUI.FontColor -- LUA_BIND_MEMBER(&LuaTextUI::FontColor)로 읽기 가능 가정
+        if currentTextColor then
+            -- 새 FLinearColor 객체를 만들어서 Alpha만 변경 후 설정
+            local newTextColor = FLinearColor.new(currentTextColor.R, currentTextColor.G, currentTextColor.B, calculatedAlpha)
+            self.ManagedTextUI:SetFontColor(newTextColor)
+        else
+             print("Warning: Could not get currentTextColor from ManagedTextUI.FontColor")
+             -- 임시로 고정 RGB 값 사용
+             local fallbackTextColor = FLinearColor.new(1.0, 0.0, 1.0, calculatedAlpha) -- 초기값과 동일한 RGB
+             self.ManagedTextUI:SetFontColor(fallbackTextColor)
+        end
+    end
+
+    -- Image UI Alpha 업데이트
+    if self.ManagedImageUI then
+        -- Text UI와 유사하게 처리. LuaImageUI.Color를 읽거나, SetColor가 RGB를 유지한다고 가정.
+        local currentImageColor = self.ManagedImageUI.Color -- LUA_BIND_MEMBER(&LuaImageUI::Color)로 읽기 가능 가정
+        if currentImageColor then
+            local newImageColor = FLinearColor.new(currentImageColor.R, currentImageColor.G, currentImageColor.B, calculatedAlpha)
+            self.ManagedImageUI:SetColor(newImageColor)
+        else
+            print("Warning: Could not get currentImageColor from ManagedImageUI.Color")
+            -- 임시로 고정 RGB 값 사용
+            local fallbackImageColor = FLinearColor.new(1.0, 1.0, 1.0, calculatedAlpha) -- 초기값과 동일한 RGB
+            self.ManagedImageUI:SetColor(fallbackImageColor)
+        end
+    end
+    
 end
 
 -- EndPlay: Actor가 파괴되거나 레벨이 전환될 때 호출

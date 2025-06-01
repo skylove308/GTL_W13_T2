@@ -86,7 +86,10 @@ void LuaUIBind::Bind(sol::table& Table)
         LUA_BIND_STATIC(&LuaUIBind::CreateImage),
         LUA_BIND_STATIC(&LuaUIBind::CreateButton),
         LUA_BIND_STATIC(&LuaUIBind::DeleteUI),
-        LUA_BIND_STATIC(&LuaUIBind::ClearLuaUI)
+        LUA_BIND_STATIC(&LuaUIBind::ClearLuaUI),
+
+        LUA_BIND_STATIC(&LuaUIBind::GetTextUI),
+        LUA_BIND_STATIC(&LuaUIBind::GetImageUI)
     );
 }
 
