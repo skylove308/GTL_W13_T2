@@ -2,11 +2,11 @@ AnimFSM = {
     current = "Idle",
     
     Update = function(self, dt)
-        state_idle = "Contents/Human/Idle"
-        state_walk = "Contents/Human/SlowRun"
-        state_run = "Contents/Human/FastRun"
+        state_idle = "Contents/DavidIdle/Armature|Idle"
+        state_walk = "Contents/DavidSlowRun/Armature|SlowRun"
+        state_run = "Contents/DavidFastRun/Armature|FastRun"
 
-        self.current = "Contents/Human/Idle"
+        self.current = "Contents/David/Armature|Idle"
         speed = self.OwnerCharacter.Speed;
 
         if speed == 6.0 then
