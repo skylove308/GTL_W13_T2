@@ -10,6 +10,10 @@
 #include "Lua/LuaScriptManager.h"
 #include "World/World.h"
 #include "Actors/Car.h"
+#include "Engine/Contents/Objects/DamageCameraShake.h"
+#include "LevelEditor/SLevelEditor.h"
+#include "UnrealEd/EditorViewportClient.h"
+#include "UnrealClient.h"
 
 ACharacter::ACharacter()
 {
@@ -68,6 +72,30 @@ void ACharacter::Tick(float DeltaTime)
     //
     //     cation(FVector(PxTr.p.x, PxTr.p.y, PxTr.p.z));
     // }
+    if (DeathCameraTransitionTime <= 0.0f)
+    {
+        if (DeathLetterBoxTransitionTime > 0.0f)
+        {
+            std::shared_ptr<FEditorViewportClient> ViewportClient = GEngineLoop.GetLevelEditor()->GetActiveViewportClient();
+            float Width = ViewportClient->GetViewport()->GetD3DViewport().Width;
+            float Height = ViewportClient->GetViewport()->GetD3DViewport().Height;
+
+            float LetterBoxWidth = Width;
+            float LetterBoxHeight = (Height - Width * 0.5f) * (DeathLetterBoxTransitionTime / 2.0f) + (Width * 0.5f);
+
+            GEngine->ActiveWorld->GetPlayerController()->SetLetterBoxWidthHeight(LetterBoxWidth, LetterBoxHeight);
+            GEngine->ActiveWorld->GetPlayerController()->ClientCameraVignetteColor(FLinearColor(0.0f, 0.0f, 0.0f, 0.7f));
+            GEngine->ActiveWorld->GetPlayerController()->ClientStartCameraVignetteAnimation(1.0f, 0.5f, 0.5f);
+            GEngine->ActiveWorld->GetPlayerController()->SetLetterBoxColor(FLinearColor(0.2f, 0.2f, 0.2f, 1.0f));
+
+            DeathLetterBoxTransitionTime -= DeltaTime;
+        }
+        else
+        {
+            DeathCameraTransitionTime = 3.0f; // 카메라 전환 시간 초기화
+        }
+    }
+
     if (GetActorLocation().X > 100 && !bSwitchCamera)
     {
         for (auto Actor : GEngine->ActiveWorld->GetActiveLevel()->Actors)
@@ -75,8 +103,10 @@ void ACharacter::Tick(float DeltaTime)
             if (ACar* Car = Cast<ACar>(Actor))
             {
                 FViewTargetTransitionParams Params;
-                Params.BlendTime = 3.0f; // 카메라 전환 시간
+                Params.BlendTime = DeathCameraTransitionTime; // 카메라 전환 시간
                 {
+                    UClass* CameraShakeClass = UDamageCameraShake::StaticClass();
+                    GEngine->ActiveWorld->GetPlayerController()->ClientStartCameraShake(CameraShakeClass);
                     GEngine->ActiveWorld->GetPlayerController()->SetViewTarget(Car, Params);
                     GEngine->ActiveWorld->GetPlayerController()->Possess(Car);
                 }
@@ -85,6 +115,12 @@ void ACharacter::Tick(float DeltaTime)
             }
         }
     }
+
+    if(bSwitchCamera && DeathCameraTransitionTime > 0.0f)
+    {
+        DeathCameraTransitionTime -= DeltaTime;
+    }
+
 }
 
 void ACharacter::RegisterLuaType(sol::state& Lua)

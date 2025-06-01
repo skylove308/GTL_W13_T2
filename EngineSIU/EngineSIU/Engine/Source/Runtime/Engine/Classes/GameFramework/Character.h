@@ -39,6 +39,8 @@ public:
     bool bIsRunning = false;
 
     bool bSwitchCamera = false;
+    float DeathCameraTransitionTime = 3.0f;
+    float DeathLetterBoxTransitionTime = 2.0f;
 
 private:
     virtual void BeginPlay() override;

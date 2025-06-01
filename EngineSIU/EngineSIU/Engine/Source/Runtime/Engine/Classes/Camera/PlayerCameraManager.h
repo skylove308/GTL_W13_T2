@@ -129,6 +129,9 @@ public:
     virtual void StopAllInstancesOfCameraShake(UClass* ShakeClass, bool bImmediately = true);
 
     float GetLetterBoxRatio();
+
+    void SetCameraVignetteColor(FLinearColor InColor);
+
     
 protected:
     virtual void DoUpdateCamera(float DeltaTime);
@@ -136,8 +139,6 @@ protected:
     virtual void UpdateViewTarget(FTViewTarget& OutVT, float DeltaTime);
     
     void SetCameraVignette(float InIntensity, float InRadius, float InSmoothness);
-
-    void SetCameraVignetteColor(FLinearColor InColor);
     
     FMinimalViewInfo BlendViewTargets(const FTViewTarget& A, const FTViewTarget& B, float Alpha);
 
@@ -212,6 +213,8 @@ public:
     float LetterBoxWidth;
 
     float LetterBoxHeight;
+
+    FLinearColor LetterBoxColor = FLinearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     uint32 bEnableFading : 1;
     uint32 bAnimateVignette : 1;
