@@ -15,6 +15,7 @@
 #include "UnrealEd/EditorViewportClient.h"
 #include "UnrealClient.h"
 #include "Components/StaticMeshComponent.h"
+#include "Actors/Road.h"
 
 ACharacter::ACharacter()
 {
@@ -193,6 +194,20 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
         // !TODO : 차랑 부딪혔을 때 추가적인 로직 구현
         // 힘을 준다던지, 캡슐을 비활성화하고 SkeletalMeshComp를 루트컴포넌트로 한다던지, 등등..
         bCameraEffect = true;
+    }
+
+    if( HitComponent && 
+        OtherComp && 
+        MeshComponent && 
+        HitComponent == CapsuleComponent && 
+        OtherComp->GetOwner() &&
+        OtherComp->GetOwner()->IsA<ARoad>())
+    {
+        ARoad* Road = Cast<ARoad>(OtherComp->GetOwner());
+        if (Road->GetCurrentRoadState() == ERoadState::Safe)
+        {
+            Road->SetIsOverlapped(true);
+        }
     }
 }
 

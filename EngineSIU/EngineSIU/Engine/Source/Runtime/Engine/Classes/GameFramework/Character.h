@@ -54,7 +54,7 @@ public:
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, ForceIncrement,  = 1000.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MaxForce,  = 100000.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MovementForceMultiplier,  = 1.0f)
-                
+ 
 private:
     virtual void BeginPlay() override;
     virtual UObject* Duplicate(UObject* InOuter) override;
