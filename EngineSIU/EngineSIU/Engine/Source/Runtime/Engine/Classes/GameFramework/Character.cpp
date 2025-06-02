@@ -195,8 +195,10 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
 float ACharacter::GetSpeed()
 {
     PxVec3 CurrVelocity = CapsuleComponent->BodyInstance->BIGameObject->DynamicRigidBody->getLinearVelocity();
+    if (bIsStop)
+        CurrVelocity = PxVec3(0.0f, 0.0f, 0.0f);
     
-    UE_LOG(ELogLevel::Display, TEXT("Speed: %f"), CurrVelocity.magnitude());
+    // UE_LOG(ELogLevel::Display, TEXT("Speed: %f"), CurrVelocity.magnitude());
     return CurrVelocity.magnitude();
 }
 
@@ -206,12 +208,8 @@ void ACharacter::SetSpeed(float NewVelocity)
 
 void ACharacter::MoveForward(float Value)
 {
-    if (Value == 0.0f)
-    {
-        CurrentForce = 0.0f;
-        return;
-    }
-
+    bIsStop = false;
+    
     if (bIsRunning)
         CurrentForce *= 2.0f;
 
@@ -245,12 +243,8 @@ void ACharacter::MoveForward(float Value)
 
 void ACharacter::MoveRight(float Value)
 {
-    if (Value == 0.0f)
-    {
-        CurrentForce = 0.0f;
-        return;
-    }
-
+    bIsStop = false;
+    
     if (bIsRunning)
         CurrentForce *= 2.0f;
 
@@ -278,4 +272,17 @@ void ACharacter::MoveRight(float Value)
     {
         MeshComponent->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
     }
+}
+
+void ACharacter::Stop()
+{
+    bIsStop = true;
+    CurrentForce = 0.0f;
+
+    physx::PxRigidDynamic* PxCharActor =
+        static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
+    if (PxCharActor == nullptr)
+        return;
+
+    PxCharActor->setLinearVelocity(physx::PxVec3(0.0f, 0.0f, 0.0f));
 }
