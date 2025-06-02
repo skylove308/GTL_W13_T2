@@ -7,19 +7,6 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "AAmbientLight_246",
-                        "ComponentOwnerClass": "AAmbientLight",
-                        "ScriptName": "",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
                     "ComponentClass": "UAmbientLightComponent",
                     "ComponentID": "UAmbientLightComponent_0",
                     "Properties": {
@@ -62,6 +49,19 @@
                         "bIsActive": "true",
                         "bSimulate": "false",
                         "m_Type": "UBillboardComponent"
+                    }
+                },
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "AAmbientLight_246",
+                        "ComponentOwnerClass": "AAmbientLight",
+                        "ScriptName": "",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
                     }
                 }
             ],
@@ -143,6 +143,19 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "ACharacter_256",
+                        "ComponentOwnerClass": "ACharacter",
+                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
                     "ComponentClass": "UCapsuleComponent",
                     "ComponentID": "CapsuleComponent",
                     "Properties": {
@@ -162,8 +175,8 @@
                         "Geom_0Rotation": "Pitch=0.000 Yaw=0.000 Roll=0.000",
                         "Geom_0Type": "2",
                         "GeomsCount": "1",
-                        "RelativeLocation": "X=105.329 Y=7.500 Z=39.350",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeLocation": "X=248.230 Y=7.500 Z=39.350",
+                        "RelativeRotation": "Pitch=0.000 Yaw=180.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "RigidBodyType": "1",
                         "bApplyGravity": "true",
@@ -200,18 +213,6 @@
                     }
                 },
                 {
-                    "ComponentClass": "UCharacterMovementComponent",
-                    "ComponentID": "CharacterMovementComponent",
-                    "Properties": {
-                        "ComponentClass": "UCharacterMovementComponent",
-                        "ComponentName": "CharacterMovementComponent",
-                        "ComponentOwner": "ACharacter_256",
-                        "ComponentOwnerClass": "ACharacter",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
                     "ComponentClass": "UCameraComponent",
                     "ComponentID": "CameraComponent",
                     "Properties": {
@@ -228,14 +229,13 @@
                     }
                 },
                 {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
+                    "ComponentClass": "UCharacterMovementComponent",
+                    "ComponentID": "CharacterMovementComponent",
                     "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
+                        "ComponentClass": "UCharacterMovementComponent",
+                        "ComponentName": "CharacterMovementComponent",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
-                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }
@@ -267,7 +267,7 @@
                         "Geom_0Rotation": "Pitch=90.000 Yaw=0.000 Roll=90.000",
                         "Geom_0Type": "2",
                         "GeomsCount": "1",
-                        "RelativeLocation": "X=32.588 Y=3000.000 Z=70.000",
+                        "RelativeLocation": "X=0.000 Y=800.000 Z=70.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=-90.000 Roll=-0.000",
                         "RelativeScale3D": "X=100.000 Y=100.000 Z=100.000",
                         "RigidBodyType": "1",
@@ -318,19 +318,6 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "ACube_232",
-                        "ComponentOwnerClass": "ACube",
-                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
                     "ComponentClass": "UStaticMeshComponent",
                     "ComponentID": "StaticMeshComponent_0",
                     "Properties": {
@@ -344,7 +331,7 @@
                         "GeomsCount": "0",
                         "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1000.000 Y=1000.000 Z=100.000",
+                        "RelativeScale3D": "X=100000.000 Y=1000.000 Z=100.000",
                         "RigidBodyType": "0",
                         "StaticMeshPath": "Contents/Primitives/CubePrimitive.obj",
                         "bApplyGravity": "false",
@@ -352,6 +339,19 @@
                         "bIsActive": "true",
                         "bSimulate": "true",
                         "m_Type": ""
+                    }
+                },
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "ACube_232",
+                        "ComponentOwnerClass": "ACube",
+                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
                     }
                 }
             ],
@@ -402,6 +402,87 @@
                 }
             ],
             "RootComponentID": "StaticMeshComponent_0"
+        },
+        {
+            "ActorClass": "ACar",
+            "ActorID": "ACar_786",
+            "ActorLabel": "ACar786",
+            "ActorTickInEditor": "false",
+            "Components": [
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "ACar_786",
+                        "ComponentOwnerClass": "ACar",
+                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "UStaticMeshComponent",
+                    "ComponentID": "CarMesh",
+                    "Properties": {
+                        "AABB_max": "X=0.000 Y=0.000 Z=0.000",
+                        "AABB_min": "X=0.000 Y=0.000 Z=0.000",
+                        "AttachParentID": "nullptr",
+                        "ComponentClass": "UStaticMeshComponent",
+                        "ComponentName": "CarMesh",
+                        "ComponentOwner": "ACar_786",
+                        "ComponentOwnerClass": "ACar",
+                        "Geom_0CollisionGroup": "2",
+                        "Geom_0CollisionWithGroup": "12",
+                        "Geom_0Extent": "X=47.000 Y=1.000 Z=47.600",
+                        "Geom_0Offset": "X=1.800 Y=0.000 Z=0.500",
+                        "Geom_0Rotation": "Pitch=90.000 Yaw=0.000 Roll=90.000",
+                        "Geom_0Type": "2",
+                        "GeomsCount": "1",
+                        "RelativeLocation": "X=-480.200 Y=1500.000 Z=70.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=-90.000 Roll=-0.000",
+                        "RelativeScale3D": "X=100.000 Y=100.000 Z=100.000",
+                        "RigidBodyType": "1",
+                        "StaticMeshPath": "Contents/Cars/VW_Touran_2007",
+                        "bApplyGravity": "false",
+                        "bAutoActive": "true",
+                        "bIsActive": "true",
+                        "bSimulate": "true",
+                        "m_Type": ""
+                    }
+                },
+                {
+                    "ComponentClass": "UCameraComponent",
+                    "ComponentID": "UCameraComponent_791",
+                    "Properties": {
+                        "AttachParentID": "CarMesh",
+                        "ComponentClass": "UCameraComponent",
+                        "ComponentName": "UCameraComponent_791",
+                        "ComponentOwner": "ACar_786",
+                        "ComponentOwnerClass": "ACar",
+                        "RelativeLocation": "X=0.000 Y=300.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=-90.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "ULuaScriptComponent_792",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "ULuaScriptComponent_792",
+                        "ComponentOwner": "ACar_786",
+                        "ComponentOwnerClass": "ACar",
+                        "ScriptName": "LuaScripts/Actors/Car.lua",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                }
+            ],
+            "RootComponentID": "CarMesh"
         }
     ],
     "NextUUID": 0,
