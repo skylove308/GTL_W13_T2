@@ -34,14 +34,14 @@ public:
     void SetCurrentRoadState(ERoadState State) { CurrentRoadState = State; }
     ERoadState GetCurrentRoadState() const { return CurrentRoadState; }
 
-    void SetCurrentRoadTime(int32 Time) { CurrentRoadTime = Time; }
-    int32 GetCurrentRoadTime() const { return CurrentRoadTime; }
+    void SetCurrentRoadTime(float Time) { CurrentRoadTime = Time; }
+    float GetCurrentRoadTime() const { return CurrentRoadTime; }
 
-    void SetSafeJoneTime(int32 Time) { SafeJoneTime = Time; }
-    int32 GetSafeJoneTime() const { return SafeJoneTime; }
+    void SetSafeJoneTime(float Time) { SafeJoneTime = Time; }
+    float GetSafeJoneTime() const { return SafeJoneTime; }
 
-    void SetWarningJoneTime(int32 Time) { WarningJoneTime = Time; }
-    int32 GetWarningJoneTime() const { return WarningJoneTime; }
+    void SetWarningJoneTime(float Time) { WarningJoneTime = Time; }
+    float GetWarningJoneTime() const { return WarningJoneTime; }
 
     void SetIsOverlapped(bool bOverlapped) { bIsOverlapped = bOverlapped; }
 
@@ -51,9 +51,9 @@ public:
 private:
     UStaticMeshComponent* RoadMesh = nullptr;
     ERoadState CurrentRoadState = ERoadState::Safe;
-    int32 CurrentRoadTime = 0.0f;
-    int32 SafeJoneTime = 5.0f;
-    int32 WarningJoneTime = 5.0f;
+    float CurrentRoadTime = 0.0f;
+    float SafeJoneTime = 2.0f;
+    float WarningJoneTime = 2.0f;
     bool bIsOverlapped = false;
 };
 

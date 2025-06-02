@@ -24,12 +24,14 @@ void ARoad::Initialize(ERoadState RoadState, FVector SpawnWorldLocation)
         RoadMesh->SetWorldLocation(SpawnWorldLocation);
         RoadMesh->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
         RoadMesh->SetWorldScale3D(FVector(30.0f, 30.0f, 30.0f));
+        RoadMesh->bSimulate = true;
     }
 
     RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road.obj"));
     RoadMesh->SetWorldLocation(SpawnWorldLocation);
     RoadMesh->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
     RoadMesh->SetWorldScale3D(FVector(30.0f, 30.0f, 30.0f));
+    RoadMesh->bSimulate = true;
 }
 
 void ARoad::BeginPlay()
@@ -51,6 +53,8 @@ UObject* ARoad::Duplicate(UObject* InOuter)
     NewActor->CurrentRoadTime = CurrentRoadTime;
     NewActor->SafeJoneTime = SafeJoneTime;
     NewActor->WarningJoneTime = WarningJoneTime;
+    NewActor->bIsOverlapped = bIsOverlapped;
+    NewActor->RoadMesh = NewActor->GetComponentByClass<UStaticMeshComponent>();
 
     return NewActor;
 }
@@ -100,8 +104,13 @@ void ARoad::OnOverlappedRoad(float DeltaTime)
     }
     else if (CurrentRoadState == ERoadState::Warning)
     {
+        for (int i = 0; i < RoadMesh->GetNumMaterials(); i++)
+        {
+            FVector EmissiveColor = FVector(0.01f, 0.0f, 0.0f) * (CurrentRoadTime - SafeJoneTime / WarningJoneTime);
+            RoadMesh->GetMaterial(i)->SetEmissive(EmissiveColor);
+        }
         CurrentRoadTime += DeltaTime;
-        if (CurrentRoadTime >= WarningJoneTime)
+        if (CurrentRoadTime >= SafeJoneTime + WarningJoneTime)
         {
             CurrentRoadState = ERoadState::Danger;
             CurrentRoadTime = 0.0f;
@@ -111,6 +120,8 @@ void ARoad::OnOverlappedRoad(float DeltaTime)
     {
         OnDeath.Broadcast();
     }
+
+
 }
 
 void ARoad::DestroyRoad()
