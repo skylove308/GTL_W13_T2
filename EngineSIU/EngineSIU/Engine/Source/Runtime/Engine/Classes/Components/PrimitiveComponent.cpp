@@ -661,8 +661,8 @@ void UPrimitiveComponent::CreatePhysXGameObject()
             AActor* OwnerActor = GetOwner();
             PxMaterial* PlayerMaterial = GEngine->PhysicsManager->GetPhysics()->createMaterial(1.0f, 0.9f, 0.0f);
             PxMaterial* CapsuleMaterial = OwnerActor && OwnerActor->IsA<ACharacter>() ? PlayerMaterial : nullptr;
-            PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z, CapsuleMaterial);
-            BodySetup->AggGeom.SphereElems.Add(PxCapsule);
+            PxShape = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z, CapsuleMaterial);
+            BodySetup->AggGeom.SphereElems.Add(PxShape);
             break;
         }
         }

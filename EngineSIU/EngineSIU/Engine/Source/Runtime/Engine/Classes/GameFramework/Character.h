@@ -1,6 +1,8 @@
 #pragma once
 #include <PxRigidDynamic.h>
 #include "Pawn.h"
+#include "PhysicsManager.h"
+#include "Components/CapsuleComponent.h"
 
 class UCapsuleComponent;
 class USkeletalMeshComponent;
@@ -29,16 +31,13 @@ public:
 public:
     virtual void OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp, const FHitResult& Hit) override;
 
-    float GetSpeed() const { return Speed; }
-    void SetSpeed(float NewSpeed) { Speed = NewSpeed; }
+    float GetVelocity();
+    void SetVelocity(float NewVelocity);
 
-    float GetMaxSpeed() const { return MaxSpeed; }
-    void SetMaxSpeed(float NewMaxSpeed) { MaxSpeed = NewMaxSpeed; }
+    bool GetIsRunning() { return bIsRunning; }
+    void SetIsRunning(bool bInIsRunning) { bIsRunning = bInIsRunning; }
 
-    float Speed = 6.0f;
-    float VelocityZ = 0.0f;
-
-    float MaxSpeed = 12.0f;
+public:
     bool bIsRunning = false;
 
     bool bCameraEffect = false;
@@ -48,8 +47,10 @@ public:
 
     const float DeathCameraTransitionTime = 0.5f;
     const float DeathLetterBoxTransitionTime = 2.0f;
-
+    
     float CurrentForce = 0.0f;
+    float TotalForce = 0.0f;
+    
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, ForceIncrement,  = 1000.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MaxForce,  = 100000.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MovementForceMultiplier,  = 1.0f)

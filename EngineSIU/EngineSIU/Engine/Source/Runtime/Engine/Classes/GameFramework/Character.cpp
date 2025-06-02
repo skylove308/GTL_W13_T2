@@ -144,8 +144,8 @@ void ACharacter::DoCameraEffect(float DeltaTime)
 void ACharacter::RegisterLuaType(sol::state& Lua)
 {
     DEFINE_LUA_TYPE_WITH_PARENT(ACharacter, sol::bases<AActor>(),
-        "Speed", sol::property(&ThisClass::GetSpeed, &ThisClass::SetSpeed),
-        "MaxSpeed", sol::property(&ThisClass::GetMaxSpeed, &ThisClass::SetMaxSpeed)
+        "Velocity", sol::property(&ThisClass::GetVelocity, &ThisClass::SetVelocity),
+        "IsRunning", sol::property(&ThisClass::GetIsRunning, &ThisClass::SetIsRunning)
     )
 }
 
@@ -192,24 +192,28 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
     }
 }
 
+float ACharacter::GetVelocity()
+{
+    PxVec3 CurrVelocity = CapsuleComponent->BodyInstance->BIGameObject->DynamicRigidBody->getLinearVelocity();
+    UE_LOG(ELogLevel::Display, TEXT("Velocity: %f"), CurrVelocity.magnitude());
+    return CurrVelocity.magnitude();
+}
+
+void ACharacter::SetVelocity(float NewVelocity)
+{
+    UE_LOG(ELogLevel::Display, TEXT("Set Velocity: %f"), NewVelocity);
+}
+
 void ACharacter::MoveForward(float Value)
 {
-    //if (Value == 0.0f) return;
-
-    //if (bIsRunning)
-    //{
-    //    Speed = 12.0f;
-    //}
-    //else
-    //{
-    //    Speed = 7.0f;
-    //}
-
     if (Value == 0.0f)
     {
         CurrentForce = 0.0f;
         return;
     }
+
+    if (bIsRunning)
+        CurrentForce *= 2.0f;
 
     physx::PxRigidDynamic* PxCharActor = static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
     if (PxCharActor == nullptr)
@@ -217,10 +221,11 @@ void ACharacter::MoveForward(float Value)
 
     CurrentForce = FMath::Min(CurrentForce + ForceIncrement, MaxForce);
     FVector Forward = GetActorForwardVector().GetSafeNormal();
+    float ForceScalar = CurrentForce * Value;
     physx::PxVec3 PushForce(
-        Forward.X * CurrentForce * Value,
-        Forward.Y * CurrentForce * Value,
-        Forward.Z * CurrentForce * Value
+        Forward.X * ForceScalar,
+        Forward.Y * ForceScalar,
+        Forward.Z * ForceScalar
     );
 
     // PushForce: PhysX 액터에 가할 힘 벡터 (PxVec3) — 뉴턴 단위, 월드 좌표 기준으로 적용됩니다.
@@ -240,36 +245,29 @@ void ACharacter::MoveForward(float Value)
 
 void ACharacter::MoveRight(float Value)
 {
-    //if (Value == 0.0f) return;
-
-    //if (bIsRunning)
-    //{
-    //    Speed = 12.0f;
-    //}
-    //else
-    //{
-    //    Speed = 7.0f;
-    //}
-
     if (Value == 0.0f)
     {
         CurrentForce = 0.0f;
         return;
     }
 
+    if (bIsRunning)
+        CurrentForce *= 2.0f;
+
     physx::PxRigidDynamic* PxCharActor = static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
     if (PxCharActor == nullptr)
         return;
 
     CurrentForce = FMath::Min(CurrentForce + ForceIncrement, MaxForce);
-
     FVector Right = GetActorRightVector().GetSafeNormal();
+    float ForceScalar = CurrentForce * Value;
+    
     physx::PxVec3 PushForce(
-        Right.X * CurrentForce * Value,
-        Right.Y * CurrentForce * Value,
-        Right.Z * CurrentForce * Value
+        Right.X * ForceScalar,
+        Right.Y * ForceScalar,
+        Right.Z * ForceScalar
     );
-
+    
     PxCharActor->addForce(PushForce, physx::PxForceMode::eFORCE, true);
 
     if (Value >= 0.0f)
@@ -279,17 +277,5 @@ void ACharacter::MoveRight(float Value)
     else
     {
         MeshComponent->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-    }
-}
-
-void ACharacter::RunFast(bool bInIsRunning)
-{
-    if (bInIsRunning)
-    {
-        Speed = MaxSpeed * 2.0f; // 빠르게 달리기
-    }
-    else
-    {
-        Speed = MaxSpeed; // 일반 속도로 돌아가기
     }
 }
