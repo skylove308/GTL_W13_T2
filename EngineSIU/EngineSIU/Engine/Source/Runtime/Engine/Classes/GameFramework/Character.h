@@ -46,7 +46,7 @@ public:
     float CurrentDeathCameraTransitionTime = 3.0f;
     float CurrentDeathLetterBoxTransitionTime = 2.0f;
 
-    const float DeathCameraTransitionTime = 3.0f;
+    const float DeathCameraTransitionTime = 0.5f;
     const float DeathLetterBoxTransitionTime = 2.0f;
 
 private:
@@ -55,4 +55,5 @@ private:
     virtual void Tick(float DeltaTime) override;
 
     void DoCameraEffect(float DeltaTime);
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, ImpulseScale, = 100000.f)
 };

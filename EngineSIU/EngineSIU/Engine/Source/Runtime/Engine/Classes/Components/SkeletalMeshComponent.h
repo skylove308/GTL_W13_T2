@@ -137,6 +137,8 @@ public:
 
     void OnChangeRigidBodyFlag();
 
+    void AddImpulseToBones(const FVector& Direction, float ImpulseScale);
+
 protected:
     bool NeedToSpawnAnimScriptInstance() const;
 
