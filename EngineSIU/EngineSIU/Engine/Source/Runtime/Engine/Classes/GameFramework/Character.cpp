@@ -144,7 +144,7 @@ void ACharacter::DoCameraEffect(float DeltaTime)
 void ACharacter::RegisterLuaType(sol::state& Lua)
 {
     DEFINE_LUA_TYPE_WITH_PARENT(ACharacter, sol::bases<AActor>(),
-        "Velocity", sol::property(&ThisClass::GetVelocity, &ThisClass::SetVelocity),
+        "Velocity", sol::property(&ThisClass::GetSpeed, &ThisClass::SetSpeed),
         "IsRunning", sol::property(&ThisClass::GetIsRunning, &ThisClass::SetIsRunning)
     )
 }
@@ -192,16 +192,16 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
     }
 }
 
-float ACharacter::GetVelocity()
+float ACharacter::GetSpeed()
 {
     PxVec3 CurrVelocity = CapsuleComponent->BodyInstance->BIGameObject->DynamicRigidBody->getLinearVelocity();
-    UE_LOG(ELogLevel::Display, TEXT("Velocity: %f"), CurrVelocity.magnitude());
+    
+    UE_LOG(ELogLevel::Display, TEXT("Speed: %f"), CurrVelocity.magnitude());
     return CurrVelocity.magnitude();
 }
 
-void ACharacter::SetVelocity(float NewVelocity)
+void ACharacter::SetSpeed(float NewVelocity)
 {
-    UE_LOG(ELogLevel::Display, TEXT("Set Velocity: %f"), NewVelocity);
 }
 
 void ACharacter::MoveForward(float Value)

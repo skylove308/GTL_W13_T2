@@ -31,8 +31,8 @@ public:
 public:
     virtual void OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp, const FHitResult& Hit) override;
 
-    float GetVelocity();
-    void SetVelocity(float NewVelocity);
+    float GetSpeed();
+    void SetSpeed(float NewVelocity);
 
     bool GetIsRunning() { return bIsRunning; }
     void SetIsRunning(bool bInIsRunning) { bIsRunning = bInIsRunning; }
