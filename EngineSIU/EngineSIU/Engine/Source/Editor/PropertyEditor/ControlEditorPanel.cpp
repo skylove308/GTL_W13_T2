@@ -46,6 +46,7 @@
 #include <Actors/Car.h>
 #include "Actors/Map.h"
 #include "Actors/Road.h"
+#include <Actors/SkySphereActor.h>
 
 
 ControlEditorPanel::ControlEditorPanel()
@@ -382,6 +383,8 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
             { .Label = "Car",               .OBJ = OBJ_CAR },
             { .Label = "Map",               .OBJ = OBJ_MAP },
             { .Label = "Road",              .OBJ = OBJ_ROAD },
+            { .Label = "SkySphere",         .OBJ = OBJ_SKYSPHERE },
+
         };
 
         for (const auto& primitive : primitives)
@@ -526,6 +529,10 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                 {
                     SpawnedActor = World->SpawnActor<ARoad>();
                     SpawnedActor->SetActorLabel(TEXT("OBJ_ROAD"));
+                case OBJ_SKYSPHERE:
+                {
+                    SpawnedActor = World->SpawnActor<ASkySphere>();
+                    SpawnedActor->SetActorLabel(TEXT("OBJ_SKYSPHERE"));
                     break;
                 }
                 case OBJ_CAMERA:

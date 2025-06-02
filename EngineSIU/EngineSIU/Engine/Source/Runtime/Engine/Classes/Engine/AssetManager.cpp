@@ -988,7 +988,7 @@ bool UAssetManager::SerializeAssetLoadResult(FArchive& Ar, FAssetLoadResult& Res
         TArray<FName> MaterialKeys;
         if (Ar.IsLoading())
         {
-            StaticMesh = FObjectFactory::ConstructObject<UStaticMesh>(nullptr);
+            StaticMesh = FObjectFactory::ConstructObject<UStaticMesh>(nullptr, Info.AssetName);
             Result.StaticMeshes.Add(StaticMesh);
         }
         else

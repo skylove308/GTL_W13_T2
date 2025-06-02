@@ -1,6 +1,73 @@
 {
     "Actors": [
         {
+            "ActorClass": "AAmbientLight",
+            "ActorID": "AAmbientLight_246",
+            "ActorLabel": "OBJ_AMBIENTLIGHT_246",
+            "ActorTickInEditor": "false",
+            "Components": [
+                {
+                    "ComponentClass": "UAmbientLightComponent",
+                    "ComponentID": "UAmbientLightComponent_0",
+                    "Properties": {
+                        "AABB_Max": "X=1.000 Y=1.000 Z=0.100",
+                        "AABB_Min": "X=-1.000 Y=-1.000 Z=-0.100",
+                        "AmbientColor": "R=0.100 G=0.100 B=0.100 A=1.000",
+                        "AttachParentID": "UBillboardComponent_0",
+                        "ComponentClass": "UAmbientLightComponent",
+                        "ComponentName": "UAmbientLightComponent_0",
+                        "ComponentOwner": "AAmbientLight_246",
+                        "ComponentOwnerClass": "AAmbientLight",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "AAmbientLight_246",
+                        "ComponentOwnerClass": "AAmbientLight",
+                        "ScriptName": "",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "UBillboardComponent",
+                    "ComponentID": "UBillboardComponent_0",
+                    "Properties": {
+                        "AABB_max": "X=0.000 Y=0.000 Z=0.000",
+                        "AABB_min": "X=0.000 Y=0.000 Z=0.000",
+                        "AttachParentID": "nullptr",
+                        "BufferKey": "Assets/Editor/Icon/AmbientLight_64x.png",
+                        "ComponentClass": "UBillboardComponent",
+                        "ComponentName": "UBillboardComponent_0",
+                        "ComponentOwner": "AAmbientLight_246",
+                        "ComponentOwnerClass": "AAmbientLight",
+                        "FinalIndexU": "0.000000",
+                        "FinalIndexV": "0.000000",
+                        "GeomsCount": "0",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "RigidBodyType": "1",
+                        "bApplyGravity": "false",
+                        "bAutoActive": "true",
+                        "bIsActive": "true",
+                        "bSimulate": "false",
+                        "m_Type": "UBillboardComponent"
+                    }
+                }
+            ],
+            "RootComponentID": "UBillboardComponent_0"
+        },
+        {
             "ActorClass": "ACharacter",
             "ActorID": "ACharacter_256",
             "ActorLabel": "OBJ_CHARACTER_256",
@@ -48,11 +115,11 @@
                         "Geom_0CollisionGroup": "4",
                         "Geom_0CollisionWithGroup": "7",
                         "Geom_0Extent": "X=30.000 Y=1.000 Z=60.000",
-                        "Geom_0Offset": "X=0.000 Y=0.000 Z=88.300",
+                        "Geom_0Offset": "X=0.000 Y=0.000 Z=76.400",
                         "Geom_0Rotation": "Pitch=0.000 Yaw=0.000 Roll=0.000",
                         "Geom_0Type": "2",
                         "GeomsCount": "1",
-                        "RelativeLocation": "X=-3.600 Y=7.500 Z=70.745",
+                        "RelativeLocation": "X=105.329 Y=7.500 Z=39.350",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "RigidBodyType": "1",
@@ -64,15 +131,42 @@
                     }
                 },
                 {
-                    "ComponentClass": "UCharacterMovementComponent",
-                    "ComponentID": "CharacterMovementComponent",
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
                     "Properties": {
-                        "ComponentClass": "UCharacterMovementComponent",
-                        "ComponentName": "CharacterMovementComponent",
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
+                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
                         "bAutoActive": "true",
                         "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "USkeletalMeshComponent",
+                    "ComponentID": "SkeletalMeshComponent",
+                    "Properties": {
+                        "AABB_max": "X=21.460 Y=89.011 Z=182.488",
+                        "AABB_min": "X=-16.749 Y=-89.011 Z=-0.205",
+                        "AnimClass": "None",
+                        "AnimationMode": "0",
+                        "AttachParentID": "CapsuleComponent",
+                        "ComponentClass": "USkeletalMeshComponent",
+                        "ComponentName": "SkeletalMeshComponent",
+                        "ComponentOwner": "ACharacter_256",
+                        "ComponentOwnerClass": "ACharacter",
+                        "GeomsCount": "0",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.290",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "RigidBodyType": "2",
+                        "SkeletalMeshKey": "Contents/James/James",
+                        "bApplyGravity": "true",
+                        "bAutoActive": "true",
+                        "bIsActive": "true",
+                        "bSimulate": "true",
+                        "m_Type": ""
                     }
                 },
                 {
@@ -92,14 +186,13 @@
                     }
                 },
                 {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
+                    "ComponentClass": "UCharacterMovementComponent",
+                    "ComponentID": "CharacterMovementComponent",
                     "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
+                        "ComponentClass": "UCharacterMovementComponent",
+                        "ComponentName": "CharacterMovementComponent",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
-                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }
@@ -113,6 +206,22 @@
             "ActorLabel": "OBJ_CAR_232",
             "ActorTickInEditor": "false",
             "Components": [
+                {
+                    "ComponentClass": "UCameraComponent",
+                    "ComponentID": "UCameraComponent_297",
+                    "Properties": {
+                        "AttachParentID": "CarMesh",
+                        "ComponentClass": "UCameraComponent",
+                        "ComponentName": "UCameraComponent_297",
+                        "ComponentOwner": "ACar_232",
+                        "ComponentOwnerClass": "ACar",
+                        "RelativeLocation": "X=150.000 Y=0.000 Z=150.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
                 {
                     "ComponentClass": "UStaticMeshComponent",
                     "ComponentID": "CarMesh",
@@ -155,22 +264,6 @@
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }
-                },
-                {
-                    "ComponentClass": "UCameraComponent",
-                    "ComponentID": "UCameraComponent_297",
-                    "Properties": {
-                        "AttachParentID": "CarMesh",
-                        "ComponentClass": "UCameraComponent",
-                        "ComponentName": "UCameraComponent_297",
-                        "ComponentOwner": "ACar_232",
-                        "ComponentOwnerClass": "ACar",
-                        "RelativeLocation": "X=250.000 Y=0.000 Z=100.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
                 }
             ],
             "RootComponentID": "CarMesh"
@@ -192,10 +285,16 @@
                         "ComponentName": "StaticMeshComponent_0",
                         "ComponentOwner": "ACube_232",
                         "ComponentOwnerClass": "ACube",
-                        "GeomsCount": "0",
-                        "RelativeLocation": "X=353.247 Y=500.000 Z=-40.000",
+                        "Geom_0CollisionGroup": "1",
+                        "Geom_0CollisionWithGroup": "15",
+                        "Geom_0Extent": "X=50000.000 Y=50000.000 Z=50.000",
+                        "Geom_0Offset": "X=0.000 Y=0.000 Z=0.000",
+                        "Geom_0Rotation": "Pitch=0.000 Yaw=0.000 Roll=0.000",
+                        "Geom_0Type": "1",
+                        "GeomsCount": "1",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=500.000 Y=2000.000 Z=100.000",
+                        "RelativeScale3D": "X=100000.000 Y=100000.000 Z=100.000",
                         "RigidBodyType": "0",
                         "StaticMeshPath": "Contents/Primitives/CubePrimitive.obj",
                         "bApplyGravity": "false",
@@ -222,9 +321,9 @@
             "RootComponentID": "StaticMeshComponent_0"
         },
         {
-            "ActorClass": "ASpotLight",
-            "ActorID": "ASpotLight_1234",
-            "ActorLabel": "OBJ_SPOTLIGHT_1234",
+            "ActorClass": "ACube",
+            "ActorID": "ACube_360",
+            "ActorLabel": "OBJ_CUBE_360",
             "ActorTickInEditor": "false",
             "Components": [
                 {
@@ -233,276 +332,30 @@
                     "Properties": {
                         "ComponentClass": "ULuaScriptComponent",
                         "ComponentName": "LuaComponent",
-                        "ComponentOwner": "ASpotLight_1234",
-                        "ComponentOwnerClass": "ASpotLight",
+                        "ComponentOwner": "ACube_360",
+                        "ComponentOwnerClass": "ACube",
                         "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "USpotLightComponent",
-                    "ComponentID": "USpotLightComponent_0",
-                    "Properties": {
-                        "AABB_Max": "X=1.000 Y=1.000 Z=0.100",
-                        "AABB_Min": "X=-1.000 Y=-1.000 Z=-0.100",
-                        "AttachParentID": "UBillboardComponent_0",
-                        "Attenuation": "20.000000",
-                        "ComponentClass": "USpotLightComponent",
-                        "ComponentName": "USpotLightComponent_0",
-                        "ComponentOwner": "ASpotLight_1234",
-                        "ComponentOwnerClass": "ASpotLight",
-                        "Direction": "X=0.005 Y=-0.171 Z=-0.985",
-                        "InnerRad": "0.261800",
-                        "Intensity": "1000000.000000",
-                        "LightColor": "R=1.000 G=1.000 B=1.000 A=1.000",
-                        "OuterRad": "0.523600",
-                        "Position": "X=-90.776 Y=20.705 Z=706.552",
-                        "Radius": "10000.000000",
-                        "RelativeLocation": "X=-90.776 Y=20.705 Z=706.552",
-                        "RelativeRotation": "Pitch=-80.146 Yaw=-88.378 Roll=146.298",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "Type": "2",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "UBillboardComponent",
-                    "ComponentID": "UBillboardComponent_0",
-                    "Properties": {
-                        "AABB_max": "X=0.000 Y=0.000 Z=0.000",
-                        "AABB_min": "X=0.000 Y=0.000 Z=0.000",
-                        "AttachParentID": "nullptr",
-                        "BufferKey": "Assets/Editor/Icon/S_LightSpot.PNG",
-                        "ComponentClass": "UBillboardComponent",
-                        "ComponentName": "UBillboardComponent_0",
-                        "ComponentOwner": "ASpotLight_1234",
-                        "ComponentOwnerClass": "ASpotLight",
-                        "FinalIndexU": "0.000000",
-                        "FinalIndexV": "0.000000",
-                        "GeomsCount": "0",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "RigidBodyType": "1",
-                        "bApplyGravity": "false",
-                        "bAutoActive": "true",
-                        "bIsActive": "true",
-                        "bSimulate": "false",
-                        "m_Type": "UBillboardComponent"
-                    }
-                }
-            ],
-            "RootComponentID": "UBillboardComponent_0"
-        },
-        {
-            "ActorClass": "ASpotLight",
-            "ActorID": "ASpotLight_393",
-            "ActorLabel": "ASpotLight393",
-            "ActorTickInEditor": "false",
-            "Components": [
-                {
-                    "ComponentClass": "USpotLightComponent",
-                    "ComponentID": "USpotLightComponent_0",
-                    "Properties": {
-                        "AABB_Max": "X=1.000 Y=1.000 Z=0.100",
-                        "AABB_Min": "X=-1.000 Y=-1.000 Z=-0.100",
-                        "AttachParentID": "UBillboardComponent_0",
-                        "Attenuation": "20.000000",
-                        "ComponentClass": "USpotLightComponent",
-                        "ComponentName": "USpotLightComponent_0",
-                        "ComponentOwner": "ASpotLight_393",
-                        "ComponentOwnerClass": "ASpotLight",
-                        "Direction": "X=0.005 Y=-0.171 Z=-0.985",
-                        "InnerRad": "0.261800",
-                        "Intensity": "1000000.000000",
-                        "LightColor": "R=1.000 G=1.000 B=1.000 A=1.000",
-                        "OuterRad": "0.523600",
-                        "Position": "X=-83.180 Y=-918.243 Z=871.623",
-                        "Radius": "10000.000000",
-                        "RelativeLocation": "X=-83.180 Y=-918.243 Z=871.623",
-                        "RelativeRotation": "Pitch=-80.146 Yaw=-88.378 Roll=146.298",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "Type": "2",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "UBillboardComponent",
-                    "ComponentID": "UBillboardComponent_0",
-                    "Properties": {
-                        "AABB_max": "X=0.000 Y=0.000 Z=0.000",
-                        "AABB_min": "X=0.000 Y=0.000 Z=0.000",
-                        "AttachParentID": "nullptr",
-                        "BufferKey": "Assets/Editor/Icon/S_LightSpot.PNG",
-                        "ComponentClass": "UBillboardComponent",
-                        "ComponentName": "UBillboardComponent_0",
-                        "ComponentOwner": "ASpotLight_393",
-                        "ComponentOwnerClass": "ASpotLight",
-                        "FinalIndexU": "0.000000",
-                        "FinalIndexV": "0.000000",
-                        "GeomsCount": "0",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "RigidBodyType": "1",
-                        "bApplyGravity": "false",
-                        "bAutoActive": "true",
-                        "bIsActive": "true",
-                        "bSimulate": "false",
-                        "m_Type": "UBillboardComponent"
-                    }
-                },
-                {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "ASpotLight_393",
-                        "ComponentOwnerClass": "ASpotLight",
-                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "ULuaScriptComponent_397",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "ULuaScriptComponent_397",
-                        "ComponentOwner": "ASpotLight_393",
-                        "ComponentOwnerClass": "ASpotLight",
-                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                }
-            ],
-            "RootComponentID": "UBillboardComponent_0"
-        },
-        {
-            "ActorClass": "AAmbientLight",
-            "ActorID": "AAmbientLight_401",
-            "ActorLabel": "OBJ_AMBIENTLIGHT_401",
-            "ActorTickInEditor": "false",
-            "Components": [
-                {
-                    "ComponentClass": "UAmbientLightComponent",
-                    "ComponentID": "UAmbientLightComponent_0",
-                    "Properties": {
-                        "AABB_Max": "X=1.000 Y=1.000 Z=0.100",
-                        "AABB_Min": "X=-1.000 Y=-1.000 Z=-0.100",
-                        "AmbientColor": "R=0.100 G=0.100 B=0.100 A=1.000",
-                        "AttachParentID": "UBillboardComponent_0",
-                        "ComponentClass": "UAmbientLightComponent",
-                        "ComponentName": "UAmbientLightComponent_0",
-                        "ComponentOwner": "AAmbientLight_401",
-                        "ComponentOwnerClass": "AAmbientLight",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "UBillboardComponent",
-                    "ComponentID": "UBillboardComponent_0",
-                    "Properties": {
-                        "AABB_max": "X=0.000 Y=0.000 Z=0.000",
-                        "AABB_min": "X=0.000 Y=0.000 Z=0.000",
-                        "AttachParentID": "nullptr",
-                        "BufferKey": "Assets/Editor/Icon/AmbientLight_64x.png",
-                        "ComponentClass": "UBillboardComponent",
-                        "ComponentName": "UBillboardComponent_0",
-                        "ComponentOwner": "AAmbientLight_401",
-                        "ComponentOwnerClass": "AAmbientLight",
-                        "FinalIndexU": "0.000000",
-                        "FinalIndexV": "0.000000",
-                        "GeomsCount": "0",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "RigidBodyType": "1",
-                        "bApplyGravity": "false",
-                        "bAutoActive": "true",
-                        "bIsActive": "true",
-                        "bSimulate": "false",
-                        "m_Type": "UBillboardComponent"
-                    }
-                },
-                {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "AAmbientLight_401",
-                        "ComponentOwnerClass": "AAmbientLight",
-                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                }
-            ],
-            "RootComponentID": "UBillboardComponent_0"
-        },
-        {
-            "ActorClass": "ARoad",
-            "ActorID": "ARoad_396",
-            "ActorLabel": "OBJ_ROAD_396",
-            "ActorTickInEditor": "false",
-            "Components": [
-                {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "ARoad_396",
-                        "ComponentOwnerClass": "ARoad",
-                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "USceneComponent",
-                    "ComponentID": "USceneComponent_380",
-                    "Properties": {
-                        "AttachParentID": "Road",
-                        "ComponentClass": "USceneComponent",
-                        "ComponentName": "USceneComponent_380",
-                        "ComponentOwner": "ARoad_396",
-                        "ComponentOwnerClass": "ARoad",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }
                 },
                 {
                     "ComponentClass": "UStaticMeshComponent",
-                    "ComponentID": "Road",
+                    "ComponentID": "StaticMeshComponent_0",
                     "Properties": {
-                        "AABB_max": "X=13.990 Y=0.010 Z=123.045",
-                        "AABB_min": "X=0.304 Y=-0.000 Z=9.265",
+                        "AABB_max": "X=1.287 Y=1.199 Z=2.555",
+                        "AABB_min": "X=-1.287 Y=-1.199 Z=-0.000",
                         "AttachParentID": "nullptr",
                         "ComponentClass": "UStaticMeshComponent",
-                        "ComponentName": "Road",
-                        "ComponentOwner": "ARoad_396",
-                        "ComponentOwnerClass": "ARoad",
+                        "ComponentName": "StaticMeshComponent_0",
+                        "ComponentOwner": "ACube_360",
+                        "ComponentOwnerClass": "ACube",
                         "GeomsCount": "0",
-                        "RelativeLocation": "X=-469.500 Y=-1500.000 Z=100.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=-0.000 Roll=90.000",
-                        "RelativeScale3D": "X=30.000 Y=30.000 Z=30.000",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "RigidBodyType": "1",
-                        "StaticMeshPath": "Contents/Road/Road.obj",
+                        "StaticMeshPath": "Contents/Reference/Reference.obj",
                         "bApplyGravity": "false",
                         "bAutoActive": "true",
                         "bIsActive": "true",
@@ -511,7 +364,40 @@
                     }
                 }
             ],
-            "RootComponentID": "Road"
+            "RootComponentID": "StaticMeshComponent_0"
+        },
+        {
+            "ActorClass": "ASkySphere",
+            "ActorID": "ASkySphere_372",
+            "ActorLabel": "OBJ_SKYSPHERE_372",
+            "ActorTickInEditor": "false",
+            "Components": [
+                {
+                    "ComponentClass": "UStaticMeshComponent",
+                    "ComponentID": "SkySphereMeshComp",
+                    "Properties": {
+                        "AABB_max": "X=1.000 Y=1.000 Z=1.000",
+                        "AABB_min": "X=-1.000 Y=-1.000 Z=-1.000",
+                        "AttachParentID": "nullptr",
+                        "ComponentClass": "UStaticMeshComponent",
+                        "ComponentName": "SkySphereMeshComp",
+                        "ComponentOwner": "ASkySphere_372",
+                        "ComponentOwnerClass": "ASkySphere",
+                        "GeomsCount": "0",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=50000.000 Y=50000.000 Z=50000.000",
+                        "RigidBodyType": "1",
+                        "StaticMeshPath": "Contents/Skysphere/skysphere.obj",
+                        "bApplyGravity": "false",
+                        "bAutoActive": "true",
+                        "bIsActive": "true",
+                        "bSimulate": "false",
+                        "m_Type": ""
+                    }
+                }
+            ],
+            "RootComponentID": "SkySphereMeshComp"
         }
     ],
     "NextUUID": 0,

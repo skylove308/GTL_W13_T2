@@ -48,4 +48,7 @@ public:
 protected:
     UStaticMesh* StaticMesh = nullptr;
     int SelectedSubMeshIndex = -1;
+
+public:
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bCastShadow, = true)
 };
