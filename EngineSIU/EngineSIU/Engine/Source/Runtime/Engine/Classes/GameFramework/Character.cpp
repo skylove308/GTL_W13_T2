@@ -14,6 +14,7 @@
 #include "LevelEditor/SLevelEditor.h"
 #include "UnrealEd/EditorViewportClient.h"
 #include "UnrealClient.h"
+#include "Actors/GameManager.h"
 #include "Components/StaticMeshComponent.h"
 
 ACharacter::ACharacter()
@@ -210,7 +211,7 @@ void ACharacter::SetSpeed(float NewVelocity)
 
 void ACharacter::MoveForward(float Value)
 {
-    if (Value == 0.0f)
+    if (Value == 0.0f || AGameManager::Instance().GetState() != EGameState::Playing)
     {
         CurrentForce = 0.0f;
         return;
@@ -249,7 +250,7 @@ void ACharacter::MoveForward(float Value)
 
 void ACharacter::MoveRight(float Value)
 {
-    if (Value == 0.0f)
+    if (Value == 0.0f || AGameManager::Instance().GetState() != EGameState::Playing)
     {
         CurrentForce = 0.0f;
         return;

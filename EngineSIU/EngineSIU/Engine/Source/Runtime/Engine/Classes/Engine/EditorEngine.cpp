@@ -21,7 +21,7 @@
 #include "PhysicsEngine/PhysicsAsset.h"
 #include "Particles/ParticleSystem.h"
 #include "GameFramework/Character.h"
-#include "Components/CapsuleComponent.h"
+#include "Actors/GameManager.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -561,6 +561,10 @@ void UEditorEngine::BindEssentialObjects()
     }
     
     //무조건 PIE들어갈때 만들어주기
+    AGameManager* GameManager = ActiveWorld->SpawnActor<AGameManager>();
+    GameManager->SetActorLabel(TEXT("OBJ_GAME_MANAGER"));
+    GameManager->SetActorTickInEditor(false);
+    
     APlayerController* PlayerController = ActiveWorld->SpawnActor<APlayerController>();
     PlayerController->SetActorLabel(TEXT("OBJ_PLAYER_CONTROLLER"));
     PlayerController->SetActorTickInEditor(false);
