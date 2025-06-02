@@ -564,3 +564,11 @@ struct FFullSubUVPayload
     UPROPERTY(EditAnywhere, int, ImageIndex, = 0)
     UPROPERTY(EditAnywhere, float, RandomImageTime, = 0)
 };
+
+class UParticleSystemComponent;
+class UParticleSystem;
+
+namespace ParticleUtils
+{
+    UParticleSystemComponent* CreateParticleOnWorld(UWorld* World, UParticleSystem* InParticleSystem, FVector SpawnLocation, bool bPlayOneShot = false, float InitialDuration = 0.0f);
+}

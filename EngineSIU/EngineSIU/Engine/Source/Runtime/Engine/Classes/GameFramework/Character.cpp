@@ -15,6 +15,8 @@
 #include "UnrealEd/EditorViewportClient.h"
 #include "UnrealClient.h"
 #include "Components/StaticMeshComponent.h"
+#include <Particles/ParticleSystemComponent.h>
+#include "ParticleHelper.h"
 
 ACharacter::ACharacter()
 {
@@ -36,6 +38,8 @@ ACharacter::ACharacter()
 
     CameraComponent = AddComponent<UCameraComponent>("CameraComponent");
     CameraComponent->SetupAttachment(RootComponent);
+
+ 
 }
 
 void ACharacter::BeginPlay()
@@ -47,6 +51,9 @@ void ACharacter::BeginPlay()
     float Width = ViewportClient->GetViewport()->GetD3DViewport().Width;
     float Height = ViewportClient->GetViewport()->GetD3DViewport().Height;
     GEngine->ActiveWorld->GetPlayerController()->SetLetterBoxWidthHeight(Width, Height);
+
+    // 액터는 Serialize로직이 없어서 하드코딩
+    ExplosionParticle = UAssetManager::Get().GetParticleSystem("Contents/ParticleSystem/UParticleSystem_368");
 }
 
 UObject* ACharacter::Duplicate(UObject* InOuter)
@@ -64,6 +71,10 @@ UObject* ACharacter::Duplicate(UObject* InOuter)
         NewActor->MovementComponent->UpdatedComponent = NewActor->CapsuleComponent;
     }
     NewActor->ImpulseScale = ImpulseScale;
+    NewActor->ExplosionParticle = ExplosionParticle;
+
+    NewActor->DeathCameraTransitionTime = DeathCameraTransitionTime;
+    NewActor->DeathLetterBoxTransitionTime = DeathLetterBoxTransitionTime;
     
     return NewActor;
 }
@@ -145,6 +156,16 @@ void ACharacter::DoCameraEffect(float DeltaTime)
 
 }
 
+void ACharacter::UpdateParticleEffectLocation()
+{
+    UParticleSystemComponent* PSC = GetComponentByClass<UParticleSystemComponent>();
+    if (PSC)
+    {
+
+    }
+}
+
+
 void ACharacter::RegisterLuaType(sol::state& Lua)
 {
     DEFINE_LUA_TYPE_WITH_PARENT(ACharacter, sol::bases<AActor>(),
@@ -193,6 +214,9 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
         // !TODO : 차랑 부딪혔을 때 추가적인 로직 구현
         // 힘을 준다던지, 캡슐을 비활성화하고 SkeletalMeshComp를 루트컴포넌트로 한다던지, 등등..
         bCameraEffect = true;
+
+        //ParticleUtils::CreateParticleOnWorld(GetWorld(), ExplosionParticle, Hit.ImpactPoint);
+        ParticleUtils::CreateParticleOnWorld(GetWorld(), ExplosionParticle, Hit.ImpactPoint, true, 0.2f);
     }
 }
 

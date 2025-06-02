@@ -52,11 +52,20 @@ void UParticleSystemComponent::TickComponent(float DeltaTime)
     {
         if (Instance)
         {
-            Instance->Tick(DeltaTime);
+            Instance->Tick(DeltaTime, bSuppressSpawning);
         }
     }
 
     UpdateDynamicData();
+
+    if (bPlayOneShot && EmitterInstances.Num() > 0)
+    {
+        float AccTime = EmitterInstances[0]->AccumulatedTime;   
+        if (AccTime >= InitialDuration)
+        {
+            bSuppressSpawning = true;
+        }
+    }
 }
 
 void UParticleSystemComponent::GetProperties(TMap<FString, FString>& OutProperties) const
@@ -82,7 +91,7 @@ void UParticleSystemComponent::SetProperties(const TMap<FString, FString>& InPro
     }
 }
 
-void UParticleSystemComponent::InitializeSystem()
+void UParticleSystemComponent::InitializeSystem(bool InPlayOneShot /*= false*/, float InInitialDuration /*= 0.0f*/)
 {
     TArray<UParticleEmitter*> Emitters = Template->GetEmitters();
     for (int32 i = 0; i < Emitters.Num(); i++)
@@ -97,6 +106,9 @@ void UParticleSystemComponent::InitializeSystem()
             CreateAndAddMeshEmitterInstance(EmitterTemplate);
         }
     }
+
+    bPlayOneShot = InPlayOneShot;
+    InitialDuration = InInitialDuration;
 }
 
 void UParticleSystemComponent::CreateAndAddSpriteEmitterInstance(UParticleEmitter* EmitterTemplate)
@@ -132,6 +144,11 @@ void UParticleSystemComponent::CreateAndAddMeshEmitterInstance(UParticleEmitter*
 void UParticleSystemComponent::UpdateDynamicData()
 {
     // Create the dynamic data for rendering this particle system
+    if(ParticleDynamicData)
+    {
+        delete ParticleDynamicData;
+        ParticleDynamicData = nullptr;
+    }
     ParticleDynamicData = CreateDynamicData();
 }
 
