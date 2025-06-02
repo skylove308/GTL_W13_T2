@@ -409,7 +409,6 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     <ClCompile Include="Engine\Source\Runtime\Renderer\RenderPassBase.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Renderer\ShadowManager.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Renderer\ShadowRenderPass.cpp" />
-    <ClCompile Include="Engine\Source\Runtime\Renderer\SkySphereRenderPass.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Renderer\SlateRenderPass.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Renderer\OpaqueRenderPass.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Renderer\TileLightCullingPass.cpp" />
@@ -784,7 +783,6 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     <ClInclude Include="Engine\Source\Runtime\Renderer\ShaderConstants.h" />
     <ClInclude Include="Engine\Source\Runtime\Renderer\ShadowManager.h" />
     <ClInclude Include="Engine\Source\Runtime\Renderer\ShadowRenderPass.h" />
-    <ClInclude Include="Engine\Source\Runtime\Renderer\SkySphereRenderPass.h" />
     <ClInclude Include="Engine\Source\Runtime\Renderer\SlateRenderPass.h" />
     <ClInclude Include="Engine\Source\Runtime\Renderer\OpaqueRenderPass.h" />
     <ClInclude Include="Engine\Source\Runtime\Renderer\TileLightCullingPass.h" />
