@@ -23,7 +23,7 @@ public:
 
     void MoveForward(float Value);
     void MoveRight(float Value);
-    void RunFast(bool bInIsRunning);
+    void Stop();
 
     virtual void RegisterLuaType(sol::state& Lua) override; // Lua에 클래스 등록해주는 함수.
     virtual bool BindSelfLuaProperties() override; // LuaEnv에서 사용할 멤버 변수 등록 함수.
@@ -43,6 +43,7 @@ public:
 public:
     bool bIsRunning = false;
     bool bIsDead = false;
+    bool bIsStop = true;
 
     bool bCameraEffect = false;
     bool bSwitchCamera = false;
