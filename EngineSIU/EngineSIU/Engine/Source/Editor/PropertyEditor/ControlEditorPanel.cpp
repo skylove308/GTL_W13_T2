@@ -44,6 +44,7 @@
 #include "GameFramework/Character.h"
 #include "Particles/ParticleSystemComponent.h"
 #include <Actors/Car.h>
+#include <Actors/SkySphereActor.h>
 
 
 ControlEditorPanel::ControlEditorPanel()
@@ -378,6 +379,7 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
             { .Label = "SequencerPlayer",   .OBJ = OBJ_SEQUENCERPLAYER },
             { .Label = "Character",         .OBJ = OBJ_CHARACTER },
             { .Label = "Car",               .OBJ = OBJ_CAR },
+            { .Label = "SkySphere",         .OBJ = OBJ_SKYSPHERE },
 
         };
 
@@ -511,6 +513,12 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                 {
                     SpawnedActor = World->SpawnActor<ACar>();
                     SpawnedActor->SetActorLabel(TEXT("OBJ_CAR"));
+                    break;
+                }
+                case OBJ_SKYSPHERE:
+                {
+                    SpawnedActor = World->SpawnActor<ASkySphere>();
+                    SpawnedActor->SetActorLabel(TEXT("OBJ_SKYSPHERE"));
                     break;
                 }
                 case OBJ_CAMERA:
