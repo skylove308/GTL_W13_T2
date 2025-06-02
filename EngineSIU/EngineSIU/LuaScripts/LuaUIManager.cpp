@@ -4,6 +4,7 @@
 #include "Engine/Source/Developer/LuaUtils/LuaTextUI.h"
 #include "Engine/Source/Developer/LuaUtils/LuaImageUI.h"
 #include "Engine/Source/Developer/LuaUtils/LuaButtonUI.h"
+#include "Engine/Source/Developer/LuaUtils/LuaSliderUI.h"
 #include "Engine/Classes/Engine/Texture.h"
 #include "Engine/EditorEngine.h"
 #include "Engine/Engine.h"
@@ -41,6 +42,17 @@ void LuaUIManager::CreateButton(FName InName,  RectTransform InRectTransform, in
     LuaButtonUI* NewButtonUI = new LuaButtonUI(InName, InRectTransform, InSortOrder, LuaFunctionName);
 
     UIMap.Add(InName, NewButtonUI);
+    UpdateUIArrayForSort();
+}
+
+void LuaUIManager::CreateSlider(FName InName, RectTransform InRectTransform, int InSortOrder, FName InBackgroundTexture, FLinearColor InBackgroundColor, FName InFillTexture, FLinearColor InFillColor, float InMarginTop, float InMarginBottom, float InMarginLeft, float InMarginRight)
+{
+    FTexture* FindBackgroundTexture = GetTextureByName(InBackgroundTexture);
+    FTexture* FindFillTexture = GetTextureByName(InFillTexture);
+
+    LuaSliderUI* NewSliderUI = new LuaSliderUI(InName, InRectTransform, InSortOrder, FindBackgroundTexture, InBackgroundColor, FindFillTexture, InFillColor, InMarginTop, InMarginBottom, InMarginLeft, InMarginRight);
+
+    UIMap.Add(InName, NewSliderUI);
     UpdateUIArrayForSort();
 }
 
@@ -104,6 +116,17 @@ LuaButtonUI* LuaUIManager::GetButtonUI(FName FindName)
     }
 
     return static_cast<LuaButtonUI*>(*FoundPtr);
+}
+
+LuaSliderUI* LuaUIManager::GetSliderUI(FName FindName)
+{
+    LuaUI** FoundPtr = UIMap.Find(FindName);
+    if (FoundPtr == nullptr || *FoundPtr == nullptr)
+    {
+        return nullptr;
+    }
+
+    return static_cast<LuaSliderUI*>(*FoundPtr);
 }
 
 void LuaUIManager::ClearLuaUI()
@@ -249,6 +272,7 @@ void LuaUIManager::GenerateResource()
     auto TEstt = FEngineLoop::ResourceManager.GetTexture(L"Assets/Texture/T_Explosion_SubUV.png");
     
     TextureMap.Add(FName("ExplosionColor"), FEngineLoop::ResourceManager.GetTexture(L"Assets/Texture/T_Explosion_SubUV.png"));
+    TextureMap.Add(FName("WhiteBox"), FEngineLoop::ResourceManager.GetTexture(L"Assets/Texture/WhiteBox.png"));
 
 }
 

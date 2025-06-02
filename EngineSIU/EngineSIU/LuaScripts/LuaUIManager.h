@@ -10,6 +10,7 @@ struct FTexture;
 class LuaTextUI;
 class LuaImageUI;
 class LuaButtonUI;
+class LuaSliderUI;
 
 class LuaUIManager 
 {
@@ -26,6 +27,10 @@ public:
     void CreateText(FName InName, RectTransform InRectTransform, int InSortOrder, FString InText, FName FontStyleName, float InFontSize, FLinearColor InFontColor);
     void CreateImage(FName InName, RectTransform InRectTransform, int InSortOrder, FName TextureName, FLinearColor InTextureColor);
     void CreateButton(FName InName, RectTransform InRectTransform, int InSortOrder, FString LuaFunctionName);
+    void CreateSlider(FName InName, RectTransform InRectTransform, int InSortOrder
+            , FName InBackgroundTexture, FLinearColor InBackgroundColor
+            , FName InFillTexture, FLinearColor InFillColor
+            , float InMarginTop, float InMarginBottom, float InMarginLeft, float InMarginRight);
 
     void DeleteUI(FName InName);
 
@@ -34,6 +39,7 @@ public:
     LuaTextUI* GetTextUI(FName FindName);
     LuaImageUI* GetImageUI(FName FindName);
     LuaButtonUI* GetButtonUI(FName FindName);
+    LuaSliderUI* GetSliderUI(FName FindName);
     
     void ClearLuaUI();
 

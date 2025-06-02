@@ -3,6 +3,7 @@
 #include "Engine/Classes/Lua/LuaUtils/LuaBindUtils.h"
 #include "Engine/Source/Developer/LuaUtils/LuaTextUI.h"
 #include "Engine/Source/Developer/LuaUtils/LuaImageUI.h"
+#include "Engine/Source/Developer/LuaUtils/LuaSliderUI.h"
 
 void LuaUIBind::Bind(sol::table& Table)
 {
@@ -38,7 +39,8 @@ void LuaUIBind::Bind(sol::table& Table)
     Table.Lua_NewUserType(
         LuaTextUI,
 
-        // 생성자
+        // 생성자 실질적으로는 사용하지 않음
+        // LuaBindUI의 Create 함수를 사용하므로
         sol::constructors<LuaTextUI(FName), LuaTextUI(FName, RectTransform, FString&, int, ImFont*, float, FLinearColor)>(),
 
         // 멤버 변수
@@ -59,7 +61,8 @@ void LuaUIBind::Bind(sol::table& Table)
     Table.Lua_NewUserType(
         LuaImageUI,
 
-        // 생성자
+        // 생성자 실질적으로는 사용하지 않음
+        // LuaBindUI의 Create 함수를 사용하므로
         sol::constructors<LuaImageUI(FName), LuaImageUI(FName, RectTransform, int, FTexture*, FLinearColor&)>(),
 
         // 멤버 변수
@@ -76,6 +79,23 @@ void LuaUIBind::Bind(sol::table& Table)
     // LuaButtonUI 바인딩
 
 
+    // LuaSliderUI 바인딩
+
+    Table.Lua_NewUserType(
+        LuaSliderUI,
+
+        // 생성자 실질적으로는 사용하지 않음
+        // LuaBindUI의 Create 함수를 사용하므로
+        sol::constructors<LuaSliderUI(FName)>(),
+
+        // 멤버 변수
+        // 텍스쳐는 SetTextureByName으로만 바꿀 수 있게함
+        LUA_BIND_MEMBER(&LuaSliderUI::CurrentValue),
+
+        // 멤버 함수
+        LUA_BIND_MEMBER(&LuaSliderUI::SetValue)
+    );
+
     // LuaUI 호출 Static Class 바인딩
     Table.Lua_NewUserType(
         LuaUIBind,
@@ -87,11 +107,13 @@ void LuaUIBind::Bind(sol::table& Table)
         LUA_BIND_STATIC(&LuaUIBind::CreateText),
         LUA_BIND_STATIC(&LuaUIBind::CreateImage),
         LUA_BIND_STATIC(&LuaUIBind::CreateButton),
+        LUA_BIND_STATIC(&LuaUIBind::CreateSlider),
         LUA_BIND_STATIC(&LuaUIBind::DeleteUI),
         LUA_BIND_STATIC(&LuaUIBind::ClearLuaUI),
 
         LUA_BIND_STATIC(&LuaUIBind::GetTextUI),
-        LUA_BIND_STATIC(&LuaUIBind::GetImageUI)
+        LUA_BIND_STATIC(&LuaUIBind::GetImageUI),
+        LUA_BIND_STATIC(&LuaUIBind::GetSliderUI)
     );
 }
 
@@ -113,6 +135,11 @@ void LuaUIBind::CreateButton(FString InName, RectTransform InRectTransform, int 
     LuaUIManager::Get().CreateButton(InName, InRectTransform, InSortOrder, LuaFunctionName);
 }
 
+void LuaUIBind::CreateSlider(FString InName, RectTransform InRectTransform, int InSortOrder, FString InBackgroundTexture, FLinearColor InBackgroundColor, FString InFillTexture, FLinearColor InFillColor, float InMarginTop, float InMarginBottom, float InMarginLeft, float InMarginRight)
+{
+    LuaUIManager::Get().CreateSlider(InName, InRectTransform, InSortOrder, InBackgroundTexture, InBackgroundColor, InFillTexture, InFillColor, InMarginTop, InMarginBottom, InMarginLeft, InMarginRight);
+}
+
 void LuaUIBind::DeleteUI(FString InName)
 {
     LuaUIManager::Get().DeleteUI(InName);
@@ -131,6 +158,11 @@ LuaImageUI* LuaUIBind::GetImageUI(FString FindName)
 LuaButtonUI* LuaUIBind::GetButtonUI(FString FindName)
 {
     return LuaUIManager::Get().GetButtonUI(FindName);
+}
+
+LuaSliderUI* LuaUIBind::GetSliderUI(FString FindName)
+{
+    return LuaUIManager::Get().GetSliderUI(FindName);
 }
 
 void LuaUIBind::ClearLuaUI()

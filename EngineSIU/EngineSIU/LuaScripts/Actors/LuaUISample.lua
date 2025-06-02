@@ -25,6 +25,7 @@ function ReturnTable:BeginPlay()
 
     self.ManagedTextUI = nil
     self.ManagedImageUI = nil
+    self.ManagedSliderUI = nil
     self.ElapsedTime = 0 -- 시간 누적용
 
     
@@ -62,11 +63,34 @@ function ReturnTable:BeginPlay()
 
     LuaUIBind.CreateImage(imageName, TextureRect, TextureSortOrder, textureName, TextureColor)
 
+    local SliderName = FString.new("MySliderUI")
+    local BGName = FString.new("WhiteBox")
+    local BGColor = FLinearColor.new(1.0, 1.0, 1.0, 1.0)
+    local FillName = FString.new("WhiteBox")
+    local FillColor = FLinearColor.new(1.0, 0.0, 0.0, 1.0)
+
+    local SliderAnchor = AnchorDirection.TopLeft;
+    local SliderPosX = 100.0
+    local SliderPosY = 100.0
+    local SliderWidth = 600.0
+    local SliderHeight = 50.0
+
+    local MarginTop = 5.0
+    local MarginBottom = 5.0
+    local MarginLeft = 5.0
+    local MarginRight = 5.0
+
+    local SliderRect = RectTransform.new(SliderPosX, SliderPosY, SliderWidth, SliderHeight, SliderAnchor)
+
+    local SliderOrder = 30
+    LuaUIBind.CreateSlider(SliderName, SliderRect, SliderOrder, BGName, BGColor, FillName, FillColor, MarginTop, MarginBottom, MarginLeft, MarginRight)
+
 
     -- 생성된 UI 객체 가져오기 (Tick에서 사용하기 위해)
     -- LuaUIBind.GetTextUI/GetImageUI는 포인터를 반환하므로, Lua에서 객체로 다뤄짐
     self.ManagedTextUI = LuaUIBind.GetTextUI(uiName) -- **중요: CreateText의 첫번째 인자(고유 이름)로 Get 해야함**
     self.ManagedImageUI = LuaUIBind.GetImageUI(imageName)
+    self.ManagedSliderUI = LuaUIBind.GetSliderUI(SliderName)
 
     -- 객체를 제대로 가져왔는지 확인 (nil 체크)
     if not self.ManagedTextUI then
@@ -75,7 +99,9 @@ function ReturnTable:BeginPlay()
     if not self.ManagedImageUI then
         print("Error: Could not get ManagedImageUI with name: " .. imageName:ToAnsiString())
     end
-
+    if not self.ManagedSliderUI then
+        print("Error: Could not get ManagedSliderUI with name: " .. SliderName:ToAnsiString())
+    end
 end
 
 -- Tick: 매 프레임마다 호출
@@ -110,6 +136,12 @@ function ReturnTable:Tick(DeltaTime)
     end
 
     -- Image UI Alpha 업데이트
+    if self.ManagedSliderUI then
+        -- Text UI와 유사하게 처리. LuaImageUI.Color를 읽거나, SetColor가 RGB를 유지한다고 가정.
+        self.ManagedSliderUI:SetValue(calculatedAlpha)
+    end
+
+    -- Slider UI Alpha 업데이트
     if self.ManagedImageUI then
         -- Text UI와 유사하게 처리. LuaImageUI.Color를 읽거나, SetColor가 RGB를 유지한다고 가정.
         local currentImageColor = self.ManagedImageUI.Color -- LUA_BIND_MEMBER(&LuaImageUI::Color)로 읽기 가능 가정
