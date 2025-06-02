@@ -21,6 +21,7 @@
 #include "PhysicsEngine/PhysicsAsset.h"
 #include "Particles/ParticleSystem.h"
 #include "GameFramework/Character.h"
+#include "Components/CapsuleComponent.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -564,8 +565,8 @@ void UEditorEngine::BindEssentialObjects()
     PlayerController->SetActorLabel(TEXT("OBJ_PLAYER_CONTROLLER"));
     PlayerController->SetActorTickInEditor(false);
     ActiveWorld->SetPlayerController(PlayerController);
-    
     ActiveWorld->GetPlayerController()->Possess(ActiveWorld->GetMainCharacter());
+    
     ActiveWorld->GetPlayerController()->BindAction("W",
         [this](float Value) {
             ActiveWorld->GetMainCharacter()->MoveForward(0.1f);
@@ -598,7 +599,7 @@ void UEditorEngine::BindEssentialObjects()
     );
     ActiveWorld->GetPlayerController()->BindAction("Idle",
         [this](float Value) {
-            ActiveWorld->GetMainCharacter()->Speed = 6.0f;
+            ActiveWorld->GetMainCharacter()->CurrentForce = 0.0f; // Speed = 6.0f;
         }
     );
 }
