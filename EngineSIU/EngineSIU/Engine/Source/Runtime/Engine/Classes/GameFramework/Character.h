@@ -15,7 +15,6 @@ class ACharacter : public APawn
 
 public:
     ACharacter();
-
     UCapsuleComponent* CapsuleComponent = nullptr;
     USkeletalMeshComponent* MeshComponent = nullptr;
     UCharacterMovementComponent* MovementComponent = nullptr;

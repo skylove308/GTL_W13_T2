@@ -22,6 +22,7 @@
 #include "Particles/ParticleSystem.h"
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
+#include "SoundManager.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -645,6 +646,7 @@ void UEditorEngine::EndPIE()
     Handler->OnPIEModeEnd();
     // 다시 EditorWorld로 돌아옴.
     ActiveWorld = EditorWorld;
+    FSoundManager::GetInstance().StopAllSounds();
 }
 
 void UEditorEngine::EndSkeletalMeshViewer()

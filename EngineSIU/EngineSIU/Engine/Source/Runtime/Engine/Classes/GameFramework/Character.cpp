@@ -17,6 +17,7 @@
 #include "Components/StaticMeshComponent.h"
 #include <Particles/ParticleSystemComponent.h>
 #include "ParticleHelper.h"
+#include "SoundManager.h"
 
 ACharacter::ACharacter()
 {
@@ -39,7 +40,10 @@ ACharacter::ACharacter()
     CameraComponent = AddComponent<UCameraComponent>("CameraComponent");
     CameraComponent->SetupAttachment(RootComponent);
 
- 
+    FSoundManager::GetInstance().LoadSound("CarCrash", "Contents/Sounds/CarCrash.wav");
+    FSoundManager::GetInstance().LoadSound("Wasted", "Contents/Sounds/Wasted.wav");
+    FSoundManager::GetInstance().LoadSound("Title", "Contents/Sounds/Title.mp3");
+
 }
 
 void ACharacter::BeginPlay()
@@ -54,6 +58,8 @@ void ACharacter::BeginPlay()
 
     // 액터는 Serialize로직이 없어서 하드코딩
     ExplosionParticle = UAssetManager::Get().GetParticleSystem("Contents/ParticleSystem/UParticleSystem_368");
+    FSoundManager::GetInstance().PlaySound("Title");
+
 }
 
 UObject* ACharacter::Duplicate(UObject* InOuter)
@@ -121,6 +127,7 @@ void ACharacter::DoCameraEffect(float DeltaTime)
         {
             CurrentDeathCameraTransitionTime = DeathCameraTransitionTime; // 카메라 전환 시간 초기화
             bCameraEffect = false; // 카메라 효과 종료
+
         }
     }
 
@@ -217,6 +224,10 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
 
         //ParticleUtils::CreateParticleOnWorld(GetWorld(), ExplosionParticle, Hit.ImpactPoint);
         ParticleUtils::CreateParticleOnWorld(GetWorld(), ExplosionParticle, Hit.ImpactPoint, true, 0.2f);
+
+        FSoundManager::GetInstance().PlaySound("CarCrash");
+        FSoundManager::GetInstance().PlaySound("Wasted", 1000);
+
     }
 }
 

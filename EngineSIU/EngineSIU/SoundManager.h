@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Container/Array.h"
+#include "UObject/NameTypes.h"
 
 class FSoundManager {
 public:
@@ -57,12 +58,24 @@ public:
         return true;
     }
 
-    void PlaySound(const std::string& name) {
+
+    void PlaySound(const std::string& name, unsigned int delayMs = 0) {
         auto it = soundMap.find(name);
         if (it != soundMap.end()) {
             FMOD::Channel* newChannel = nullptr;
             system->playSound(it->second, nullptr, false, &newChannel);
             if (newChannel) {
+                if (delayMs > 0) {
+                    unsigned long long dspClock = 0;
+                    FMOD::ChannelGroup* masterGroup = nullptr;
+                    if (system->getMasterChannelGroup(&masterGroup) == FMOD_OK && masterGroup) {
+                        masterGroup->getDSPClock(&dspClock, nullptr);
+                        int sampleRate = 0;
+                        system->getSoftwareFormat(&sampleRate, nullptr, nullptr);
+                        unsigned long long delayDSPClock = dspClock + (delayMs * sampleRate) / 1000;
+                        newChannel->setDelay(delayDSPClock, 0, false);
+                    }
+                }
                 activeChannels.push_back(newChannel);
             }
         }
