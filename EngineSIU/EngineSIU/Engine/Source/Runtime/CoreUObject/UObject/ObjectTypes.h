@@ -22,6 +22,8 @@ enum OBJECTS : uint8
     OBJ_SEQUENCERPLAYER,
     OBJ_CHARACTER,
     OBJ_CAR,
+    OBJ_MAP,
+    OBJ_ROAD,
     OBJ_END
 };
 

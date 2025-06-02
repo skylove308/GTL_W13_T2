@@ -1631,6 +1631,7 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Lua\LuaTypes\LuaUserTypes.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Physics\SimulationEventCallback.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\Map.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\Road.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="EngineSIU.natvis" />
@@ -1776,6 +1777,7 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Lua\LuaUtils\LuaTypeMacros.h" />
     <ClInclude Include="Engine\Source\Runtime\Physics\SimulationEventCallback.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\Map.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\Road.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\CompositingShader.hlsl" />

@@ -44,6 +44,8 @@
 #include "GameFramework/Character.h"
 #include "Particles/ParticleSystemComponent.h"
 #include <Actors/Car.h>
+#include "Actors/Map.h"
+#include "Actors/Road.h"
 
 
 ControlEditorPanel::ControlEditorPanel()
@@ -378,7 +380,8 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
             { .Label = "SequencerPlayer",   .OBJ = OBJ_SEQUENCERPLAYER },
             { .Label = "Character",         .OBJ = OBJ_CHARACTER },
             { .Label = "Car",               .OBJ = OBJ_CAR },
-
+            { .Label = "Map",               .OBJ = OBJ_MAP },
+            { .Label = "Road",              .OBJ = OBJ_ROAD },
         };
 
         for (const auto& primitive : primitives)
@@ -511,6 +514,18 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                 {
                     SpawnedActor = World->SpawnActor<ACar>();
                     SpawnedActor->SetActorLabel(TEXT("OBJ_CAR"));
+                    break;
+                }
+                case OBJ_MAP:
+                {
+                    SpawnedActor = World->SpawnActor<AMap>();
+                    SpawnedActor->SetActorLabel(TEXT("OBJ_MAP"));
+                    break;
+                }
+                case OBJ_ROAD:
+                {
+                    SpawnedActor = World->SpawnActor<ARoad>();
+                    SpawnedActor->SetActorLabel(TEXT("OBJ_ROAD"));
                     break;
                 }
                 case OBJ_CAMERA:
