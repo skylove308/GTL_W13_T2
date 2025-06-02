@@ -16,7 +16,7 @@ AnimFSM = {
 
         if isDead then
             current_state = state_die
-        else if speed <= 0.0 then
+        elseif speed <= 0.0 then
             current_state = state_idle
         else
             if isRunning then

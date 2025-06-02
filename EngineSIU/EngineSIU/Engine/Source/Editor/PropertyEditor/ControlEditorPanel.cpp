@@ -528,7 +528,9 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                 case OBJ_ROAD:
                 {
                     SpawnedActor = World->SpawnActor<ARoad>();
+                    Cast<ARoad>(SpawnedActor)->Initialize(ERoadState::Safe, FVector(0.0f));
                     SpawnedActor->SetActorLabel(TEXT("OBJ_ROAD"));
+                    break;
                 case OBJ_SKYSPHERE:
                 {
                     SpawnedActor = World->SpawnActor<ASkySphere>();

@@ -12,14 +12,15 @@ enum class ERoadState : uint8
     Destroy
 };
 
+class UStaticMeshComponent;
 class ARoad : public AActor
 {
     DECLARE_CLASS(ARoad, AActor)
 
 public:
-    ARoad() = default;
-    ARoad(ERoadState RoadState, FVector SpawnWorldLocation = FVector(0.0f, 0.0f, 0.0f));
+    ARoad();
 
+    void Initialize(ERoadState RoadState, FVector SpawnWorldLocation = FVector(0.0f, 0.0f, 0.0f));
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
     virtual UObject* Duplicate(UObject* InOuter) override;
@@ -48,6 +49,7 @@ public:
     FOnCharacterDeath OnDeath;
 
 private:
+    UStaticMeshComponent* RoadMesh = nullptr;
     ERoadState CurrentRoadState = ERoadState::Safe;
     int32 CurrentRoadTime = 0.0f;
     int32 SafeJoneTime = 5.0f;

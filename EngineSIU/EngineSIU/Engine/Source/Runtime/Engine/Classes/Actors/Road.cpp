@@ -4,7 +4,13 @@
 #include "Lua/LuaUtils/LuaTypeMacros.h"
 #include "Lua/LuaScriptComponent.h"
 
-ARoad::ARoad(ERoadState RoadState, FVector SpawnWorldLocation)
+ARoad::ARoad()
+{
+    RoadMesh = AddComponent<UStaticMeshComponent>("Road");
+    RootComponent = RoadMesh;
+}
+
+void ARoad::Initialize(ERoadState RoadState, FVector SpawnWorldLocation)
 {
     CurrentRoadState = RoadState;
 
@@ -14,16 +20,17 @@ ARoad::ARoad(ERoadState RoadState, FVector SpawnWorldLocation)
     }
     else if (RoadState == ERoadState::Car)
     {
-        UStaticMeshComponent* StaticMeshComp = AddComponent<UStaticMeshComponent>("Road");
-        StaticMeshComp->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road.obj"));
-        RootComponent = StaticMeshComp;
-        StaticMeshComp->SetWorldLocation(SpawnWorldLocation);
-        RootComponent->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
-        RootComponent->SetWorldScale3D(FVector(30.0f, 30.0f, 30.0f));
+        RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road.obj"));
+        RoadMesh->SetWorldLocation(SpawnWorldLocation);
+        RoadMesh->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
+        RoadMesh->SetWorldScale3D(FVector(30.0f, 30.0f, 30.0f));
     }
 
+    RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road.obj"));
+    RoadMesh->SetWorldLocation(SpawnWorldLocation);
+    RoadMesh->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
+    RoadMesh->SetWorldScale3D(FVector(30.0f, 30.0f, 30.0f));
 }
-
 
 void ARoad::BeginPlay()
 {
