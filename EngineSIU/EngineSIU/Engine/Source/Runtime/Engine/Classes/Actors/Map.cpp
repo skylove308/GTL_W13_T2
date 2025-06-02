@@ -7,7 +7,7 @@
 AMap::AMap()
 {
     UStaticMeshComponent* StaticMeshComp = AddComponent<UStaticMeshComponent>("StreetMap");
-    StaticMeshComp->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Primitives/CubePrimitive.Obj"));
+    StaticMeshComp->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Building/Building.Obj"));
     RootComponent = StaticMeshComp;
 }
 

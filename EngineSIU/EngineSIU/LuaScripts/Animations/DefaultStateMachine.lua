@@ -8,12 +8,15 @@ AnimFSM = {
         state_idle = "Contents/JamesIdle/Armature|Idle"
         state_walk = "Contents/DavidSlowRun/Armature|SlowRun"
         state_run = "Contents/DavidFastRun/Armature|FastRun"
+        state_die = "Contents/JamesDie/Armature|Die"
 
-        self.current = "Contents/David/Armature|Idle"
         speed = self.OwnerCharacter.Velocity;
         isRunning = self.OwnerCharacter.IsRunning;
+        isDead = self.OwnerCharacter.IsDead;
 
-        if speed <= 0.0 then
+        if isDead then
+            current_state = state_die
+        elseif speed <= 0.0 then
             current_state = state_idle
         else
             if isRunning then
@@ -23,9 +26,15 @@ AnimFSM = {
             end
         end
 
+        if current_state == state_die then
+            state_by_blend = 1.2
+        else
+            state_by_blend = 0.5
+        end
+
         return {
             anim = current_state,
-            blend = 0.5
+            blend = state_by_blend
         }
     end
 }
