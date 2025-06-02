@@ -27,13 +27,13 @@ function ReturnTable:BeginPlay()
     self.ManagedImageUI = nil
     self.ElapsedTime = 0 -- 시간 누적용
 
-
+    
     local uiName = FString.new("MyDynamicTextUI")
     local textContent = FString.new("Hello from Lua with Dynamic Rect!")
 
     local posX = -150.0
     local posY = 50.0
-    local width = 200.0
+    local width = 200.0     -- Text는 FontSize에만 크기 영향 받음
     local height = 80.0
     local anchor = AnchorDirection.TopCenter -- Enum 값 사용
 
@@ -123,7 +123,12 @@ function ReturnTable:Tick(DeltaTime)
             self.ManagedImageUI:SetColor(fallbackImageColor)
         end
     end
-    
+
+    if self.ElapsedTime >= 3.0 then
+        LuaUIBind.DeleteUI(self.ManagedTextUI:GetNameStr())
+        self.ManagedTextUI = nil
+    end
+
 end
 
 -- EndPlay: Actor가 파괴되거나 레벨이 전환될 때 호출

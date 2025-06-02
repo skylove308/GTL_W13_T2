@@ -45,13 +45,29 @@ void LuaUIManager::CreateButton(FName InName,  RectTransform InRectTransform, in
 
 void LuaUIManager::DeleteUI(FName InName)
 {
-    LuaUI** FoundPtr = UIMap.Find(InName);
-    if (FoundPtr != nullptr && *FoundPtr != nullptr)
+    // 이미 PendingDestroyUIs에 InName이 없을 때만 추가
+    if (!PendingDestroyUIs.Contains(InName))
     {
-        delete* FoundPtr;
+        PendingDestroyUIs.Add(InName);
+    }
+}
+
+void LuaUIManager::ActualDeleteUIs()
+{
+    if (PendingDestroyUIs.Num() == 0) return;
+
+    for (auto DestroyName : PendingDestroyUIs) 
+    {
+        LuaUI** FoundPtr = UIMap.Find(DestroyName);
+        if (FoundPtr != nullptr && *FoundPtr != nullptr)
+        {
+            delete* FoundPtr;
+        }
+
+        UIMap.Remove(DestroyName);
     }
 
-    UIMap.Remove(InName);
+    PendingDestroyUIs.Empty();
 
     UpdateUIArrayForSort();
 }

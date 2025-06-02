@@ -28,6 +28,8 @@ public:
     void CreateButton(FName InName, RectTransform InRectTransform, int InSortOrder, FString LuaFunctionName);
 
     void DeleteUI(FName InName);
+
+    void ActualDeleteUIs();
     
     LuaTextUI* GetTextUI(FName FindName);
     LuaImageUI* GetImageUI(FName FindName);
@@ -63,4 +65,6 @@ private:
 
     TMap<FName, ImFont*> FontMap;
     TMap<FName, std::shared_ptr<FTexture>> TextureMap;
+
+    TArray<FName> PendingDestroyUIs;
 };

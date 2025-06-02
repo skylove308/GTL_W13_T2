@@ -51,7 +51,8 @@ void LuaUIBind::Bind(sol::table& Table)
         LUA_BIND_MEMBER(&LuaTextUI::SetText),
         LUA_BIND_MEMBER(&LuaTextUI::SetFont),
         LUA_BIND_MEMBER(&LuaTextUI::SetFontSize),
-        LUA_BIND_MEMBER(&LuaTextUI::SetFontColor)
+        LUA_BIND_MEMBER(&LuaTextUI::SetFontColor),
+        LUA_BIND_MEMBER(&LuaTextUI::GetNameStr)
     );
 
     // LuaImageUI 바인딩
@@ -67,7 +68,8 @@ void LuaUIBind::Bind(sol::table& Table)
 
         // 멤버 함수
         LUA_BIND_MEMBER(&LuaImageUI::SetTextureByName),
-        LUA_BIND_MEMBER(&LuaImageUI::SetColor)
+        LUA_BIND_MEMBER(&LuaImageUI::SetColor),
+        LUA_BIND_MEMBER(&LuaImageUI::GetNameStr)
     );
 
 
@@ -98,12 +100,12 @@ void LuaUIBind::CreateText(FString InName, RectTransform InRectTransform, int In
     // Lua 쪽에는 FName 있는 것이 큰 의미가 없을 것 같아서 
     // FString을 받아서 FName으로 바꾸도록 작업
 
-    LuaUIManager::Get().CreateText(InName, InRectTransform, InSortOrder, InText, FontStyleName, InFontSize, InFontColor);
+    LuaUIManager::Get().CreateText(FName(InName), InRectTransform, InSortOrder, InText, FName(FontStyleName), InFontSize, InFontColor);
 }
 
 void LuaUIBind::CreateImage(FString InName, RectTransform InRectTransform, int InSortOrder, FString TextureName, FLinearColor InTextureColor)
 {
-    LuaUIManager::Get().CreateImage(InName, InRectTransform, InSortOrder, TextureName, InTextureColor);
+    LuaUIManager::Get().CreateImage(FName(InName), InRectTransform, InSortOrder, FName(TextureName), InTextureColor);
 }
 
 void LuaUIBind::CreateButton(FString InName, RectTransform InRectTransform, int InSortOrder, FString LuaFunctionName)

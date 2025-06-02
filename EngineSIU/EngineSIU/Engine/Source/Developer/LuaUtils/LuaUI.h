@@ -53,6 +53,7 @@ protected:
 public:
     virtual void Create();
     FName GetName();
+    FString GetNameStr();
 
     RectTransform& GetRectTransform() { return Rect; }
 

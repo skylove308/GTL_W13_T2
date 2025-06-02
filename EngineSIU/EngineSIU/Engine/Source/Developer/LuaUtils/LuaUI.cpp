@@ -11,6 +11,11 @@ FName LuaUI::GetName()
     return Name;
 }
 
+FString LuaUI::GetNameStr()
+{
+    return Name.ToString();
+}
+
 void LuaUI::SetPosition(float X, float Y)
 {
     Rect.Position.X = X;

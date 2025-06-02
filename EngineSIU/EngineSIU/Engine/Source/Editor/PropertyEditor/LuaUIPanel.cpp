@@ -9,6 +9,7 @@ LuaUIViewPanel::LuaUIViewPanel()
 
 void LuaUIViewPanel::Render()
 {
+    LuaUIManager::Get().ActualDeleteUIs();
     LuaUIManager::Get().DrawLuaUIs();
 }
 
