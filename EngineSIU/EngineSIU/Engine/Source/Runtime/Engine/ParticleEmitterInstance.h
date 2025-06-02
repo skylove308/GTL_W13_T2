@@ -53,9 +53,9 @@ public:
 public:
     void Initialize();
 
-    void Tick(float DeltaTime);
+    void Tick(float DeltaTime, bool bSuppressSpawning);
     void SpawnParticles(int32 Count, float StartTime, float Increment, 
-                        const FVector& InitialLocation, const FVector& InitialVelocity);
+                        const FVector& InitialLocation, const FVector& InitialVelocity, bool bSuppressSpawning);
     void KillParticle(int32 Index);
 
     int32 CalculateSpawnCount(float DeltaTime);
