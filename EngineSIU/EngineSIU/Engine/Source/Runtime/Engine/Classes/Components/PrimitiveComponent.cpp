@@ -639,7 +639,8 @@ void UPrimitiveComponent::CreatePhysXGameObject()
 
     for (const auto& GeomAttribute : GeomAttributes)
     {
-        PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
+        FVector Scale = GetComponentScale3D();
+        PxVec3 Offset = PxVec3(GeomAttribute.Offset.X *Scale.X , GeomAttribute.Offset.Y * Scale.Y, GeomAttribute.Offset.Z * Scale.Z);
         FQuat GeomQuat = GeomAttribute.Rotation.Quaternion();
         PxQuat GeomPQuat = PxQuat(GeomQuat.X, GeomQuat.Y, GeomQuat.Z, GeomQuat.W);
         PxVec3 Extent = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
