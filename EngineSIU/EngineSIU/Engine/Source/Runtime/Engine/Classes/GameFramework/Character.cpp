@@ -43,6 +43,10 @@ void ACharacter::BeginPlay()
     APawn::BeginPlay();
 
     CameraComponent->FollowMainPlayer();
+    std::shared_ptr<FEditorViewportClient> ViewportClient = GEngineLoop.GetLevelEditor()->GetActiveViewportClient();
+    float Width = ViewportClient->GetViewport()->GetD3DViewport().Width;
+    float Height = ViewportClient->GetViewport()->GetD3DViewport().Height;
+    GEngine->ActiveWorld->GetPlayerController()->SetLetterBoxWidthHeight(Width, Height);
 }
 
 UObject* ACharacter::Duplicate(UObject* InOuter)

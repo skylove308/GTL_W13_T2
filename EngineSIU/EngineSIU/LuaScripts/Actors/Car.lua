@@ -11,7 +11,7 @@ local FVector = EngineTypes.FVector -- EngineTypes로 등록된 FVector local로
 function ReturnTable:BeginPlay()
 
     print("BeginPlay ", self.Name) -- Table에 등록해 준 Name 출력.
-    self.this.InitialVelocity = FVector(0, -1000, 0)
+    self.this.InitialVelocity = FVector(0, -2000, 0)
     print("InitialVelocity")
     self.this.Mass = 1000000.0
     print("Mass")

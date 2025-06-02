@@ -747,16 +747,28 @@ void USkeletalMeshComponent::AddImpulseToBones(const FVector& Direction, float I
     {
         return;
     }
+
     for (auto& Body : Bodies)
     {
         if (Body->BIGameObject && Body->BIGameObject->DynamicRigidBody)
         {
-            PxVec3 Impulse = PxVec3(Direction.X, Direction.Y, Direction.Z) * ImpulseScale;
+            // 랜덤 방향 벡터
+            FVector RandomUnit = FMath::VRand(); // 랜덤 단위 벡터
+
+            // Direction 기준으로 약간의 랜덤 방향 가중치 추가
+            float RandomFactor = 0.7f; // 0~1 사이: 값이 클수록 더 불규칙
+            FVector FinalDirection = (Direction.GetSafeNormal() * (1.0f - RandomFactor)) + (RandomUnit * RandomFactor);
+            FinalDirection.Normalize();
+
+            // 크기도 약간 랜덤화 (예: ±10%)
+            float RandomScale = ImpulseScale * FMath::FRandRange(0.8f, 1.2f);
+            FinalDirection = FinalDirection * RandomScale;
+            // 물리 엔진에 적용
+            PxVec3 Impulse = PxVec3(FinalDirection.X, FinalDirection.Y, FinalDirection.Z);
             Body->BIGameObject->DynamicRigidBody->addForce(Impulse, PxForceMode::eIMPULSE);
         }
     }
 }
-
 
 bool USkeletalMeshComponent::NeedToSpawnAnimScriptInstance() const
 {
