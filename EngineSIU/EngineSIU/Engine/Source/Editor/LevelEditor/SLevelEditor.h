@@ -28,6 +28,8 @@ public:
     void RegisterEditorInputDelegates();
     void RegisterPIEInputDelegates();
 
+    void GetEditorSize(uint32& OutWidth, uint32& OutHeight);
+
 private:
     SSplitterH* HSplitter;
     SSplitterV* VSplitter;

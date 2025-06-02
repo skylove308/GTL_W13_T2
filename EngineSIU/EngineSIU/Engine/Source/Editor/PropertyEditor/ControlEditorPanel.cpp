@@ -46,6 +46,7 @@
 #include <Actors/Car.h>
 
 
+
 ControlEditorPanel::ControlEditorPanel()
 {
     SetSupportedWorldTypes(EWorldTypeBitFlag::Editor | EWorldTypeBitFlag::PIE | EWorldTypeBitFlag::SkeletalViewer | EWorldTypeBitFlag::PhysicsAssetViewer);
@@ -490,11 +491,11 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                     break;
                 }
                 case OBJ_SKELETALMESH:
-                {
-                    SpawnedActor = World->SpawnActor<ASkeletalMeshActor>();
-                    SpawnedActor->SetActorTickInEditor(true);
+                    {
+                        SpawnedActor = World->SpawnActor<ASkeletalMeshActor>();
+                        SpawnedActor->SetActorTickInEditor(true);
+                    }
                     break;
-                }   
                 case OBJ_SEQUENCERPLAYER:
                 {
                     SpawnedActor = World->SpawnActor<ASequencerPlayer>();
