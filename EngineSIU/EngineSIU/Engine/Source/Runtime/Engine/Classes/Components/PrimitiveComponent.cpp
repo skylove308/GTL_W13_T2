@@ -699,7 +699,11 @@ void UPrimitiveComponent::OnCollisionEnter(UPrimitiveComponent* HitComponent, UP
 
 void UPrimitiveComponent::OnCollisionExit(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp)
 {
-
+    if( AActor* Actor = GetOwner())
+    {
+        UE_LOG(ELogLevel::Warning, "OnCollisionExit %s, %s", HitComponent->GetName().ToAnsiString(), OtherComp->GetName().ToAnsiString());
+        Actor->OnCollisionExit(HitComponent, OtherComp);
+    }
 }
 
 void UPrimitiveComponent::OnCollisionStay(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& Hit)

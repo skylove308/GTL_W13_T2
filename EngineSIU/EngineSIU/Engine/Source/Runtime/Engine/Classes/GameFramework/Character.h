@@ -29,6 +29,7 @@ public:
 
 public:
     virtual void OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp, const FHitResult& Hit) override;
+    virtual void OnCollisionExit(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp) override;
 
     float GetSpeed();
     void SetSpeed(float NewVelocity);
@@ -65,6 +66,7 @@ private:
     virtual void BeginPlay() override;
     virtual UObject* Duplicate(UObject* InOuter) override;
     virtual void Tick(float DeltaTime) override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 
     void DoCameraEffect(float DeltaTime);
     void UpdateParticleEffectLocation();

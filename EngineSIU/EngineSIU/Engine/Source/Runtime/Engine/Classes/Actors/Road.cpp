@@ -3,6 +3,10 @@
 #include "Engine/FObjLoader.h"
 #include "Lua/LuaUtils/LuaTypeMacros.h"
 #include "Lua/LuaScriptComponent.h"
+#include "Engine/Engine.h"
+#include "World/World.h"
+#include "Actors/Cube.h"
+
 
 ARoad::ARoad()
 {
@@ -13,25 +17,24 @@ ARoad::ARoad()
 void ARoad::Initialize(ERoadState RoadState, FVector SpawnWorldLocation)
 {
     CurrentRoadState = RoadState;
+    RoadMesh->SetWorldLocation(SpawnWorldLocation);
+    RoadMesh->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
+    RoadMesh->SetWorldScale3D(FVector(30.0f, 30.0f, 1000.0f));
 
     if (RoadState == ERoadState::Safe)
     {
-
+        RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road.obj"));
+        RoadMesh->bSimulate = true;
+        RoadMesh->RigidBodyType = ERigidBodyType::STATIC;
     }
     else if (RoadState == ERoadState::Car)
     {
         RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road.obj"));
-        RoadMesh->SetWorldLocation(SpawnWorldLocation);
-        RoadMesh->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
-        RoadMesh->SetWorldScale3D(FVector(30.0f, 30.0f, 30.0f));
         RoadMesh->bSimulate = true;
+        RoadMesh->RigidBodyType = ERigidBodyType::STATIC;
     }
 
-    RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road.obj"));
-    RoadMesh->SetWorldLocation(SpawnWorldLocation);
-    RoadMesh->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
-    RoadMesh->SetWorldScale3D(FVector(30.0f, 30.0f, 30.0f));
-    RoadMesh->bSimulate = true;
+
 }
 
 void ARoad::BeginPlay()
@@ -106,7 +109,17 @@ bool ARoad::BindSelfLuaProperties()
 
 void ARoad::OnOverlappedRoad(float DeltaTime)
 {
-    if (!bIsOverlapped) return;
+    if (!bIsOverlapped)
+    {
+        CurrentRoadState = ERoadState::Safe;
+        if (CurrentRoadTime > SafeJoneTime)
+        {
+            OnNoRed.Broadcast();
+        }
+        CurrentRoadTime = 0.0f;
+
+        return;
+    }
 
     if (CurrentRoadState == ERoadState::Safe)
     {
@@ -118,11 +131,7 @@ void ARoad::OnOverlappedRoad(float DeltaTime)
     }
     else if (CurrentRoadState == ERoadState::Warning)
     {
-        for (int i = 0; i < RoadMesh->GetNumMaterials(); i++)
-        {
-            FVector EmissiveColor = FVector(0.01f, 0.0f, 0.0f) * (CurrentRoadTime - SafeJoneTime / WarningJoneTime);
-            RoadMesh->GetMaterial(i)->SetEmissive(EmissiveColor);
-        }
+        OnRed.Broadcast();
 
         CurrentRoadTime += DeltaTime;
         if (CurrentRoadTime >= SafeJoneTime + WarningJoneTime)
