@@ -26,9 +26,15 @@ AnimFSM = {
             end
         end
 
+        if current_state == state_die then
+            state_by_blend = 1.2
+        else
+            state_by_blend = 0.5
+        end
+
         return {
             anim = current_state,
-            blend = 0.5
+            blend = state_by_blend
         }
     end
 }

@@ -46,6 +46,20 @@ void ARoad::Tick(float DeltaTime)
     OnOverlappedRoad(DeltaTime);
 }
 
+void ARoad::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
+
+    if (EndPlayReason == EEndPlayReason::WorldTransition)
+    {
+        for (int i = 0; i < RoadMesh->GetNumMaterials(); i++)
+        {
+            FVector EmissiveColor = FVector(0.0f, 0.0f, 0.0f);
+            RoadMesh->GetMaterial(i)->SetEmissive(EmissiveColor);
+        }
+    }
+}
+
 UObject* ARoad::Duplicate(UObject* InOuter)
 {
     ThisClass* NewActor = Cast<ThisClass>(Super::Duplicate(InOuter));
@@ -109,6 +123,7 @@ void ARoad::OnOverlappedRoad(float DeltaTime)
             FVector EmissiveColor = FVector(0.01f, 0.0f, 0.0f) * (CurrentRoadTime - SafeJoneTime / WarningJoneTime);
             RoadMesh->GetMaterial(i)->SetEmissive(EmissiveColor);
         }
+
         CurrentRoadTime += DeltaTime;
         if (CurrentRoadTime >= SafeJoneTime + WarningJoneTime)
         {

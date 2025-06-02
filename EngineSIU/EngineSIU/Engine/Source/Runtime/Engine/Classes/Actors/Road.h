@@ -23,6 +23,7 @@ public:
     void Initialize(ERoadState RoadState, FVector SpawnWorldLocation = FVector(0.0f, 0.0f, 0.0f));
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     virtual UObject* Duplicate(UObject* InOuter) override;
     
     void OnOverlappedRoad(float DeltaTime);

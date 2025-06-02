@@ -50,6 +50,9 @@ public:
 
     void SetAnimation(UAnimSequence* NewAnim, float BlendingTime, float LoopAnim = false, bool ReverseAnim = false);
 
+    UAnimSequence* PrevAnim;
+    UAnimSequence* CurrAnim;
+
 private:
     float ElapsedTime;
     float PlayRate;
@@ -63,9 +66,6 @@ private:
     int32 LoopEndFrame;
 
     int CurrentKey;
-    
-    UAnimSequence* PrevAnim;
-    UAnimSequence* CurrAnim;
     
     float BlendAlpha;
     float BlendStartTime;
