@@ -603,7 +603,7 @@ void UEditorEngine::BindEssentialObjects()
     );
     ActiveWorld->GetPlayerController()->BindAction("Idle",
         [this](float Value) {
-            ActiveWorld->GetMainCharacter()->CurrentForce = 0.0f; // Speed = 6.0f;
+            ActiveWorld->GetMainCharacter()->Stop();
         }
     );
 }

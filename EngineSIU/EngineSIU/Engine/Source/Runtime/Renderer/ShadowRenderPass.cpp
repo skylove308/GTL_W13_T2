@@ -182,7 +182,7 @@ void FShadowRenderPass::RenderAllMeshesForSpotLight(const std::shared_ptr<FEdito
 
     for (UStaticMeshComponent* Comp : StaticMeshComponents)
     {
-        if (!Comp || !Comp->GetStaticMesh())
+        if (!Comp || !Comp->GetStaticMesh() || !Comp->bCastShadow)
         {
             continue;
         }
@@ -244,7 +244,7 @@ void FShadowRenderPass::RenderAllMeshesForCSM(const std::shared_ptr<FEditorViewp
     
     for (UStaticMeshComponent* Comp : StaticMeshComponents)
     {
-        if (!Comp || !Comp->GetStaticMesh())
+        if (!Comp || !Comp->GetStaticMesh() || !Comp->bCastShadow)
         {
             continue;
         }
@@ -309,7 +309,7 @@ void FShadowRenderPass::RenderAllMeshesForPointLight(const std::shared_ptr<FEdit
     
     for (UStaticMeshComponent* Comp : StaticMeshComponents)
     {
-        if (!Comp || !Comp->GetStaticMesh()) { continue; }
+        if (!Comp || !Comp->GetStaticMesh() || !Comp->bCastShadow) { continue; }
 
         FStaticMeshRenderData* RenderData = Comp->GetStaticMesh()->GetRenderData();
         if (RenderData == nullptr) { continue; }
