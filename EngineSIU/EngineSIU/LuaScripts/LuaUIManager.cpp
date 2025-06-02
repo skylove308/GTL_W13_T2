@@ -7,6 +7,7 @@
 #include "Engine/Classes/Engine/Texture.h"
 #include "Engine/EditorEngine.h"
 #include "Engine/Engine.h"
+#include "LevelEditor/SLevelEditor.h"
 
 void LuaUIManager::CreateUI(FName InName)
 {
@@ -167,11 +168,19 @@ void LuaUIManager::UpdateCanvasRectTransform(HWND hWnd)
     // 창의 크기만큼 크기 지정
     // Direction은 왼쪽 상단으로 지정하여 바로 코드에 적용할 수 있도록 함
 
-    RECT clientRect;
+    /*RECT clientRect;
     GetClientRect(hWnd, &clientRect);
 
     CanvasRectTransform.Size.X = clientRect.right - clientRect.left;
-    CanvasRectTransform.Size.Y = clientRect.bottom - clientRect.top;
+    CanvasRectTransform.Size.Y = clientRect.bottom - clientRect.top;*/
+
+    // 위는 전체 화면 크기만큼 Canvas를 쓰는 것
+    // SLevel 크기로 해서 게임 화면 크기만큼만 Canvas로 쓰도록
+    uint32 Width, Height;
+    GEngineLoop.GetLevelEditor()->GetEditorSize(Width, Height);
+
+    CanvasRectTransform.Size.X = Width;
+    CanvasRectTransform.Size.Y = Height;
 }
 
 ImFont* LuaUIManager::GetFontStyleByName(FName FontName)
