@@ -1,9 +1,7 @@
 #include "PrimitiveComponent.h"
 
-#include "BoxComponent.h"
 #include "CapsuleComponent.h"
 #include "PhysicsManager.h"
-#include "SphereComp.h"
 #include "SphereComponent.h"
 #include "Engine/Engine.h"
 #include "UObject/Casts.h"
@@ -11,9 +9,9 @@
 #include "Engine/OverlapResult.h"
 #include "GameFramework/Actor.h"
 #include "Math/JungleMath.h"
-#include "Misc/Parse.h"
 #include "World/World.h"
 #include "PhysicsEngine/PhysicsAsset.h"
+#include "GameFramework/Character.h"
 
 // 언리얼 엔진에서도 여기에서 FOverlapInfo의 생성자를 정의하고 있음.
 FOverlapInfo::FOverlapInfo(UPrimitiveComponent* InComponent, int32 InBodyIndex)
@@ -224,7 +222,6 @@ void UPrimitiveComponent::EndPhysicsTickComponent(float DeltaTime)
         // ✅ 쿼터니언에서 오일러 각도로 변환
         XMFLOAT4 quat;
         XMStoreFloat4(&quat, rotation);
-        
         FQuat MyQuat = FQuat(quat.x, quat.y, quat.z, quat.w);
         FRotator Rotator = MyQuat.Rotator();
         
@@ -662,7 +659,10 @@ void UPrimitiveComponent::CreatePhysXGameObject()
         }
         case EGeomType::ECapsule:
         {
-            PxShape = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z);
+            AActor* OwnerActor = GetOwner();
+            PxMaterial* PlayerMaterial = GEngine->PhysicsManager->GetPhysics()->createMaterial(2.0f, 2.0f, 0.0f);
+            PxMaterial* CapsuleMaterial = OwnerActor && OwnerActor->IsA<ACharacter>() ? PlayerMaterial : nullptr;
+            PxShape = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z, CapsuleMaterial);
             BodySetup->AggGeom.SphereElems.Add(PxShape);
             break;
         }
@@ -678,6 +678,9 @@ void UPrimitiveComponent::CreatePhysXGameObject()
     }
     
     GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(PPos, PQuat, BodyInstance,  BodySetup, RigidBodyType);
+    BodyInstance->SetGameObject(Obj);
+    BodyInstance->RigidActorSync = Obj->DynamicRigidBody;
+    BodyInstance->RigidActorAsync = Obj->DynamicRigidBody;
 }
 
 void UPrimitiveComponent::BeginPlay()

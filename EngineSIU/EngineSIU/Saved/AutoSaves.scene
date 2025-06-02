@@ -7,6 +7,19 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "AAmbientLight_246",
+                        "ComponentOwnerClass": "AAmbientLight",
+                        "ScriptName": "",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
                     "ComponentClass": "UAmbientLightComponent",
                     "ComponentID": "UAmbientLightComponent_0",
                     "Properties": {
@@ -162,7 +175,7 @@
                         "Geom_0Rotation": "Pitch=0.000 Yaw=0.000 Roll=0.000",
                         "Geom_0Type": "2",
                         "GeomsCount": "1",
-                        "RelativeLocation": "X=-3.600 Y=7.500 Z=70.745",
+                        "RelativeLocation": "X=105.329 Y=7.500 Z=39.350",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "RigidBodyType": "1",
@@ -187,7 +200,7 @@
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
                         "GeomsCount": "0",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=-8.963",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.290",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "RigidBodyType": "2",
@@ -301,8 +314,8 @@
                         "ComponentName": "UCameraComponent_297",
                         "ComponentOwner": "ACar_232",
                         "ComponentOwnerClass": "ACar",
-                        "RelativeLocation": "X=171.600 Y=0.000 Z=118.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeLocation": "X=0.000 Y=300.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=-90.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "bAutoActive": "true",
                         "bIsActive": "true"
@@ -354,6 +367,52 @@
                         "ComponentClass": "ULuaScriptComponent",
                         "ComponentName": "LuaComponent",
                         "ComponentOwner": "ACube_232",
+                        "ComponentOwnerClass": "ACube",
+                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                }
+            ],
+            "RootComponentID": "StaticMeshComponent_0"
+        },
+        {
+            "ActorClass": "ACube",
+            "ActorID": "ACube_360",
+            "ActorLabel": "OBJ_CUBE_360",
+            "ActorTickInEditor": "false",
+            "Components": [
+                {
+                    "ComponentClass": "UStaticMeshComponent",
+                    "ComponentID": "StaticMeshComponent_0",
+                    "Properties": {
+                        "AABB_max": "X=1.287 Y=1.199 Z=2.555",
+                        "AABB_min": "X=-1.287 Y=-1.199 Z=-0.000",
+                        "AttachParentID": "nullptr",
+                        "ComponentClass": "UStaticMeshComponent",
+                        "ComponentName": "StaticMeshComponent_0",
+                        "ComponentOwner": "ACube_360",
+                        "ComponentOwnerClass": "ACube",
+                        "GeomsCount": "0",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "RigidBodyType": "1",
+                        "StaticMeshPath": "Contents/Reference/Reference.obj",
+                        "bApplyGravity": "false",
+                        "bAutoActive": "true",
+                        "bIsActive": "true",
+                        "bSimulate": "false",
+                        "m_Type": ""
+                    }
+                },
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "ACube_360",
                         "ComponentOwnerClass": "ACube",
                         "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
                         "bAutoActive": "true",

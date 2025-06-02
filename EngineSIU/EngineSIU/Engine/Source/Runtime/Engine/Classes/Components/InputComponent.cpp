@@ -135,6 +135,9 @@ void UInputComponent::InputKey(const FKeyEvent& InKeyEvent)
     case 32: // SpaceBar
         {
             if (InKeyEvent.GetInputEvent() == IE_Pressed)
+
+
+                
             {
                 PressedKeys.Add(EKeys::SpaceBar);
             }

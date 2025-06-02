@@ -6,6 +6,7 @@
 #include <DirectXMath.h>
 #include <pvd/PxPvd.h>
 
+#include "RendererHelpers.h"
 #include "Container/Array.h"
 #include "Container/Map.h"
 #include "PhysicsEngine/ConstraintInstance.h"
@@ -22,7 +23,6 @@ using namespace DirectX;
 
 class UPrimitiveComponent;
 
-// 게임 오브젝트
 struct GameObject {
     PxRigidDynamic* DynamicRigidBody = nullptr;
     PxRigidStatic* StaticRigidBody = nullptr;
@@ -63,7 +63,7 @@ public:
     PxShape* CreateBoxShape(const PxVec3& Pos, const PxQuat& Quat, const PxVec3& HalfExtents) const;
     PxShape* CreateSphereShape(const PxVec3& Pos, const PxQuat& Quat, float Radius) const;
     PxShape* CreateCapsuleShape(const FVector& Pos, const FQuat& Quat, float Radius, float HalfHeight) const;
-    PxShape* CreateCapsuleShape(const PxVec3& Pos, const PxQuat& Quat, float Radius, float HalfHeight) const;
+    PxShape* CreateCapsuleShape(const PxVec3& Pos, const PxQuat& Quat, float Radius, float HalfHeight, PxMaterial* Material = nullptr) const;
     PxQuat EulerToQuat(const PxVec3& EulerAngles) const;
 
     //filter shader

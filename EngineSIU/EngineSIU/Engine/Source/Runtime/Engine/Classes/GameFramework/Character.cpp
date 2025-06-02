@@ -20,8 +20,11 @@ ACharacter::ACharacter()
 {
     CapsuleComponent = AddComponent<UCapsuleComponent>("CapsuleComponent");
     CapsuleComponent->InitCapsuleSize(42.f, 96.f);
+    CapsuleComponent->bSimulate = true;
+    CapsuleComponent->bApplyGravity = true;
     CapsuleComponent->bLockXRotation = true;
     CapsuleComponent->bLockYRotation = true;
+    CapsuleComponent->RigidBodyType = ERigidBodyType::DYNAMIC;
     RootComponent = CapsuleComponent;
 
     MeshComponent = AddComponent<USkeletalMeshComponent>("SkeletalMeshComponent");
@@ -145,8 +148,8 @@ void ACharacter::DoCameraEffect(float DeltaTime)
 void ACharacter::RegisterLuaType(sol::state& Lua)
 {
     DEFINE_LUA_TYPE_WITH_PARENT(ACharacter, sol::bases<AActor>(),
-        "Speed", sol::property(&ThisClass::GetSpeed, &ThisClass::SetSpeed),
-        "MaxSpeed", sol::property(&ThisClass::GetMaxSpeed, &ThisClass::SetMaxSpeed)
+        "Velocity", sol::property(&ThisClass::GetSpeed, &ThisClass::SetSpeed),
+        "IsRunning", sol::property(&ThisClass::GetIsRunning, &ThisClass::SetIsRunning)
     )
 }
 
@@ -193,22 +196,46 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
     }
 }
 
+float ACharacter::GetSpeed()
+{
+    PxVec3 CurrVelocity = CapsuleComponent->BodyInstance->BIGameObject->DynamicRigidBody->getLinearVelocity();
+    
+    UE_LOG(ELogLevel::Display, TEXT("Speed: %f"), CurrVelocity.magnitude());
+    return CurrVelocity.magnitude();
+}
+
+void ACharacter::SetSpeed(float NewVelocity)
+{
+}
+
 void ACharacter::MoveForward(float Value)
 {
-    if (Value == 0.0f) return;
+    if (Value == 0.0f)
+    {
+        CurrentForce = 0.0f;
+        return;
+    }
 
     if (bIsRunning)
-    {
-        Speed = 12.0f;
-    }
-    else
-    {
-        Speed = 7.0f;
-    }
+        CurrentForce *= 2.0f;
 
-    FVector Forward = GetActorForwardVector() * Speed * Value;
-    FVector NewLocation = GetActorLocation() + Forward;
-    SetActorLocation(NewLocation);
+    physx::PxRigidDynamic* PxCharActor = static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
+    if (PxCharActor == nullptr)
+        return;
+
+    CurrentForce = FMath::Min(CurrentForce + ForceIncrement, MaxForce);
+    FVector Forward = GetActorForwardVector().GetSafeNormal();
+    float ForceScalar = CurrentForce * Value;
+    physx::PxVec3 PushForce(
+        Forward.X * ForceScalar,
+        Forward.Y * ForceScalar,
+        Forward.Z * ForceScalar
+    );
+
+    // PushForce: PhysX 액터에 가할 힘 벡터 (PxVec3) — 뉴턴 단위, 월드 좌표 기준으로 적용됩니다.
+    // physx::PxForceMode::eFORCE: 지속적인 힘 모드. 매 시뮬레이션 스텝마다 힘(force) / 질량(mass)에 따라 가속도가 계산되어 적용됩니다.
+    // /*autowake=*/ true: 슬립 상태인 리지드 바디라도 강제로 깨워서 즉시 물리 시뮬레이션에 반영하도록 설정합니다.
+    PxCharActor->addForce(PushForce, physx::PxForceMode::eFORCE, /*autowake=*/ true);
 
     if (Value >= 0.0f)
     {
@@ -222,20 +249,30 @@ void ACharacter::MoveForward(float Value)
 
 void ACharacter::MoveRight(float Value)
 {
-    if (Value == 0.0f) return;
+    if (Value == 0.0f)
+    {
+        CurrentForce = 0.0f;
+        return;
+    }
 
     if (bIsRunning)
-    {
-        Speed = 12.0f;
-    }
-    else
-    {
-        Speed = 7.0f;
-    }
+        CurrentForce *= 2.0f;
 
-    FVector Right = GetActorRightVector() * Speed * Value;
-    FVector NewLocation = GetActorLocation() + Right;
-    SetActorLocation(NewLocation);
+    physx::PxRigidDynamic* PxCharActor = static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
+    if (PxCharActor == nullptr)
+        return;
+
+    CurrentForce = FMath::Min(CurrentForce + ForceIncrement, MaxForce);
+    FVector Right = GetActorRightVector().GetSafeNormal();
+    float ForceScalar = CurrentForce * Value;
+    
+    physx::PxVec3 PushForce(
+        Right.X * ForceScalar,
+        Right.Y * ForceScalar,
+        Right.Z * ForceScalar
+    );
+    
+    PxCharActor->addForce(PushForce, physx::PxForceMode::eFORCE, true);
 
     if (Value >= 0.0f)
     {
@@ -244,17 +281,5 @@ void ACharacter::MoveRight(float Value)
     else
     {
         MeshComponent->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-    }
-}
-
-void ACharacter::RunFast(bool bInIsRunning)
-{
-    if (bInIsRunning)
-    {
-        Speed = MaxSpeed * 2.0f; // 빠르게 달리기
-    }
-    else
-    {
-        Speed = MaxSpeed; // 일반 속도로 돌아가기
     }
 }

@@ -1626,6 +1626,7 @@
     <ClCompile Include="Engine\Source\Runtime\Physics\SimulationEventCallback.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\SkySphereActor.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Renderer\SkySphereRenderPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\Map.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="EngineSIU.natvis" />
@@ -1772,6 +1773,7 @@
     <ClInclude Include="Engine\Source\Runtime\Physics\SimulationEventCallback.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\SkySphereActor.h" />
     <ClInclude Include="Engine\Source\Runtime\Renderer\SkySphereRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\Map.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\CompositingShader.hlsl" />
