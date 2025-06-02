@@ -13,6 +13,8 @@ DECLARE_MULTICAST_DELEGATE_FourParams(FActorHitSignature, AActor* /* SelfActor *
 
 class UActorComponent;
 class ULuaScriptComponent;
+class UPrimitiveComponent;
+struct FHitResult;
 
 namespace sol
 {
@@ -111,6 +113,23 @@ public:
     bool AddActorRotation(const FQuat& DeltaRotation);
     bool AddActorScale(const FVector& DeltaScale);
 
+public:
+    // physx simulation callback
+    virtual void OnCollisionEnter(
+        UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp,
+        const FHitResult& Hit
+    );
+
+    virtual void OnCollisionExit(
+        UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp
+    );
+
+    virtual void OnCollisionStay(
+        UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+        const FHitResult& Hit
+    );
+
+
 protected:
     UPROPERTY
     (USceneComponent*, RootComponent, = nullptr)
@@ -184,7 +203,7 @@ public:
     virtual bool BindSelfLuaProperties(); // LuaEnv에서 사용할 멤버 변수 등록 함수.
     ULuaScriptComponent* GetLuaScriptComponent() const { return LuaScriptComponent; } 
     
-private:
+protected:
     UPROPERTY(EditAnywhere | EditInline, ULuaScriptComponent*, LuaScriptComponent, = nullptr)
     UPROPERTY(EditAnywhere, bool, bUseScript, = true)
     

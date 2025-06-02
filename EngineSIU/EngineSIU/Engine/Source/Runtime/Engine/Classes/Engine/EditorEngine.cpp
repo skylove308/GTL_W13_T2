@@ -587,11 +587,21 @@ void UEditorEngine::BindEssentialObjects()
             ActiveWorld->GetMainCharacter()->MoveRight(0.1f);
         }
     );
-    // ActiveWorld->GetPlayerController()->BindAction("None",
-    //     [this](float Value) {
-    //         ActiveWorld->GetMainCharacter()->Speed = 6.0f;
-    //     }
-    // );
+    ActiveWorld->GetPlayerController()->BindAction("Run",
+        [this](float Value) {
+            ActiveWorld->GetMainCharacter()->bIsRunning = true;
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("RunRelease",
+        [this](float Value) {
+            ActiveWorld->GetMainCharacter()->bIsRunning = false;
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("Idle",
+        [this](float Value) {
+            ActiveWorld->GetMainCharacter()->Speed = 6.0f;
+        }
+    );
 }
 
 void UEditorEngine::SetPhysXScene(UWorld* World)
@@ -601,18 +611,9 @@ void UEditorEngine::SetPhysXScene(UWorld* World)
 
     for (const auto& Actor : World->GetActiveLevel()->Actors)
     {
-        // temp
-        if (Actor->IsA<ACharacter>())
+        TArray< UPrimitiveComponent*> Prims = Actor->GetComponentsByClass<UPrimitiveComponent>();
+        for (UPrimitiveComponent* Prim : Prims)
         {
-            UCapsuleComponent* capsule = Actor->GetComponentByClass<UCapsuleComponent>();
-            if (capsule)
-            {
-                capsule->CreatePhysXGameObject();
-            }
-        }
-        else
-        {
-            UPrimitiveComponent* Prim = Actor->GetComponentByClass<UPrimitiveComponent>();
             if (Prim)
             {
                 Prim->CreatePhysXGameObject();

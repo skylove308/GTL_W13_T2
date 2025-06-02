@@ -17,6 +17,7 @@
 #include "UObject/ObjectFactory.h"
 #include "PhysicsEngine/ConstraintInstance.h"
 #include "Engine/Contents/AnimInstance/LuaScriptAnimInstance.h"
+#include <Actors/Car.h>
 
 bool USkeletalMeshComponent::bIsCPUSkinning = false;
 
@@ -161,13 +162,22 @@ void USkeletalMeshComponent::TickComponent(float DeltaTime)
 {
     Super::TickComponent(DeltaTime);
 
-    if(!bSimulate)
+    if(RigidBodyType != ERigidBodyType::DYNAMIC)
     {
         TickPose(DeltaTime);
         UpdateBoneTransformToPhysScene();
     }
     else
     {
+        // bone[0]의 월드 트랜스폼을 Root컴포넌트의 월드로 적용
+        if (AttachParent)
+        {
+            if (BonePoseContext.Pose.GetNumBones() > 0)
+            {
+                BonePoseContext.Pose[0] = AttachParent->GetComponentTransform();
+                //AttachParent->SetWorldLocation(BonePoseContext.Pose[0].GetTranslation());
+            }
+        }
     }
 }
 
@@ -240,7 +250,7 @@ void USkeletalMeshComponent::EndPhysicsTickComponent(float DeltaTime)
             BonePoseContext.Pose[i] = FTransform(CurrentLocalMatrix);
         }
         
-        CPUSkinning();
+        //CPUSkinning();
     }
 }
 
@@ -268,7 +278,6 @@ void USkeletalMeshComponent::TickAnimInstances(float DeltaTime)
 {
     if (AnimScriptInstance)
     {
-        //AnimScriptInstance->SetAnimState(AnimScriptInstance->GetStateMachine()->GetState());
         AnimScriptInstance->UpdateAnimation(DeltaTime, BonePoseContext);
     }
 }
@@ -552,33 +561,45 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
     {
         FBodyInstance* NewBody = new FBodyInstance(this);
 
-        for (const auto& GeomAttribute : BodySetups[i]->GeomAttributes)
+        for (auto& GeomAttribute : BodySetups[i]->GeomAttributes)
         {
             PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
             FQuat GeomQuat = GeomAttribute.Rotation.Quaternion();
             PxQuat GeomPQuat = PxQuat(GeomQuat.X, GeomQuat.Y, GeomQuat.Z, GeomQuat.W);
             PxVec3 Extent = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
 
+            GeomAttribute.CollisionGroup = ECollisionGroup::GROUP_CHARACTER_RAGDOLL;
+            //GeomAttribute.CollisionWithGroup = static_cast<ECollisionGroup>((uint32)ECollisionGroup::GROUP_ALL & ~(uint32)ECollisionGroup::GROUP_CHARACTER_BODY);
+            GeomAttribute.CollisionWithGroup = static_cast<ECollisionGroup>((uint32)ECollisionGroup::GROUP_WORLD_STATIC);
+
+            PxShape* Shape = nullptr;
             switch (GeomAttribute.GeomType)
             {
             case EGeomType::ESphere:
             {
-                PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, GeomPQuat, Extent.x);
-                BodySetups[i]->AggGeom.SphereElems.Add(PxSphere);
+                Shape = GEngine->PhysicsManager->CreateSphereShape(Offset, GeomPQuat, Extent.x);
+                BodySetups[i]->AggGeom.SphereElems.Add(Shape);
                 break;
             }
             case EGeomType::EBox:
             {
-                PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, GeomPQuat, Extent);
-                BodySetups[i]->AggGeom.BoxElems.Add(PxBox);
+                Shape = GEngine->PhysicsManager->CreateBoxShape(Offset, GeomPQuat, Extent);
+                BodySetups[i]->AggGeom.BoxElems.Add(Shape);
                 break;
             }
             case EGeomType::ECapsule:
             {
-                PxShape* PxCapsule = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z);
-                BodySetups[i]->AggGeom.SphereElems.Add(PxCapsule);
+                Shape = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z);
+                BodySetups[i]->AggGeom.SphereElems.Add(Shape);
                 break;
             }
+            }
+            if (Shape)
+            {
+                PxFilterData FilterData;
+                FilterData.word0 = static_cast<uint32>(GeomAttribute.CollisionGroup);
+                FilterData.word1 = static_cast<uint32>(GeomAttribute.CollisionWithGroup);
+                Shape->setSimulationFilterData(FilterData);
             }
         }
 
@@ -702,7 +723,6 @@ void USkeletalMeshComponent::UpdateBoneTransformToPhysScene()
 
 void USkeletalMeshComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-    int i = 1;
     OnChangeRigidBodyFlag();
 }
 
@@ -720,6 +740,23 @@ void USkeletalMeshComponent::OnChangeRigidBodyFlag()
         }
     }
 }
+
+void USkeletalMeshComponent::AddImpulseToBones(const FVector& Direction, float ImpulseScale)
+{
+    if (Bodies.Num() <= 0)
+    {
+        return;
+    }
+    for (auto& Body : Bodies)
+    {
+        if (Body->BIGameObject && Body->BIGameObject->DynamicRigidBody)
+        {
+            PxVec3 Impulse = PxVec3(Direction.X, Direction.Y, Direction.Z) * ImpulseScale;
+            Body->BIGameObject->DynamicRigidBody->addForce(Impulse, PxForceMode::eIMPULSE);
+        }
+    }
+}
+
 
 bool USkeletalMeshComponent::NeedToSpawnAnimScriptInstance() const
 {

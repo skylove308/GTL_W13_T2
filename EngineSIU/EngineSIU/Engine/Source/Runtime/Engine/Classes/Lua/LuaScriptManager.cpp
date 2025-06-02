@@ -32,6 +32,13 @@ FLuaScriptManager::FLuaScriptManager()
     SetLuaDefaultTypes();
 }
 
+FLuaScriptManager::~FLuaScriptManager()
+{
+    ScriptCacheMap.Empty();
+    ActiveLuaComponents.Empty();
+    ActiveAnimLua.Empty();
+}
+
 void FLuaScriptManager::SetLuaDefaultTypes()
 {
     sol::table TypeTable = LuaState.create_table("EngineTypes");
@@ -149,8 +156,7 @@ void FLuaScriptManager::HotReloadLuaScript()
     {
         for (const ULuaScriptComponent* LuaComponent : ActiveLuaComponents)
         {
-            const FString FullPath = "LuaScripts/Actors/" + LuaComponent->GetScriptName() + ".lua";
-            if (FullPath == ChangedScript)
+            if (LuaComponent->GetScriptName() == ChangedScript)
             {
                 LuaComponent->GetOwner()->BindSelfLuaProperties();
                 UE_LOG(ELogLevel::Display, TEXT("Lua Script Reloaded: %s"), *ChangedScript);

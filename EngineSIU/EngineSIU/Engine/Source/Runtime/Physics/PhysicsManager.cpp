@@ -6,6 +6,8 @@
 
 #include "World/World.h"
 #include <thread>
+#include "Physics/SimulationEventCallback.h"
+
 
 
 void GameObject::SetRigidBodyType(ERigidBodyType RigidBodyType) const
@@ -75,19 +77,22 @@ PxScene* FPhysicsManager::CreateScene(UWorld* World)
     
     PxSceneDesc SceneDesc(Physics->getTolerancesScale());
     
-    SceneDesc.gravity = PxVec3(0, 0, -9.81f);
+    SceneDesc.gravity = PxVec3(0, 0, -98.1f);
     
     unsigned int hc = std::thread::hardware_concurrency();
     Dispatcher = PxDefaultCpuDispatcherCreate(hc-2);
     SceneDesc.cpuDispatcher = Dispatcher;
     
-    SceneDesc.filterShader = PxDefaultSimulationFilterShader;
+    //SceneDesc.filterShader = PxDefaultSimulationFilterShader;
+    SceneDesc.filterShader = FilterShader;
     
     // sceneDesc.simulationEventCallback = gMyCallback; // TODO: 이벤트 핸들러 등록(옵저버 or component 별 override)
     
     SceneDesc.flags |= PxSceneFlag::eENABLE_ACTIVE_ACTORS;
     SceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
     SceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
+
+    SceneDesc.simulationEventCallback = new FSimulationEventCallback(); // 충돌 이벤트 콜백 설정
     
     PxScene* NewScene = Physics->createScene(SceneDesc);
     SceneMap.Add(World, NewScene);
@@ -706,15 +711,73 @@ PxShape* FPhysicsManager::CreateCapsuleShape(const FVector& Pos, const FQuat& Qu
 
 PxShape* FPhysicsManager::CreateCapsuleShape(const PxVec3& Pos, const PxQuat& Quat, float Radius, float HalfHeight, PxMaterial* UseMaterial) const
 {
+    const PxQuat axisCorrectionQuat = PxQuat(PxHalfPi, PxVec3(0.0f, 1.0f, 0.0f));
+    PxQuat finalShapeQuat = Quat * axisCorrectionQuat;
+    finalShapeQuat.normalize(); // 정규화 보장
     // Capsule 모양 생성
     PxMaterial* MatToUse = (UseMaterial != nullptr) ? UseMaterial : Material;
     PxShape* Result = Physics->createShape(PxCapsuleGeometry(Radius, HalfHeight), *MatToUse);
     
     // 위치와 회전을 모두 적용한 Transform 생성
-    PxTransform LocalTransform(Pos, Quat);
+    PxTransform LocalTransform(Pos, finalShapeQuat);
     Result->setLocalPose(LocalTransform);
     
     return Result;
+}
+
+PxFilterFlags FPhysicsManager::FilterShader(
+    PxFilterObjectAttributes attributes0,
+    PxFilterData filterData0,
+    PxFilterObjectAttributes attributes1,
+    PxFilterData filterData1,
+    PxPairFlags& pairFlags,
+    const void* constantBlock,
+    PxU32 constantBlockSize)
+{
+    // 트리거는 따로 처리
+    if (PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1))
+    {
+        pairFlags = PxPairFlag::eTRIGGER_DEFAULT;
+        return PxFilterFlag::eDEFAULT;
+    }
+
+    const auto IsRagdoll = [](PxFilterData data) {
+        return (data.word0 & static_cast<int>(ECollisionGroup::GROUP_CHARACTER_RAGDOLL)) != 0;
+        };
+
+    const auto IsBody = [](PxFilterData data) {
+        return (data.word0 & static_cast<int>(ECollisionGroup::GROUP_CHARACTER_BODY)) != 0;
+        };
+
+    const bool AIsRagdoll = IsRagdoll(filterData0);
+    const bool BIsRagdoll = IsRagdoll(filterData1);
+    const bool AIsBody = IsBody(filterData0);
+    const bool BIsBody = IsBody(filterData1);
+
+    // ✅ CASE 1: Ragdoll ↔ Body → 완전 무시
+    if ((AIsRagdoll && BIsBody) || (BIsRagdoll && AIsBody))
+    {
+        return PxFilterFlag::eSUPPRESS; // 충돌, 콜백 모두 없음
+    }
+
+    // ✅ CASE 2: Ragdoll ↔ Other → 충돌은 함, 콜백은 없음
+    if (AIsRagdoll || BIsRagdoll)
+    {
+        pairFlags = PxPairFlag::eCONTACT_DEFAULT; // 충돌 응답만
+        return PxFilterFlag::eDEFAULT;
+    }
+
+    // ✅ 기본 충돌 로직 (Ragdoll도 아님)
+    if ((filterData0.word0 & filterData1.word1) && (filterData1.word0 & filterData0.word1))
+    {
+        pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+        pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
+        pairFlags |= PxPairFlag::eNOTIFY_TOUCH_LOST;
+        pairFlags |= PxPairFlag::eNOTIFY_CONTACT_POINTS;
+        return PxFilterFlag::eDEFAULT;
+    }
+
+    return PxFilterFlag::eDEFAULT;
 }
 
 void FPhysicsManager::Simulate(float DeltaTime)

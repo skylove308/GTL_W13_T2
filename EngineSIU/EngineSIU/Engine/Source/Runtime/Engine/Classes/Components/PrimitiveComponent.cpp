@@ -279,6 +279,17 @@ void UPrimitiveComponent::GetProperties(TMap<FString, FString>& OutProperties) c
     OutProperties.Add(TEXT("bSimulate"), bSimulate ? TEXT("true") : TEXT("false"));
     OutProperties.Add(TEXT("bApplyGravity"), bApplyGravity ? TEXT("true") : TEXT("false"));
     OutProperties.Add(TEXT("RigidBodyType"), FString::FromInt(static_cast<uint8>(RigidBodyType)));
+    OutProperties.Add(TEXT("GeomsCount"), FString::FromInt(GeomAttributes.Num()));
+    for (int32 i = 0; i < GeomAttributes.Num(); ++i)
+    {
+        FString GeomKey = FString::Printf(TEXT("Geom_%d"), i);
+        OutProperties.Add(GeomKey + TEXT("Type"), FString::FromInt(static_cast<uint8>(GeomAttributes[i].GeomType)));
+        OutProperties.Add(GeomKey + TEXT("Offset"), GeomAttributes[i].Offset.ToString());
+        OutProperties.Add(GeomKey + TEXT("Rotation"), GeomAttributes[i].Rotation.ToString());
+        OutProperties.Add(GeomKey + TEXT("Extent"), GeomAttributes[i].Extent.ToString());
+        OutProperties.Add(GeomKey + TEXT("CollisionGroup"), FString::FromInt(static_cast<uint8>(GeomAttributes[i].CollisionGroup)));
+        OutProperties.Add(GeomKey + TEXT("CollisionWithGroup"), FString::FromInt(static_cast<uint8>(GeomAttributes[i].CollisionWithGroup)));
+    }
 }
 
 void UPrimitiveComponent::SetProperties(const TMap<FString, FString>& InProperties)
@@ -322,6 +333,48 @@ void UPrimitiveComponent::SetProperties(const TMap<FString, FString>& InProperti
     if (InProperties.Contains(TEXT("RigidBodyType")))
     {
         RigidBodyType = static_cast<ERigidBodyType>(FString::ToInt(InProperties[TEXT("RigidBodyType")]));
+    }
+
+    TempStr = InProperties.Find(TEXT("GeomsCount"));
+    if (TempStr)
+    {
+        int32 GeomsCount = FString::ToInt(*TempStr);
+        GeomAttributes.SetNum(GeomsCount);
+        for (int32 i = 0; i < GeomsCount; ++i)
+        {
+            FString GeomKey = FString::Printf(TEXT("Geom_%d"), i);
+            AggregateGeomAttributes& GeomAttribute = GeomAttributes[i];
+            TempStr = InProperties.Find(GeomKey + TEXT("Type"));
+            if (TempStr)
+            {
+                GeomAttribute.GeomType = static_cast<EGeomType>(FString::ToInt(*TempStr));
+            }
+            TempStr = InProperties.Find(GeomKey + TEXT("Offset"));
+            if (TempStr)
+            {
+                GeomAttribute.Offset.InitFromString(*TempStr);
+            }
+            TempStr = InProperties.Find(GeomKey + TEXT("Rotation"));
+            if (TempStr)
+            {
+                GeomAttribute.Rotation.InitFromString(*TempStr);
+            }
+            TempStr = InProperties.Find(GeomKey + TEXT("Extent"));
+            if (TempStr)
+            {
+                GeomAttribute.Extent.InitFromString(*TempStr);
+            }
+            TempStr = InProperties.Find(GeomKey + TEXT("CollisionGroup"));
+            if (TempStr)
+            {
+                GeomAttribute.CollisionGroup = static_cast<ECollisionGroup>(FString::ToInt(*TempStr));
+            }
+            TempStr = InProperties.Find(GeomKey + TEXT("CollisionWithGroup"));
+            if (TempStr)
+            {
+                GeomAttribute.CollisionWithGroup = static_cast<ECollisionGroup>(FString::ToInt(*TempStr));
+            }
+        }
     }
 }
 
@@ -547,15 +600,17 @@ void UPrimitiveComponent::CreatePhysXGameObject()
 
     if (GeomAttributes.Num() == 0)
     {
+        AggregateGeomAttributes Attr;
+
         if (UCapsuleComponent* Capsule = Cast<UCapsuleComponent>(this))
         {
-            AggregateGeomAttributes Attr;
             Attr.GeomType = EGeomType::ECapsule;
             Attr.Offset = FVector::ZeroVector;
             PxQuat RotateToZ = PxQuat(PxPi / 2.0f, PxVec3(0, 0, 1));
             FQuat UnrealQuat = FQuat(RotateToZ.x, RotateToZ.y, RotateToZ.z, RotateToZ.w);
             Attr.Rotation = UnrealQuat.Rotator();
             Attr.Extent = FVector(Capsule->GetRadius(), Capsule->GetRadius(), Capsule->GetHalfHeight());
+
             GeomAttributes.Add(Attr);
         }
         else if (USphereComponent* Sphere = Cast<USphereComponent>(this))
@@ -575,27 +630,30 @@ void UPrimitiveComponent::CreatePhysXGameObject()
             Attr.Extent = FVector(AABB.MaxLocation - AABB.MinLocation) / 2 * GetComponentScale3D();
             GeomAttributes.Add(Attr);
         }
+        Attr.CollisionGroup = ECollisionGroup::GROUP_CHARACTER_BODY;
+        Attr.CollisionWithGroup = static_cast<ECollisionGroup>((uint32)ECollisionGroup::GROUP_MAX & ~(uint32)ECollisionGroup::GROUP_CHARACTER_RAGDOLL);
     }
 
     for (const auto& GeomAttribute : GeomAttributes)
     {
-        PxVec3 Offset = PxVec3(GeomAttribute.Offset.Y, GeomAttribute.Offset.Z, GeomAttribute.Offset.X);
+        PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
         FQuat GeomQuat = GeomAttribute.Rotation.Quaternion();
-        PxQuat GeomPQuat = PxQuat(GeomQuat.Y, GeomQuat.Z, GeomQuat.X, GeomQuat.W);
+        PxQuat GeomPQuat = PxQuat(GeomQuat.X, GeomQuat.Y, GeomQuat.Z, GeomQuat.W);
         PxVec3 Extent = PxVec3(GeomAttribute.Extent.X, GeomAttribute.Extent.Y, GeomAttribute.Extent.Z);
 
+        PxShape* PxShape = nullptr;
         switch (GeomAttribute.GeomType)
         {
         case EGeomType::ESphere:
         {
-            PxShape* PxSphere = GEngine->PhysicsManager->CreateSphereShape(Offset, GeomPQuat, Extent.x);
-            BodySetup->AggGeom.SphereElems.Add(PxSphere);
+            PxShape = GEngine->PhysicsManager->CreateSphereShape(Offset, GeomPQuat, Extent.x);
+            BodySetup->AggGeom.SphereElems.Add(PxShape);
             break;
         }
         case EGeomType::EBox:
         {
-            PxShape* PxBox = GEngine->PhysicsManager->CreateBoxShape(Offset, GeomPQuat, Extent);
-            BodySetup->AggGeom.BoxElems.Add(PxBox);
+            PxShape = GEngine->PhysicsManager->CreateBoxShape(Offset, GeomPQuat, Extent);
+            BodySetup->AggGeom.BoxElems.Add(PxShape);
             break;
         }
         case EGeomType::ECapsule:
@@ -608,7 +666,16 @@ void UPrimitiveComponent::CreatePhysXGameObject()
             break;
         }
         }
+
+        if (PxShape)
+        {
+            PxFilterData FilterData;
+            FilterData.word0 = static_cast<uint32>(GeomAttribute.CollisionGroup);
+            FilterData.word1 = static_cast<uint32>(GeomAttribute.CollisionWithGroup);
+            PxShape->setSimulationFilterData(FilterData);
+        }
     }
+    
     GameObject* Obj = GEngine->PhysicsManager->CreateGameObject(PPos, PQuat, BodyInstance,  BodySetup, RigidBodyType);
     BodyInstance->SetGameObject(Obj);
     BodyInstance->RigidActorSync = Obj->DynamicRigidBody;
@@ -618,6 +685,24 @@ void UPrimitiveComponent::CreatePhysXGameObject()
 void UPrimitiveComponent::BeginPlay()
 {
     USceneComponent::BeginPlay();
+}
+
+void UPrimitiveComponent::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
+{
+    if (AActor* Actor = GetOwner())
+    {
+        UE_LOG(ELogLevel::Warning, "OnCollisionEnter %s, %s", HitComponent->GetName().ToAnsiString(), OtherComp->GetName().ToAnsiString());
+        Actor->OnCollisionEnter(HitComponent, OtherComp, Hit);
+    }
+}
+
+void UPrimitiveComponent::OnCollisionExit(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp)
+{
+
+}
+
+void UPrimitiveComponent::OnCollisionStay(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
+{
 }
 
 void UPrimitiveComponent::UpdateOverlapsImpl(const TArray<FOverlapInfo>* NewPendingOverlaps, bool bDoNotifies, const TArray<const FOverlapInfo>* OverlapsAtEndLocation)
