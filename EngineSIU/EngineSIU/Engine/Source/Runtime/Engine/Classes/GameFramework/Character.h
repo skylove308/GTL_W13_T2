@@ -49,9 +49,6 @@ public:
     bool bSwitchCamera = false;
     float CurrentDeathCameraTransitionTime = 3.0f;
     float CurrentDeathLetterBoxTransitionTime = 2.0f;
-
-    const float DeathCameraTransitionTime = 0.5f;
-    const float DeathLetterBoxTransitionTime = 2.0f;
     
     float CurrentForce = 0.0f;
     float TotalForce = 0.0f;
@@ -60,11 +57,19 @@ public:
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MaxForce,  = 100000.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MovementForceMultiplier,  = 1.0f)
  
+
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, DeathCameraTransitionTime,  = 3.0f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, DeathLetterBoxTransitionTime,  = 2.0f)
+
+                
 private:
     virtual void BeginPlay() override;
     virtual UObject* Duplicate(UObject* InOuter) override;
     virtual void Tick(float DeltaTime) override;
 
     void DoCameraEffect(float DeltaTime);
+    void UpdateParticleEffectLocation();
+
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, ImpulseScale, = 100000.f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, class UParticleSystem*, ExplosionParticle, = nullptr)
 };

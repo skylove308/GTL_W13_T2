@@ -38,10 +38,13 @@ void FParticleEmitterInstance::Initialize()
     AccumulatedTime = 0.0f;
     SpawnFraction = 0.0f;
 
+    // 시작할 때 Burst
+    CurrentTimeForBurst = CurrentLODLevel->SpawnModule->BurstTime;
+
     bEnabled = true;
 }
 
-void FParticleEmitterInstance::Tick(float DeltaTime)
+void FParticleEmitterInstance::Tick(float DeltaTime, bool bSuppressSpawning)
 {
     AccumulatedTime += DeltaTime;
     CurrentTimeForBurst += DeltaTime;
@@ -57,7 +60,7 @@ void FParticleEmitterInstance::Tick(float DeltaTime)
     {
         float Increment = (SpawnCount > 1) ? DeltaTime / (SpawnCount - 1) : 0.0f;
         float StartTime = AccumulatedTime - DeltaTime;
-        SpawnParticles(SpawnCount, StartTime, Increment, FVector::ZeroVector, FVector::ZeroVector);
+        SpawnParticles(SpawnCount, StartTime, Increment, FVector::ZeroVector, FVector::ZeroVector, bSuppressSpawning);
     }
 
     UpdateModules(DeltaTime);
@@ -66,8 +69,11 @@ void FParticleEmitterInstance::Tick(float DeltaTime)
 
 void FParticleEmitterInstance::SpawnParticles(
     int32 Count, float StartTime, float Increment,
-    const FVector& InitialLocation, const FVector& InitialVelocity)
+    const FVector& InitialLocation, const FVector& InitialVelocity, bool bSuppressSpawning)
 {
+    if (bSuppressSpawning)
+        return;
+
     for (int32 i = 0; i < Count; i++)
     {
         int32 NextIndex = ActiveParticles++;
