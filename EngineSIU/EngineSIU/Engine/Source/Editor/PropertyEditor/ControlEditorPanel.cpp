@@ -465,7 +465,7 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                     TextComponent->SetRowColumnCount(106, 106);
                     TextComponent->SetText(L"Default");
                     SpawnedActor->SetRootComponent(TextComponent);
-                    
+
                     break;
                 }
                 case OBJ_FOG:
@@ -500,7 +500,7 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                     SpawnedActor = World->SpawnActor<ASkeletalMeshActor>();
                     SpawnedActor->SetActorTickInEditor(true);
                     break;
-                }   
+                }
                 case OBJ_SEQUENCERPLAYER:
                 {
                     SpawnedActor = World->SpawnActor<ASequencerPlayer>();
@@ -539,6 +539,7 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                 case OBJ_PLAYER:
                 case OBJ_END:
                     break;
+                }
                 }
 
                 if (SpawnedActor)

@@ -150,7 +150,8 @@ void ACharacter::RegisterLuaType(sol::state& Lua)
 {
     DEFINE_LUA_TYPE_WITH_PARENT(ACharacter, sol::bases<AActor>(),
         "Velocity", sol::property(&ThisClass::GetSpeed, &ThisClass::SetSpeed),
-        "IsRunning", sol::property(&ThisClass::GetIsRunning, &ThisClass::SetIsRunning)
+        "IsRunning", sol::property(&ThisClass::GetIsRunning, &ThisClass::SetIsRunning),
+        "IsDead", sol::property(&ThisClass::GetIsDead, &ThisClass::SetIsDead)
     )
 }
 
@@ -204,6 +205,11 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
         OtherComp->GetOwner()->IsA<ARoad>())
     {
         ARoad* Road = Cast<ARoad>(OtherComp->GetOwner());
+        Road->OnDeath.AddLambda([this]()
+        {
+            bIsDead = true;
+        });
+
         if (Road->GetCurrentRoadState() == ERoadState::Safe)
         {
             Road->SetIsOverlapped(true);

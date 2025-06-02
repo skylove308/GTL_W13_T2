@@ -37,8 +37,12 @@ public:
     bool GetIsRunning() { return bIsRunning; }
     void SetIsRunning(bool bInIsRunning) { bIsRunning = bInIsRunning; }
 
+    bool GetIsDead() { return bIsDead; }
+    void SetIsDead(bool bInIsDead) { bIsDead = bInIsDead; }
+
 public:
     bool bIsRunning = false;
+    bool bIsDead = false;
 
     bool bCameraEffect = false;
     bool bSwitchCamera = false;
