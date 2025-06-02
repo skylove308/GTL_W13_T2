@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <cmath>
 #include <concepts>
 #include <numbers>
@@ -112,7 +112,7 @@ struct FMath
     [[nodiscard]] static FORCEINLINE double InvSqrt(double A) { return 1.0 / sqrt(A); }
 
     /**
-     * 비교값(Comparand)에 따라 값을 선택적으로 반환합니다. 
+     * 비교값(Comparand)에 따라 값을 선택적으로 반환합니다.
      * 이 함수의 주요 목적은 부동소수점 비교 시 발생하는 분기 예측을 회피하고
      * 컴파일러 내장 함수를 통해 최적화하는 것입니다.
      *
@@ -162,15 +162,15 @@ struct FMath
     /** TCustomLerp<T>에 있는 Lerp를 호출합니다. */
     template <typename T, typename U>
         requires (
-            TCustomLerpable<T>
-            && (std::is_floating_point_v<U> || std::is_same_v<T, U>)
-            && !std::is_same_v<T, bool>
-            && requires(const T& A, const T& B, const U& Alpha)
-            {
-                { TCustomLerp<T>::Lerp(A, B, Alpha) } -> std::same_as<T>;
-            }
+    TCustomLerpable<T>
+        && (std::is_floating_point_v<U> || std::is_same_v<T, U>)
+        && !std::is_same_v<T, bool>
+        && requires(const T& A, const T& B, const U& Alpha)
+    {
+        { TCustomLerp<T>::Lerp(A, B, Alpha) } -> std::same_as<T>;
+    }
         )
-    [[nodiscard]] static T Lerp(const T& A, const T& B, const U& Alpha)
+        [[nodiscard]] static T Lerp(const T& A, const T& B, const U& Alpha)
     {
         return TCustomLerp<T>::Lerp(A, B, Alpha);
     }
@@ -178,17 +178,17 @@ struct FMath
     /** 서로 다른 타입에 대해 Lerp를 적용시킵니다. */
     template <typename T1, typename T2, typename T3>
         requires (
-            !std::is_same_v<T1, T2>
-            && !TCustomLerpable<T1>
-            && !TCustomLerpable<T2>
-            && requires(const T1& A, const T2& B, const T3& Alpha)
-            {
-                { Lerp(A, B, Alpha) } -> std::same_as<decltype(A * B)>;
-            }
-        )
-    [[nodiscard]] static auto Lerp(const T1& A, const T2& B, const T3& Alpha) -> decltype(A * B)
+    !std::is_same_v<T1, T2>
+        && !TCustomLerpable<T1>
+        && !TCustomLerpable<T2>
+        && requires(const T1& A, const T2& B, const T3& Alpha)
     {
-        using ABType = decltype(A * B);
+        { Lerp(A, B, Alpha) } -> std::same_as<decltype(A* B)>;
+    }
+        )
+        [[nodiscard]] static auto Lerp(const T1& A, const T2& B, const T3& Alpha) -> decltype(A* B)
+    {
+        using ABType = decltype(A* B);
         return Lerp(ABType(A), ABType(B), Alpha);
     }
 
@@ -203,24 +203,24 @@ struct FMath
      */
     template <typename T, typename U>
         requires (
-            !TCustomLerpable<T>
-            && (std::is_floating_point_v<U> || std::is_same_v<T, U>)
+    !TCustomLerpable<T>
+        && (std::is_floating_point_v<U> || std::is_same_v<T, U>)
         )
-    [[nodiscard]] static constexpr FORCEINLINE_DEBUGGABLE T CubicInterp(const T& P0, const T& T0, const T& P1, const T& T1, const U& A)
+        [[nodiscard]] static constexpr FORCEINLINE_DEBUGGABLE T CubicInterp(const T& P0, const T& T0, const T& P1, const T& T1, const U& A)
     {
         const U A2 = A * A;
         const U A3 = A2 * A;
 
-        return T((((2*A3)-(3*A2)+1) * P0) + ((A3-(2*A2)+A) * T0) + ((A3-A2) * T1) + (((-2*A3)+(3*A2)) * P1));
+        return T((((2 * A3) - (3 * A2) + 1) * P0) + ((A3 - (2 * A2) + A) * T0) + ((A3 - A2) * T1) + (((-2 * A3) + (3 * A2)) * P1));
     }
 
     /** 커스텀 타입에 대해서 CubicInterp을 수행합니다. */
     template <typename T, typename U>
         requires TCustomLerpable<T>
-        && requires(const T& P0, const T& T0, const T& P1, const T& T1, const U& A)
-        {
-            { TCustomLerp<T>::CubicInterp(P0, T0, P1, T1, A) } -> std::same_as<T>;
-        }
+    && requires(const T& P0, const T& T0, const T& P1, const T& T1, const U& A)
+    {
+        { TCustomLerp<T>::CubicInterp(P0, T0, P1, T1, A) } -> std::same_as<T>;
+    }
     [[nodiscard]] static FORCEINLINE_DEBUGGABLE T CubicInterp(const T& P0, const T& T0, const T& P1, const T& T1, const U& A)
     {
         return TCustomLerp<T>::CubicInterp(P0, T0, P1, T1, A);
@@ -248,8 +248,8 @@ struct FMath
     {
         return Lerp<T>(
             A, B, (Alpha < 0.5f)
-                ? InterpEaseIn(0.f, 1.f, Alpha * 2.f, Exp) * 0.5f
-                : InterpEaseOut(0.f, 1.f, Alpha * 2.f - 1.f, Exp) * 0.5f + 0.5f
+            ? InterpEaseIn(0.f, 1.f, Alpha * 2.f, Exp) * 0.5f
+            : InterpEaseOut(0.f, 1.f, Alpha * 2.f - 1.f, Exp) * 0.5f + 0.5f
         );
     }
 
@@ -347,8 +347,8 @@ struct FMath
     {
         return Lerp<T>(
             A, B, (Alpha < 0.5f)
-                ? InterpCircularIn(0.f, 1.f, Alpha * 2.f) * 0.5f
-                : InterpCircularOut(0.f, 1.f, Alpha * 2.f - 1.f) * 0.5f + 0.5f
+            ? InterpCircularIn(0.f, 1.f, Alpha * 2.f) * 0.5f
+            : InterpCircularOut(0.f, 1.f, Alpha * 2.f - 1.f) * 0.5f + 0.5f
         );
     }
 
@@ -379,7 +379,7 @@ struct FMath
         requires (!std::is_same_v<T1, bool> && !std::is_same_v<T2, bool>)
     [[nodiscard]] static auto FInterpConstantTo(T1 Current, T2 Target, T3 DeltaTime, T4 InterpSpeed)
     {
-        using RetType = decltype(T1() * T2() * T3() * T4());
+        using RetType = decltype(T1()* T2()* T3()* T4());
 
         const RetType Dist = Target - Current;
 
@@ -398,7 +398,7 @@ struct FMath
         requires (!std::is_same_v<T1, bool> && !std::is_same_v<T2, bool>)
     [[nodiscard]] static auto FInterpTo(T1 Current, T2 Target, T3 DeltaTime, T4 InterpSpeed)
     {
-        using RetType = decltype(T1() * T2() * T3() * T4());
+        using RetType = decltype(T1()* T2()* T3()* T4());
 
         // If no interp speed, jump to target value
         if (InterpSpeed <= 0.f)
@@ -429,12 +429,14 @@ struct FMath
     /** Current에서 Target까지 쿼터니언 보간 (타겟 각도 차이에 비례하여 초기 고속 적용 후 감속) */
     [[nodiscard]] static FQuat QInterpTo(const FQuat& Current, const FQuat& Target, float DeltaTime, float InterpSpeed);
 
+    [[nodiscard]] static FVector VRand();
+
     // 다른 Lerp는 UnrealMathUtility.h의 1469
     // End Interpolations
 
 
     template <typename T>
-    [[nodiscard]] static FORCEINLINE constexpr auto RadiansToDegrees(const T& RadVal) -> decltype(RadVal * (180.0f / PI))
+    [[nodiscard]] static FORCEINLINE constexpr auto RadiansToDegrees(const T& RadVal) -> decltype(RadVal* (180.0f / PI))
     {
         return RadVal * (180.0f / PI);
     }
@@ -450,7 +452,7 @@ struct FMath
     }
 
     template <typename T>
-    [[nodiscard]] static FORCEINLINE constexpr auto DegreesToRadians(const T& DegVal) -> decltype(DegVal * (PI / 180.0f))
+    [[nodiscard]] static FORCEINLINE constexpr auto DegreesToRadians(const T& DegVal) -> decltype(DegVal* (PI / 180.0f))
     {
         return DegVal * (PI / 180.0f);
     }
@@ -471,7 +473,7 @@ struct FMath
 
     // Returns 2^Value
     [[nodiscard]] static FORCEINLINE float Exp2(float Value) { return powf(2.f, Value); /*exp2f(Value);*/ }
-    [[nodiscard]] static FORCEINLINE double Exp2(double Value) {return pow(2.0, Value); /*exp2(Value);*/ }
+    [[nodiscard]] static FORCEINLINE double Exp2(double Value) { return pow(2.0, Value); /*exp2(Value);*/ }
 
     [[nodiscard]] static FORCEINLINE float Loge(float Value) { return logf(Value); }
     [[nodiscard]] static FORCEINLINE double Loge(double Value) { return log(Value); }
@@ -560,7 +562,7 @@ struct FMath
         return fmodf(X, Y);
     }
 
-    [[nodiscard]]static int RandHelper(int max)
+    [[nodiscard]] static int RandHelper(int max)
     {
         static std::mt19937 rng(std::random_device{}());
         std::uniform_int_distribution<int> dist(0, max - 1);
@@ -570,22 +572,22 @@ struct FMath
     [[nodiscard]] static float PerlinNoise1D(float x)
     {
         static auto fade = [](float t) -> float
-        {
-            return t * t * t * (t * (t * 6 - 15) + 10);
-        };
+            {
+                return t * t * t * (t * (t * 6 - 15) + 10);
+            };
 
         static auto lerp = [](float a, float b, float t) -> float
-        {
-            return a + t * (b - a);
-        };
+            {
+                return a + t * (b - a);
+            };
 
         static auto grad = [](int hash, float x) -> float
-        {
-            int h = hash & 15;
-            float grad = 1.0f + (h & 7); // Gradient value 1-8
-            if (h & 8) grad = -grad;
-            return grad * x;
-        };
+            {
+                int h = hash & 15;
+                float grad = 1.0f + (h & 7); // Gradient value 1-8
+                if (h & 8) grad = -grad;
+                return grad * x;
+            };
 
         static int p[512] = {
             151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180,
@@ -616,7 +618,7 @@ struct FMath
     static FORCEINLINE int64 FloorToInt(double F) { return static_cast<int64>(std::floor(F)); }
     static FORCEINLINE int32 RoundToInt(float F) { return static_cast<int32>(std::round(F)); }
     static FORCEINLINE int64 RoundToInt(double F) { return static_cast<int64>(std::round(F)); }
-    
+
     static FORCEINLINE float Frac(float Value)
     {
         return Value - FloorToFloat(Value);
@@ -625,5 +627,18 @@ struct FMath
     static FORCEINLINE double Frac(double Value)
     {
         return Value - FloorToDouble(Value);
+    }
+
+    /** Returns a random float between 0 and 1, inclusive. */
+    static FORCEINLINE float FRand()
+    {
+        constexpr int32 RandMax = 0x00ffffff < 0x7fff ? 0x00ffffff : 0x7fff;
+        return (rand() & RandMax) / (float)RandMax;
+    }
+
+    /** Util to generate a random number in a range. */
+    [[nodiscard]] static FORCEINLINE float FRandRange(float InMin, float InMax)
+    {
+        return InMin + (InMax - InMin) * FRand();
     }
 };

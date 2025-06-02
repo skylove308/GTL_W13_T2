@@ -1,4 +1,4 @@
-﻿#include "MathUtility.h"
+#include "MathUtility.h"
 #include "Color.h"
 #include "Quat.h"
 #include "Vector.h"
@@ -224,4 +224,20 @@ FQuat FMath::QInterpTo(const FQuat& Current, const FQuat& Target, float DeltaTim
 	}
 
 	return FQuat::Slerp(Current, Target, FMath::Clamp<float>(InterpSpeed * DeltaTime, 0.f, 1.f));
+}
+
+FVector FMath::VRand()
+{
+    FVector Result;
+    float L;
+    do
+    {
+        Result.X = FRand() * 2.0f - 1.0f;
+        Result.Y = FRand() * 2.0f - 1.0f;
+        Result.Z = FRand() * 2.0f - 1.0f;
+
+        L = Result.SizeSquared();
+    } while (L < KINDA_SMALL_NUMBER || L > 1.0f);
+
+    return Result * (1.0f / Sqrt(L));
 }
