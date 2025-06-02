@@ -660,7 +660,7 @@ void UPrimitiveComponent::CreatePhysXGameObject()
         case EGeomType::ECapsule:
         {
             AActor* OwnerActor = GetOwner();
-            PxMaterial* PlayerMaterial = GEngine->PhysicsManager->GetPhysics()->createMaterial(2.0f, 2.0f, 0.0f);
+            PxMaterial* PlayerMaterial = GEngine->PhysicsManager->GetPhysics()->createMaterial(3.0f, 5.0f, 0.0f);
             PxMaterial* CapsuleMaterial = OwnerActor && OwnerActor->IsA<ACharacter>() ? PlayerMaterial : nullptr;
             PxShape = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z, CapsuleMaterial);
             BodySetup->AggGeom.SphereElems.Add(PxShape);

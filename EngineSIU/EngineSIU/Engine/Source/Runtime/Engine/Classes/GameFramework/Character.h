@@ -37,8 +37,12 @@ public:
     bool GetIsRunning() { return bIsRunning; }
     void SetIsRunning(bool bInIsRunning) { bIsRunning = bInIsRunning; }
 
+    bool GetIsDead() { return bIsDead; }
+    void SetIsDead(bool bInIsDead) { bIsDead = bInIsDead; }
+
 public:
     bool bIsRunning = false;
+    bool bIsDead = false;
     bool bIsStop = true;
 
     bool bCameraEffect = false;
@@ -52,6 +56,7 @@ public:
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, ForceIncrement,  = 1000.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MaxForce,  = 100000.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MovementForceMultiplier,  = 1.0f)
+ 
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, DeathCameraTransitionTime,  = 3.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, DeathLetterBoxTransitionTime,  = 2.0f)

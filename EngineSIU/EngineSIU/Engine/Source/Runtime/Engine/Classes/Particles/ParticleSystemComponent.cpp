@@ -143,6 +143,12 @@ void UParticleSystemComponent::CreateAndAddMeshEmitterInstance(UParticleEmitter*
 
 void UParticleSystemComponent::UpdateDynamicData()
 {
+    if (ParticleDynamicData)
+    {
+        delete ParticleDynamicData;
+        ParticleDynamicData = nullptr;
+    }
+
     // Create the dynamic data for rendering this particle system
     if(ParticleDynamicData)
     {

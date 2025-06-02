@@ -166,6 +166,19 @@ void USkeletalMeshComponent::TickComponent(float DeltaTime)
     {
         TickPose(DeltaTime);
         UpdateBoneTransformToPhysScene();
+        
+        // Die 애니매이션의 경우, 한 번 실행후 RigidBodyType를 DYNAMIC으로 변경
+        if (Cast<ULuaScriptAnimInstance>(AnimScriptInstance))
+        {
+            if(Cast<ULuaScriptAnimInstance>(AnimScriptInstance)->PrevAnim == 
+                Cast<ULuaScriptAnimInstance>(AnimScriptInstance)->CurrAnim &&
+                Cast<ULuaScriptAnimInstance>(AnimScriptInstance)->PrevAnim == 
+                UAssetManager::Get().GetAnimation("Contents/JamesDie/Armature|Die"))
+            {
+                RigidBodyType = ERigidBodyType::DYNAMIC;
+                OnChangeRigidBodyFlag();
+            }
+        }
     }
     else
     {

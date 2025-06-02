@@ -44,6 +44,8 @@
 #include "GameFramework/Character.h"
 #include "Particles/ParticleSystemComponent.h"
 #include <Actors/Car.h>
+#include "Actors/Map.h"
+#include "Actors/Road.h"
 #include <Actors/SkySphereActor.h>
 
 
@@ -379,6 +381,8 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
             { .Label = "SequencerPlayer",   .OBJ = OBJ_SEQUENCERPLAYER },
             { .Label = "Character",         .OBJ = OBJ_CHARACTER },
             { .Label = "Car",               .OBJ = OBJ_CAR },
+            { .Label = "Map",               .OBJ = OBJ_MAP },
+            { .Label = "Road",              .OBJ = OBJ_ROAD },
             { .Label = "SkySphere",         .OBJ = OBJ_SKYSPHERE },
 
         };
@@ -461,7 +465,7 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                     TextComponent->SetRowColumnCount(106, 106);
                     TextComponent->SetText(L"Default");
                     SpawnedActor->SetRootComponent(TextComponent);
-                    
+
                     break;
                 }
                 case OBJ_FOG:
@@ -496,7 +500,7 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                     SpawnedActor = World->SpawnActor<ASkeletalMeshActor>();
                     SpawnedActor->SetActorTickInEditor(true);
                     break;
-                }   
+                }
                 case OBJ_SEQUENCERPLAYER:
                 {
                     SpawnedActor = World->SpawnActor<ASequencerPlayer>();
@@ -515,6 +519,18 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                     SpawnedActor->SetActorLabel(TEXT("OBJ_CAR"));
                     break;
                 }
+                case OBJ_MAP:
+                {
+                    SpawnedActor = World->SpawnActor<AMap>();
+                    SpawnedActor->SetActorLabel(TEXT("OBJ_MAP"));
+                    break;
+                }
+                case OBJ_ROAD:
+                {
+                    SpawnedActor = World->SpawnActor<ARoad>();
+                    Cast<ARoad>(SpawnedActor)->Initialize(ERoadState::Safe, FVector(0.0f));
+                    SpawnedActor->SetActorLabel(TEXT("OBJ_ROAD"));
+                    break;
                 case OBJ_SKYSPHERE:
                 {
                     SpawnedActor = World->SpawnActor<ASkySphere>();
@@ -525,6 +541,7 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                 case OBJ_PLAYER:
                 case OBJ_END:
                     break;
+                }
                 }
 
                 if (SpawnedActor)

@@ -1627,6 +1627,7 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\SkySphereActor.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Renderer\SkySphereRenderPass.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\Map.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\Road.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="EngineSIU.natvis" />
@@ -1774,6 +1775,7 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\SkySphereActor.h" />
     <ClInclude Include="Engine\Source\Runtime\Renderer\SkySphereRenderPass.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\Map.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\Road.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\CompositingShader.hlsl" />
