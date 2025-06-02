@@ -42,7 +42,7 @@ public:
     sol::table& GetLuaSelfTable() { return SelfTable; }
 
 private:
-    UPROPERTY(EditAnywhere, FString, ScriptName, = "DefaultActor")
+    UPROPERTY(EditAnywhere, FString, ScriptName,)
     sol::table SelfTable;
 };
 

@@ -105,7 +105,7 @@ bool ULuaScriptComponent::LoadScript()
     
     SelfTable = FLuaScriptManager::Get().CreateLuaTable(ScriptFullName);
 
-        if (!SelfTable.valid())
+    if (!SelfTable.valid())
     {
         return false;
     }

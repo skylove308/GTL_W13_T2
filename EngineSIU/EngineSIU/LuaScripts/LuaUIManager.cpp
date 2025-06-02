@@ -254,7 +254,7 @@ LuaUIManager::LuaUIManager()
 
 
 
-    TestCODE();
+    //TestCODE();
 }
 
 void LuaUIManager::GenerateResource()
