@@ -1,6 +1,7 @@
 #pragma once
 #include "Gameframework/Actor.h"
 
+struct FMap;
 DECLARE_MULTICAST_DELEGATE(FOnCharacterDeath);
 DECLARE_MULTICAST_DELEGATE(FOnCharacterRed);
 DECLARE_MULTICAST_DELEGATE(FOnCharacterNoRed);
@@ -24,7 +25,7 @@ class ARoad : public AActor
 public:
     ARoad();
 
-    void Initialize(ERoadState RoadState, FVector SpawnWorldLocation = FVector(0.0f, 0.0f, 0.0f));
+    void Initialize(ERoadState RoadState, FMap* Map = nullptr, FVector SpawnWorldLocation = FVector(0.0f, 0.0f, 0.0f));
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -50,6 +51,8 @@ public:
 
     void SetIsOverlapped(bool bOverlapped) { bIsOverlapped = bOverlapped; }
 
+    void TurnOnStreetLights();
+
 public:
     FOnCharacterDeath OnDeath;
     FOnCharacterRed OnRed;
@@ -67,5 +70,6 @@ private:
     bool bIsFirstTimeOnRoad = false;
     ACar* CurrentCar = nullptr;
     float CarOnRoadTime = 0.0f;
+    FMap* MyMap = nullptr;
 };
 

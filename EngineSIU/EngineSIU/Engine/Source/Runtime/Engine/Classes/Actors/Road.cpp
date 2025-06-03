@@ -1,4 +1,6 @@
 #include "Road.h"
+
+#include "StreetLight.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/FObjLoader.h"
 #include "Lua/LuaUtils/LuaTypeMacros.h"
@@ -8,6 +10,7 @@
 #include "Actors/Cube.h"
 #include "Actors/Car.h"
 #include "Actors/GameManager.h"
+#include "Components/Light/SpotLightComponent.h"
 #include "Engine/Contents/Maps/MapModule.h"
 
 
@@ -17,10 +20,11 @@ ARoad::ARoad()
     RootComponent = RoadMesh;
 }
 
-void ARoad::Initialize(ERoadState RoadState, FVector SpawnWorldLocation)
+void ARoad::Initialize(ERoadState RoadState, FMap* Map, FVector SpawnWorldLocation)
 {
     CurrentRoadState = RoadState;
     RoadMesh->SetWorldLocation(SpawnWorldLocation);
+    MyMap = Map;
 
     if (RoadState == ERoadState::Safe)
     {
@@ -187,6 +191,16 @@ bool ARoad::BindSelfLuaProperties()
     return true;
 }
 
+void ARoad::TurnOnStreetLights()
+{
+    if (MyMap == nullptr)
+        return;
+    
+    for (AStreetLight* StreetLight : MyMap->StreetLights)
+    {
+        StreetLight->CreateSpotLight();
+    }
+}
 
 void ARoad::OnOverlappedRoad(float DeltaTime)
 {

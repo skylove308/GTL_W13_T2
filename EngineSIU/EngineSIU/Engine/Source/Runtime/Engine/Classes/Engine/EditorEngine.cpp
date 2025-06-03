@@ -577,7 +577,6 @@ void UEditorEngine::BindEssentialObjects()
     PlayerController->SetActorTickInEditor(false);
     ActiveWorld->SetPlayerController(PlayerController);
     ActiveWorld->GetPlayerController()->Possess(ActiveWorld->GetMainCharacter());
-
 }
 
 void UEditorEngine::SetPhysXScene(UWorld* World)

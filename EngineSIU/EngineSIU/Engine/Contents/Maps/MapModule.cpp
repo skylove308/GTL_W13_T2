@@ -17,13 +17,13 @@ void FMapModule::SpawnRoadMap()
     ARoad* Road = GEngine->ActiveWorld->SpawnActor<ARoad>();
     if (Road)
     {
-        Road->Initialize(ERoadState::Safe, SpawnLocation);
+        Road->Initialize(ERoadState::Safe, Map, SpawnLocation);
         Map->Roads.Add(Road);
     }
 
     if (Road->GetCurrentRoadState() == ERoadState::Safe)
     {
-        int StreetLightCount = 20;
+        int StreetLightCount = 3;
         float Spacing = 1000.0f;
 
         float randomShift = FMath::FRandRange(-Spacing * 0.5f, Spacing * 0.5f);
@@ -53,12 +53,11 @@ void FMapModule::SpawnRoadMap()
         ARoad* CarRoad = GEngine->ActiveWorld->SpawnActor<ARoad>();
         if (CarRoad)
         {
-            CarRoad->Initialize(ERoadState::Car, SpawnLocation);
+            CarRoad->Initialize(ERoadState::Car, Map, SpawnLocation);
             Map->Roads.Add(CarRoad);
         }
         SpawnLocation += FVector(600.0f, 0.0f, 0.0f);
     }
-
     Maps.push(Map);
     MapSize++;
 }

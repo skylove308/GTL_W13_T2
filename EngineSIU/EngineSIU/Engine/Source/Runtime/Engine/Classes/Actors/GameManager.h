@@ -1,6 +1,8 @@
 #pragma once
 #include "GameFramework/Actor.h"
 
+struct FMap;
+
 enum class EGameState
 {
     None = 0,

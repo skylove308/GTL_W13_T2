@@ -1,6 +1,7 @@
 #pragma once
 #include "GameFramework/Actor.h"
 
+class USpotLightComponent;
 class UStaticMeshComponent;
 
 class AStreetLight : public AActor
@@ -10,10 +11,13 @@ class AStreetLight : public AActor
 public:
     AStreetLight();
 
-    void Initialize(FVector SpawnWorldLocation = FVector(0.0f, 0.0f, 0.0f));
-
     virtual void BeginPlay() override;
 
+    void Initialize(FVector SpawnWorldLocation = FVector(0.0f, 0.0f, 0.0f));
+    void CreateSpotLight();
+
+    USpotLightComponent* GetSpotLight() const { return SpotLight; }
 private:
     UStaticMeshComponent* StreetLightMesh = nullptr;
+    USpotLightComponent* SpotLight = nullptr;
 };

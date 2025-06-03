@@ -23,6 +23,10 @@
 #include "Actors/GameManager.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Actors/Camera.h"
+#include "Actors/StreetLight.h"
+#include "Engine/Contents/Maps/MapModule.h"
+
+class AStreetLight;
 
 ACharacter::ACharacter()
 {
@@ -293,8 +297,10 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
         });
 
         if (CurrentRoad->GetCurrentRoadState() == ERoadState::Safe)
+            
         {
             CurrentRoad->SetIsOverlapped(true);
+            CurrentRoad->TurnOnStreetLights();
         }
     }
 }
@@ -311,6 +317,10 @@ void ACharacter::OnCollisionExit(UPrimitiveComponent* HitComponent, UPrimitiveCo
         ARoad* Road = Cast<ARoad>(OtherComp->GetOwner());
         Road->SetIsOverlapped(false);
 
+        // if (Road->GetCurrentRoadState() == ERoadState::Safe)
+        // {
+        //     Road->DestroyStreetLights();
+        // }
     }
 }
 
