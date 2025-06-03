@@ -36,6 +36,7 @@ public:
 
     void StartGame();
     void ExitGame();
+    FMapModule* GetMapModule() const { return MapModule; }
 
 private:
     FMapModule* MapModule = nullptr;
