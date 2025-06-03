@@ -4,7 +4,9 @@
 #include "sol/sol.hpp"
 
 // console 디버깅용.
+#if !GAME_BUILD
 #pragma comment( linker, "/entry:WinMainCRTStartup /subsystem:console" )
+#endif
 
 class AActor;
 

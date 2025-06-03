@@ -35,8 +35,9 @@ void AGameManager::SetState(EGameState State)
     {
     case EGameState::Restart:
     {
-        ExitGame();
-        StartGame();
+        UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
+        Engine->EndPIE();
+        Engine->StartPIE();
         break;
     }
     case EGameState::Exit:
