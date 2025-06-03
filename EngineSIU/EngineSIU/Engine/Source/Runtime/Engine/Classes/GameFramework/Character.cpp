@@ -164,16 +164,6 @@ void ACharacter::DoCameraEffect(float DeltaTime)
 
 }
 
-void ACharacter::UpdateParticleEffectLocation()
-{
-    UParticleSystemComponent* PSC = GetComponentByClass<UParticleSystemComponent>();
-    if (PSC)
-    {
-
-    }
-}
-
-
 void ACharacter::RegisterLuaType(sol::state& Lua)
 {
     DEFINE_LUA_TYPE_WITH_PARENT(ACharacter, sol::bases<AActor>(),
@@ -205,13 +195,15 @@ bool ACharacter::BindSelfLuaProperties()
 
 void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
 {
-    if (HitComponent && 
+    if (!bIsDead &&
+        HitComponent && 
         OtherComp && 
         MeshComponent && 
         HitComponent == CapsuleComponent && 
         OtherComp->GetOwner() &&
         OtherComp->GetOwner()->IsA<ACar>())
     {
+        bIsDead = true;
         MeshComponent->RigidBodyType = ERigidBodyType::DYNAMIC; // 충돌 시 동적 물리로 변경
         MeshComponent->OnChangeRigidBodyFlag();
 
@@ -229,7 +221,6 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
 
         FSoundManager::GetInstance().PlaySound("CarCrash");
         FSoundManager::GetInstance().PlaySound("Wasted", 1000);
-
     }
 
     if( HitComponent && 
@@ -333,6 +324,44 @@ void ACharacter::MoveRight(float Value)
         MeshComponent->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
     }
 }
+
+//void ACharacter::MoveForward(float Value)
+//{
+//    bIsStop = false;
+//
+//    physx::PxRigidDynamic* PxCharActor = static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
+//    if (PxCharActor == nullptr)
+//        return;
+//
+//    FVector Forward = GetActorForwardVector().GetSafeNormal();
+//    float Speed = bIsRunning ? RunSpeed : WalkSpeed;
+//
+//    FVector DesiredVelocity = Forward * Speed * Value;
+//    physx::PxVec3 PxVelocity(DesiredVelocity.X, DesiredVelocity.Y, DesiredVelocity.Z);
+//
+//    PxCharActor->setLinearVelocity(PxVelocity, true); // true = autowake
+//
+//    MeshComponent->SetRelativeRotation(Value >= 0.0f ? FRotator(0.0f, 0.0f, 0.0f) : FRotator(0.0f, 180.0f, 0.0f));
+//}
+//
+//void ACharacter::MoveRight(float Value)
+//{
+//    bIsStop = false;
+//
+//    physx::PxRigidDynamic* PxCharActor = static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
+//    if (PxCharActor == nullptr)
+//        return;
+//
+//    FVector Right = GetActorRightVector().GetSafeNormal();
+//    float Speed = bIsRunning ? RunSpeed : WalkSpeed;
+//
+//    FVector DesiredVelocity = Right * Speed * Value;
+//    physx::PxVec3 PxVelocity(DesiredVelocity.X, DesiredVelocity.Y, DesiredVelocity.Z);
+//
+//    PxCharActor->setLinearVelocity(PxVelocity, true);
+//
+//    MeshComponent->SetRelativeRotation(Value >= 0.0f ? FRotator(0.0f, 90.0f, 0.0f) : FRotator(0.0f, -90.0f, 0.0f));
+//}
 
 void ACharacter::Stop()
 {

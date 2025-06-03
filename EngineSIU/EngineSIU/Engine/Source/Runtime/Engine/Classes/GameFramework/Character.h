@@ -60,6 +60,10 @@ public:
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, DeathCameraTransitionTime,  = 3.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, DeathLetterBoxTransitionTime,  = 2.0f)
 
+
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, WalkSpeed, = 200.f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, RunSpeed, = 300.f)
+
                 
 private:
     virtual void BeginPlay() override;
@@ -67,7 +71,6 @@ private:
     virtual void Tick(float DeltaTime) override;
 
     void DoCameraEffect(float DeltaTime);
-    void UpdateParticleEffectLocation();
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, ImpulseScale, = 100000.f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, class UParticleSystem*, ExplosionParticle, = nullptr)
