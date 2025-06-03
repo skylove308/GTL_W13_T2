@@ -1,7 +1,7 @@
 # Blender 4.4.0 MTL File: 'None'
 # www.blender.org
 
-newmtl Material
+newmtl RoadMaterial
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
@@ -14,4 +14,4 @@ Pc 0.000000
 Pcr 0.030000
 aniso 0.000000
 anisor 0.000000
-map_Kd Tileable-City-Road-Textures-.jpg
+map_Kd RoadTexture.jpg
