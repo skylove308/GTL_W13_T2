@@ -92,6 +92,6 @@ private:
 
     void DoCameraEffect(float DeltaTime);
 
-    UPROPERTY_WITH_FLAGS(EditAnywhere, float, ImpulseScale, = 100.f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, ImpulseScale, = 10000.f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, class UParticleSystem*, ExplosionParticle, = nullptr)
 };

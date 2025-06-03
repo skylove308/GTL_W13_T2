@@ -77,7 +77,7 @@ void ACharacter::BeginPlay()
     // 액터는 Serialize로직이 없어서 하드코딩
     ExplosionParticle = UAssetManager::Get().GetParticleSystem("Contents/ParticleSystem/UParticleSystem_368");
     FSoundManager::GetInstance().PlaySound("Title");
-    CapsuleComponent->BodyInstance->BIGameObject->DynamicRigidBody->setMass(10.0f);
+    //CapsuleComponent->BodyInstance->BIGameObject->DynamicRigidBody->setMass(10.0f);
 
     BindInput();
 }

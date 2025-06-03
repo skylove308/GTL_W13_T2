@@ -7,6 +7,19 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "AAmbientLight_246",
+                        "ComponentOwnerClass": "AAmbientLight",
+                        "ScriptName": "",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
                     "ComponentClass": "UAmbientLightComponent",
                     "ComponentID": "UAmbientLightComponent_0",
                     "Properties": {
@@ -50,19 +63,6 @@
                         "bSimulate": "false",
                         "m_Type": "UBillboardComponent"
                     }
-                },
-                {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "AAmbientLight_246",
-                        "ComponentOwnerClass": "AAmbientLight",
-                        "ScriptName": "",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
                 }
             ],
             "RootComponentID": "UBillboardComponent_0"
@@ -74,29 +74,19 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
-                    "ComponentClass": "USkeletalMeshComponent",
-                    "ComponentID": "SkeletalMeshComponent",
+                    "ComponentClass": "UCameraComponent",
+                    "ComponentID": "FollowCamera",
                     "Properties": {
-                        "AABB_max": "X=21.460 Y=89.011 Z=182.488",
-                        "AABB_min": "X=-16.749 Y=-89.011 Z=-0.205",
-                        "AnimClass": "None",
-                        "AnimationMode": "0",
-                        "AttachParentID": "CapsuleComponent",
-                        "ComponentClass": "USkeletalMeshComponent",
-                        "ComponentName": "SkeletalMeshComponent",
+                        "AttachParentID": "CameraBoom",
+                        "ComponentClass": "UCameraComponent",
+                        "ComponentName": "FollowCamera",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
-                        "GeomsCount": "0",
                         "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "RigidBodyType": "2",
-                        "SkeletalMeshKey": "Contents/James/James",
-                        "bApplyGravity": "true",
                         "bAutoActive": "true",
-                        "bIsActive": "true",
-                        "bSimulate": "true",
-                        "m_Type": ""
+                        "bIsActive": "true"
                     }
                 },
                 {
@@ -131,6 +121,45 @@
                     }
                 },
                 {
+                    "ComponentClass": "USkeletalMeshComponent",
+                    "ComponentID": "SkeletalMeshComponent",
+                    "Properties": {
+                        "AABB_max": "X=21.460 Y=89.011 Z=182.488",
+                        "AABB_min": "X=-16.749 Y=-89.011 Z=-0.205",
+                        "AnimClass": "None",
+                        "AnimationMode": "0",
+                        "AttachParentID": "CapsuleComponent",
+                        "ComponentClass": "USkeletalMeshComponent",
+                        "ComponentName": "SkeletalMeshComponent",
+                        "ComponentOwner": "ACharacter_256",
+                        "ComponentOwnerClass": "ACharacter",
+                        "GeomsCount": "0",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "RigidBodyType": "2",
+                        "SkeletalMeshKey": "Contents/James/James",
+                        "bApplyGravity": "true",
+                        "bAutoActive": "true",
+                        "bIsActive": "true",
+                        "bSimulate": "true",
+                        "m_Type": ""
+                    }
+                },
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "ACharacter_256",
+                        "ComponentOwnerClass": "ACharacter",
+                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
                     "ComponentClass": "UCharacterMovementComponent",
                     "ComponentID": "CharacterMovementComponent",
                     "Properties": {
@@ -151,44 +180,15 @@
                         "ComponentName": "CameraBoom",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
-                        "MaxPitch": "70.000000",
-                        "MaxYaw": "60.000000",
-                        "MinPitch": "0.000000",
-                        "MinYaw": "-60.000000",
+                        "MaxPitch": "50.000000",
+                        "MaxYaw": "50.000000",
+                        "MinPitch": "10.000000",
+                        "MinYaw": "-50.000000",
                         "RelativeLocation": "X=0.000 Y=0.000 Z=50.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "SocketOffset": "X=0.000 Y=0.000 Z=0.000",
-                        "TargetArmLength": "300.000000",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "UCameraComponent",
-                    "ComponentID": "FollowCamera",
-                    "Properties": {
-                        "AttachParentID": "CameraBoom",
-                        "ComponentClass": "UCameraComponent",
-                        "ComponentName": "FollowCamera",
-                        "ComponentOwner": "ACharacter_256",
-                        "ComponentOwnerClass": "ACharacter",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "ACharacter_256",
-                        "ComponentOwnerClass": "ACharacter",
-                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
+                        "TargetArmLength": "400.000000",
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }
@@ -303,19 +303,6 @@
                     }
                 },
                 {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "ADirectionalLight_433",
-                        "ComponentOwnerClass": "ADirectionalLight",
-                        "ScriptName": "",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
                     "ComponentClass": "UBillboardComponent",
                     "ComponentID": "UBillboardComponent_0",
                     "Properties": {
@@ -339,6 +326,19 @@
                         "bIsActive": "true",
                         "bSimulate": "false",
                         "m_Type": "UBillboardComponent"
+                    }
+                },
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "ADirectionalLight_433",
+                        "ComponentOwnerClass": "ADirectionalLight",
+                        "ScriptName": "",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
                     }
                 }
             ],

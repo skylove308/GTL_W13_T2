@@ -125,13 +125,18 @@ void ARoad::Tick(float DeltaTime)
             CurrentCar->GetRootComponent()->SetWorldRotation(FRotator(CarRotation.Pitch, CarRotation.Yaw - 180, CarRotation.Roll));
             CurrentCar->SetSpawnDirectionRight(false);
         }
-
-        FBodyInstance* CarBodyInstance = Cast<UPrimitiveComponent>(CurrentCar->GetRootComponent())->CreatePhysXGameObject();
-        if (CarBodyInstance)
+        UPrimitiveComponent* PrimComp = Cast<UPrimitiveComponent>(CurrentCar->GetRootComponent());
+        if(PrimComp)
         {
-            CarBodyInstance->BIGameObject->DynamicRigidBody->setMass(1e10);
-            CarBodyInstance->BIGameObject->DynamicRigidBody->setMassSpaceInertiaTensor(PxVec3(1e10));
+            PrimComp->CreatePhysXGameObject();
+            FBodyInstance* CarBodyInstance = PrimComp->BodyInstance;
+            if (CarBodyInstance)
+            {
+                CarBodyInstance->BIGameObject->DynamicRigidBody->setMass(1e10);
+                CarBodyInstance->BIGameObject->DynamicRigidBody->setMassSpaceInertiaTensor(PxVec3(1e10));
+            }
         }
+        
 
         bIsCarOnRoad = true;
     }
