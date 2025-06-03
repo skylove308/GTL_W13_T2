@@ -63,7 +63,7 @@ void ARoad::Tick(float DeltaTime)
 
     OnOverlappedRoad(DeltaTime);
 
-    int RandNum = FMath::RandHelper(500);
+    int RandNum = FMath::RandHelper(300);
     int DirectionNum = FMath::RandHelper(2);
     if (CurrentRoadState == ERoadState::Car && RandNum == 0 && !bIsCarOnRoad)
     {
@@ -83,7 +83,7 @@ void ARoad::Tick(float DeltaTime)
                 CurrentCar->SetActorLocation(FVector(GetActorLocation().X, 8000.0f, 305.0f));
                 break;
             case ECarType::Train:
-                CurrentCar->SetActorLocation(FVector(GetActorLocation().X, 8000.0f, 350.0f));
+                CurrentCar->SetActorLocation(FVector(GetActorLocation().X, 8000.0f, 305.0f));
                 break;
             }
 
@@ -104,12 +104,12 @@ void ARoad::Tick(float DeltaTime)
                 CurrentCar->SetActorLocation(FVector(GetActorLocation().X, -8000.0f, 305.0f));
                 break;
             case ECarType::Train:
-                CurrentCar->SetActorLocation(FVector(GetActorLocation().X, -8000.0f, 350.0f));
+                CurrentCar->SetActorLocation(FVector(GetActorLocation().X, -8000.0f, 305.0f));
                 break;
             }
 
             FRotator CarRotation = CurrentCar->GetRootComponent()->GetComponentRotation();
-            CurrentCar->GetRootComponent()->SetWorldRotation(FRotator(CarRotation.Pitch, -CarRotation.Yaw, CarRotation.Roll));
+            CurrentCar->GetRootComponent()->SetWorldRotation(FRotator(CarRotation.Pitch, CarRotation.Yaw - 180, CarRotation.Roll));
             CurrentCar->SetSpawnDirectionRight(false);
         }
 
@@ -204,6 +204,12 @@ void ARoad::OnOverlappedRoad(float DeltaTime)
 
     if (CurrentRoadState == ERoadState::Safe)
     {
+        // 첫 로드에 있는 경우에는 경고 상태로 가지 않도록 함
+        if (GameManager->GetMapModule()->GetMaps().front()->Roads[0] == this)
+        {
+            return;
+        }
+
         if (!bIsFirstTimeOnRoad)
         {
             bIsFirstTimeOnRoad = true;
@@ -211,12 +217,6 @@ void ARoad::OnOverlappedRoad(float DeltaTime)
             GameManager->SetScore(CurrentScore + 1);
             GameManager->SpawnMap();
             GameManager->DestroyMap();
-        }
-
-        // 첫 로드에 있는 경우에는 경고 상태로 가지 않도록 함
-        if (GameManager->GetMapModule()->GetMaps().front()->Roads[0] == this) 
-        {
-            return;
         }
 
         CurrentRoadTime += DeltaTime;
