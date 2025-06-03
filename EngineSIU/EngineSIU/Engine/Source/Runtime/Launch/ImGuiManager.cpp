@@ -5,6 +5,8 @@
 #include "Font/RawFonts.h"
 #include "Font/IconDefs.h"
 
+ImFont* UImGuiManager::GraffitiFont = nullptr;
+
 void UImGuiManager::Initialize(HWND hWnd, ID3D11Device* Device, ID3D11DeviceContext* DeviceContext)
 {
     IMGUI_CHECKVERSION();
@@ -38,6 +40,7 @@ void UImGuiManager::Initialize(HWND hWnd, ID3D11Device* Device, ID3D11DeviceCont
 
     IO.Fonts->AddFontFromMemoryTTF(FeatherRawData, FontSizeOfFeather, 22.0f, &FeatherFontConfig, IconRanges);
     PreferenceStyle();
+    GraffitiFont = IO.Fonts->AddFontFromFileTTF("Font/GraffitiRustyRegular-OVlE3.ttf", 80.0f, nullptr);
 }
 
 void UImGuiManager::BeginFrame() const
