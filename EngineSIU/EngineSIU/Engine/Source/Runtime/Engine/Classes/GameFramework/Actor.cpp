@@ -7,6 +7,8 @@
 #include "Lua/LuaScriptManager.h"
 #include "Lua/LuaUtils/LuaTypeMacros.h"
 #include "Engine/HitResult.h"
+#include "Editor/LevelEditor/SLevelEditor.h"
+#include "Editor/UnrealEd/EditorViewportClient.h"
 
 AActor::AActor()
 {
@@ -418,11 +420,20 @@ void AActor::InitLuaScriptComponent()
 void AActor::RegisterLuaType(sol::state& Lua)
 {
     DEFINE_LUA_TYPE_NO_PARENT(AActor,
-    "UUID", sol::property(&ThisClass::GetUUID),
-    "ActorLocation", sol::property(&ThisClass::GetActorLocation, &ThisClass::SetActorLocation),
-    "ActorRotation", sol::property(&ThisClass::GetActorRotation, &ThisClass::SetActorRotation),
-    "ActorScale", sol::property(&ThisClass::GetActorScale, &ThisClass::SetActorScale),
-    "Destroy", &ThisClass::Destroy
+        "UUID", sol::property(&ThisClass::GetUUID),
+        "ActorLocation", sol::property(&ThisClass::GetActorLocation, &ThisClass::SetActorLocation),
+        "ActorRotation", sol::property(&ThisClass::GetActorRotation, &ThisClass::SetActorRotation),
+        "ActorScale", sol::property(&ThisClass::GetActorScale, &ThisClass::SetActorScale),
+        "Destroy", &ThisClass::Destroy,
+        "GetMainCameraPos", []() -> FVector
+        {
+            auto VPC = GEngineLoop.GetLevelEditor()->GetActiveViewportClient().get();
+            if (VPC)
+            {
+                return VPC->GetCameraLocation();
+            }
+            return FVector(FVector::ZeroVector);
+        }
     )
 
 }
