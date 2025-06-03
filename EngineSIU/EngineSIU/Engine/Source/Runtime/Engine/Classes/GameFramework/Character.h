@@ -4,11 +4,13 @@
 #include "PhysicsManager.h"
 #include "Components/CapsuleComponent.h"
 
+class ARoad;
 class UCapsuleComponent;
 class USkeletalMeshComponent;
 class UCharacterMovementComponent;
-class UCameraComponent;
 class USpringArmComponent;
+class UCameraComponent;
+class AGameManager;
 
 class ACharacter : public APawn
 {
@@ -77,6 +79,9 @@ public:
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MeshRotationSpeed, = 10.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector2D, ControllerRotation)
 
+
+    AGameManager* GameManager = nullptr;
+    ARoad* CurrentRoad = nullptr;
                 
 private:
     virtual void BeginPlay() override;

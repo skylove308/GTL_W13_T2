@@ -7,6 +7,8 @@
 #include "Animation/AnimStateMachine.h"
 #include "GameFramework/Actor.h"
 
+#include "LuaScripts/LuaUIBind.h"
+
 TMap<FString, FLuaTableScriptInfo> FLuaScriptManager::ScriptCacheMap;
 TSet<ULuaScriptComponent*> FLuaScriptManager::ActiveLuaComponents;
 TSet<UAnimStateMachine*> FLuaScriptManager::ActiveAnimLua;
@@ -52,6 +54,9 @@ void FLuaScriptManager::SetLuaDefaultTypes()
     LuaTypes::FBindLua<FRotator>::Bind(TypeTable);
     LuaTypes::FBindLua<FQuat>::Bind(TypeTable);
     LuaTypes::FBindLua<FMatrix>::Bind(TypeTable);
+    LuaTypes::FBindLua<FString>::Bind(TypeTable);
+
+    LuaUIBind::Bind(TypeTable);
 }
 
 FLuaScriptManager& FLuaScriptManager::Get()
@@ -156,7 +161,8 @@ void FLuaScriptManager::HotReloadLuaScript()
     {
         for (const ULuaScriptComponent* LuaComponent : ActiveLuaComponents)
         {
-            if (LuaComponent->GetScriptName() == ChangedScript)
+            const FString FullPath = "LuaScripts/Actors/" + LuaComponent->GetScriptName() + ".lua";
+            if (FullPath == ChangedScript)
             {
                 LuaComponent->GetOwner()->BindSelfLuaProperties();
                 UE_LOG(ELogLevel::Display, TEXT("Lua Script Reloaded: %s"), *ChangedScript);

@@ -142,7 +142,7 @@ void ARoad::OnOverlappedRoad(float DeltaTime)
     }
     else if (CurrentRoadState == ERoadState::Danger)
     {
-        //OnDeath.Broadcast();
+        OnDeath.Broadcast();
     }
 
 

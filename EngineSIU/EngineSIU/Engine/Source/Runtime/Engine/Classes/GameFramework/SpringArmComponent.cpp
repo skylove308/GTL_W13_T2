@@ -14,6 +14,8 @@ UObject* USpringArmComponent::Duplicate(UObject* InOuter)
     ThisClass* NewComponent = Cast<ThisClass>(Super::Duplicate(InOuter));
     NewComponent->TargetArmLength = TargetArmLength;
     NewComponent->SocketOffset = SocketOffset;
+    NewComponent->MinPitch = MinPitch;
+    NewComponent->MaxPitch = MaxPitch;
     return NewComponent;
 }
 
@@ -23,6 +25,8 @@ void USpringArmComponent::GetProperties(TMap<FString, FString>& OutProperties) c
     // 카메라의 FOV, AspectRatio, NearClip, FarClip을 OutProperties에 추가
     OutProperties.Add(TEXT("TargetArmLength"), FString::Printf(TEXT("%f"), TargetArmLength));
     OutProperties.Add(TEXT("SocketOffset"), *SocketOffset.ToString());
+    OutProperties.Add(TEXT("MinPitch"), FString::Printf(TEXT("%f"), MinPitch));
+    OutProperties.Add(TEXT("MaxPitch"), FString::Printf(TEXT("%f"), MaxPitch));
 }
 
 void USpringArmComponent::SetProperties(const TMap<FString, FString>& InProperties)
@@ -33,6 +37,10 @@ void USpringArmComponent::SetProperties(const TMap<FString, FString>& InProperti
     if (TempStr) TargetArmLength = FCString::Atof(**TempStr);
     TempStr = InProperties.Find(TEXT("SocketOffset"));
     if (TempStr) SocketOffset.InitFromString(*TempStr);
+    TempStr = InProperties.Find(TEXT("MinPitch"));
+    if (TempStr) MinPitch = FCString::Atof(**TempStr);
+    TempStr = InProperties.Find(TEXT("MaxPitch"));
+    if (TempStr) MaxPitch = FCString::Atof(**TempStr);
 }
 
 void USpringArmComponent::InitializeComponent()

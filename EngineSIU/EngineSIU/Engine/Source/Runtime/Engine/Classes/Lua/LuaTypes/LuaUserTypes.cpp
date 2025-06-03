@@ -5,12 +5,12 @@
 #include "Math/Color.h"
 #include "Math/Matrix.h"
 #include "Math/Quat.h"
+#include "Engine/Source/Runtime/Core/Container/String.h"
 
 void LuaTypes::FBindLua<FColor>::Bind(sol::table& Table)
 {
     Table.Lua_NewUserType(
         FColor,
-        sol::call_constructor,
 
         // 생성자
         sol::constructors<FColor(), FColor(uint8, uint8, uint8, uint8)>(),
@@ -39,7 +39,6 @@ void LuaTypes::FBindLua<FLinearColor>::Bind(sol::table& Table)
 {
     Table.Lua_NewUserType(
         FLinearColor,
-        sol::call_constructor,
 
         // Constructors
         sol::constructors<FLinearColor(), FLinearColor(float, float, float, float)>(),
@@ -70,7 +69,6 @@ void LuaTypes::FBindLua<FVector>::Bind(sol::table& Table)
 {
     Table.Lua_NewUserType(
         FVector,
-        sol::call_constructor,
         // Constructors
         sol::constructors<
         FVector(),
@@ -123,7 +121,6 @@ void LuaTypes::FBindLua<FVector2D>::Bind(sol::table& Table)
 {
     Table.Lua_NewUserType(
         FVector2D,
-        sol::call_constructor,
 
         // Constructors
         sol::constructors<FVector2D(), FVector2D(float, float)>(),
@@ -156,7 +153,6 @@ void LuaTypes::FBindLua<FVector4>::Bind(sol::table& Table)
 {
     Table.Lua_NewUserType(
         FVector4,
-        sol::call_constructor,
 
         // Constructors
         sol::constructors<FVector4(), FVector4(float, float, float, float)>(),
@@ -173,7 +169,6 @@ void LuaTypes::FBindLua<FRotator>::Bind(sol::table& Table)
 {
     Table.Lua_NewUserType(
         FRotator,
-        sol::call_constructor,
 
         // Constructors
         sol::constructors<FRotator(), FRotator(float, float, float)>(),
@@ -203,7 +198,6 @@ void LuaTypes::FBindLua<FQuat>::Bind(sol::table& Table)
 {
     Table.Lua_NewUserType(
         FQuat,
-        sol::call_constructor,
 
         // Constructors
         sol::constructors<FQuat(), FQuat(float, float, float, float)>(),
@@ -232,7 +226,6 @@ void LuaTypes::FBindLua<FMatrix>::Bind(sol::table& Table)
 {
     Table.Lua_NewUserType(
         FMatrix,
-        sol::call_constructor,
 
         // Constructors
         sol::constructors<FMatrix()>(),
@@ -246,5 +239,30 @@ void LuaTypes::FBindLua<FMatrix>::Bind(sol::table& Table)
 
         // Static functions
         LUA_BIND_STATIC(FMatrix::Identity)
+    );
+}
+
+void LuaTypes::FBindLua<FString>::Bind(sol::table& Table)
+{
+    Table.Lua_NewUserType(
+        FString,
+
+        // Constructors
+        sol::constructors<FString(), FString(const ANSICHAR*), FString(const FString&)
+                        , FString(const std::string&), FString(const std::wstring&)>(),
+
+        LUA_BIND_MEMBER(&FString::Len),
+        LUA_BIND_MEMBER(&FString::IsEmpty),
+        LUA_BIND_MEMBER(&FString::Empty),
+        LUA_BIND_MEMBER(&FString::Equals),
+        LUA_BIND_MEMBER(&FString::Contains),
+
+        LUA_BIND_MEMBER(&FString::Mid),
+        LUA_BIND_MEMBER(&FString::Left),
+        LUA_BIND_MEMBER(&FString::RightChop),
+
+        LUA_BIND_MEMBER(&FString::ToAnsiString),
+        LUA_BIND_MEMBER(&FString::ToWideString),
+        LUA_BIND_MEMBER(&FString::ToBool)
     );
 }

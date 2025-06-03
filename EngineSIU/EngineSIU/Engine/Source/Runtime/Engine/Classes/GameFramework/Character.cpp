@@ -20,6 +20,7 @@
 #include "ParticleHelper.h"
 #include "Engine/SkeletalMesh.h"
 #include "SoundManager.h"
+#include "Actors/GameManager.h"
 #include "GameFramework/SpringArmComponent.h"
 
 ACharacter::ACharacter()
@@ -50,7 +51,6 @@ ACharacter::ACharacter()
     FSoundManager::GetInstance().LoadSound("CarCrash", "Contents/Sounds/CarCrash.wav");
     FSoundManager::GetInstance().LoadSound("Wasted", "Contents/Sounds/Wasted.wav");
     FSoundManager::GetInstance().LoadSound("Title", "Contents/Sounds/Title.mp3");
-
 }
 
 void ACharacter::BeginPlay()
@@ -62,6 +62,16 @@ void ACharacter::BeginPlay()
     float Width = ViewportClient->GetViewport()->GetD3DViewport().Width;
     float Height = ViewportClient->GetViewport()->GetD3DViewport().Height;
     GEngine->ActiveWorld->GetPlayerController()->SetLetterBoxWidthHeight(Width, Height);
+
+    auto Actors = GEngine->ActiveWorld->GetActiveLevel()->Actors;
+    for (auto Actor : Actors)
+    {
+        if (Actor->IsA<AGameManager>())
+        {
+            GameManager = Cast<AGameManager>(Actor);
+            break;
+        }
+    }
 
     // 액터는 Serialize로직이 없어서 하드코딩
     ExplosionParticle = UAssetManager::Get().GetParticleSystem("Contents/ParticleSystem/UParticleSystem_368");
@@ -236,6 +246,8 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
 
         FSoundManager::GetInstance().PlaySound("CarCrash");
         FSoundManager::GetInstance().PlaySound("Wasted", 1000);
+
+        GameManager->SetState(EGameState::GameOver);
     }
 
     if (HitComponent &&
@@ -245,8 +257,8 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
         OtherComp->GetOwner() &&
         OtherComp->GetOwner()->IsA<ARoad>())
     {
-        ARoad* Road = Cast<ARoad>(OtherComp->GetOwner());
-        Road->OnRed.AddLambda([this]()
+        CurrentRoad = Cast<ARoad>(OtherComp->GetOwner());
+        CurrentRoad->OnRed.AddLambda([this]()
         {
             USkeletalMesh* SkeletalMeshAsset = MeshComponent->GetSkeletalMeshAsset();
             for (int i = 0; i < SkeletalMeshAsset->GetRenderData()->MaterialSubsets.Num(); i++)
@@ -257,7 +269,7 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
             }
         });
 
-        Road->OnNoRed.AddLambda([this]()
+        CurrentRoad->OnNoRed.AddLambda([this]()
             {
                 USkeletalMesh* SkeletalMeshAsset = MeshComponent->GetSkeletalMeshAsset();
                 for (int i = 0; i < SkeletalMeshAsset->GetRenderData()->MaterialSubsets.Num(); i++)
@@ -268,14 +280,15 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
                 }
             });
 
-        Road->OnDeath.AddLambda([this]()
+        CurrentRoad->OnDeath.AddLambda([this]()
         {
             bIsDead = true;
+            GameManager->SetState(EGameState::GameOver);
         });
 
-        if (Road->GetCurrentRoadState() == ERoadState::Safe)
+        if (CurrentRoad->GetCurrentRoadState() == ERoadState::Safe)
         {
-            Road->SetIsOverlapped(true);
+            CurrentRoad->SetIsOverlapped(true);
         }
     }
 }
@@ -327,8 +340,7 @@ void ACharacter::BindInput()
     ActiveWorld->GetPlayerController()->BindKeyPressAction("Idle",
         [&](float Value) {
             Stop();
-        }
-    );
+        });
 
     ActiveWorld->GetPlayerController()->BindOnKeyPressAction("W",
         [&]() {
@@ -449,6 +461,9 @@ void ACharacter::ApplyMovementForce(const FVector& Direction, float Scale)
 
 void ACharacter::Stop()
 {
+    if (GameManager && GameManager->GetState() != EGameState::Playing)
+        return;
+    
     bIsStop = true;
 
     physx::PxRigidDynamic* PxCharActor =

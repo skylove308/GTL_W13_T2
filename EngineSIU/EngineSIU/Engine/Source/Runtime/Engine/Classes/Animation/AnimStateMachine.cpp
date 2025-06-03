@@ -8,6 +8,11 @@
 #include "Lua/LuaScriptManager.h"
 #include "Animation/AnimSequence.h"
 
+#include "Components/SkeletalMeshComponent.h"
+#include "Engine/Contents/AnimInstance/LuaScriptAnimInstance.h"
+#include "Lua/LuaScriptManager.h"
+#include "Animation/AnimSequence.h"
+
 UAnimStateMachine::UAnimStateMachine()
 {
     
