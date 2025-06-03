@@ -1,0 +1,140 @@
+# Blender 4.3.2 MTL File: 'None'
+# www.blender.org
+
+newmtl MTL_Emissive
+Kd 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.552786
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+
+newmtl MTL_FakeAds
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.552786
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd SubwayCarTextures/FakeAds/T_FakeAds_Color.png
+
+newmtl MTL_Lightoff
+Kd 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.552786
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+
+newmtl MTL_NonSeethroughGlass
+Kd 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.552786
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+
+newmtl MTL_SubwayCarExterior
+Ks 1.000000 1.000000 1.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.552786
+Pm 0.301282
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd SubwayCarTextures/Exterior Trim Textures/SM_ExteriorSubwayTrim_low_lambert1_BaseColor.png
+map_Ke SubwayCarTextures/Exterior Trim Textures/SM_ExteriorSubwayTrim_low_lambert1_Emissive.png
+map_Bump -bm 1.000000 SubwayCarTextures/Exterior Trim Textures/SM_ExteriorSubwayTrim_low_lambert1_Normal.png
+
+newmtl MTL_SubwayExteriorWindows
+Kd 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.552786
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+
+newmtl MTL_SubwayUnder
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.552786
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd SubwayCarTextures/Under Carriage Textures/T_SubwayUnderCarriage_Colour.png
+map_Bump -bm 1.000000 SubwayCarTextures/Under Carriage Textures/T_SubwayUnderCarriage_Normal.png
+
+newmtl Mtl_SubwayInterior
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.552786
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd SubwayCarTextures/Interior Trim Textures/SM_InteriorSubwayTrim_low_Mtl_SubwayInterior_BaseColor.png
+map_Bump -bm 1.000000 SubwayCarTextures/Interior Trim Textures/SM_InteriorSubwayTrim_low_Mtl_SubwayInterior_Normal.png
+
+newmtl lambert1
+Kd 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.552786
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
