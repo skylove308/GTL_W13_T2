@@ -204,7 +204,7 @@ private:
     TArray<float> CascadeSplits;                  // 캐스케이드 분할 거리 (NearClip ~ FarClip)
 
 public:
-    float LogValue = 0.7f;
+    float LogValue = 0.9f;
 private:
 
     // 설정 값
