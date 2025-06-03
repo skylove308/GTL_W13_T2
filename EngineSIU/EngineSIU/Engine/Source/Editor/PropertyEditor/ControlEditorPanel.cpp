@@ -47,6 +47,7 @@
 #include "Actors/Map.h"
 #include "Actors/Road.h"
 #include <Actors/SkySphereActor.h>
+#include "ShadowManager.h"
 
 ControlEditorPanel::ControlEditorPanel()
 {
@@ -338,6 +339,16 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
         if (ImGui::DragFloat("##Gamma", &Gamma, 0.01f, 0.01f, 4.0f, "%.1f"))
         {
             FEngineLoop::Renderer.CompositingPass->GammaValue = Gamma;
+        }
+
+        ImGui::Separator();
+
+        ImGui::Text("FSM LogValue");
+        float LogValue = FEngineLoop::Renderer.ShadowManager->LogValue;
+        ImGui::SetNextItemWidth(120.0f);
+        if (ImGui::DragFloat("##LogValue", &LogValue, 0.01f, 0.01f, 1.f, "%.1f"))
+        {
+            FEngineLoop::Renderer.ShadowManager->LogValue = LogValue;
         }
 
         ImGui::EndPopup();

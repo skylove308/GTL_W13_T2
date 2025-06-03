@@ -586,7 +586,7 @@ void FShadowManager::UpdateCascadeMatrices(const std::shared_ptr<FEditorViewport
         float p = (float)i / (float)NumCascades;
         float logSplit = NearClip * powf(EffectiveFarClip / NearClip, p);
         float uniSplit = NearClip + (EffectiveFarClip - NearClip) * p;
-        CascadeSplits[i] = 0.7f * logSplit + 0.3f * uniSplit; // 혼합 비율은 조정 가능
+        CascadeSplits[i] = LogValue * logSplit + (1-LogValue) * uniSplit; // 혼합 비율은 조정 가능
     }
 
     const FMatrix InvCamView = FMatrix::Inverse(CamView);
