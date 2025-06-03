@@ -8,6 +8,7 @@ class UCapsuleComponent;
 class USkeletalMeshComponent;
 class UCharacterMovementComponent;
 class UCameraComponent;
+class USpringArmComponent;
 
 class ACharacter : public APawn
 {
@@ -19,13 +20,13 @@ public:
     USkeletalMeshComponent* MeshComponent = nullptr;
     UCharacterMovementComponent* MovementComponent = nullptr;
     UCameraComponent* CameraComponent = nullptr;
+    USpringArmComponent* CameraBoom = nullptr;
 
-    void MoveForward(float Value);
-    void MoveRight(float Value);
+    void Move(float DeltaTime);
     void ApplyMovementForce(const FVector& Direction, float Scale);
     void Stop();
-    void RotateCharacterMesh(float DeltaTime);
-
+    void Rotate(float DeltaTime);
+    void UpdatePhysXTransform(const FVector& Location, const FQuat& Rotation);
 
     virtual void RegisterLuaType(sol::state& Lua) override; // Lua에 클래스 등록해주는 함수.
     virtual bool BindSelfLuaProperties() override; // LuaEnv에서 사용할 멤버 변수 등록 함수.
@@ -58,6 +59,8 @@ public:
     
     float CurrentForce = 0.0f;
     float TotalForce = 0.0f;
+
+    UPROPERTY_WITH_FLAGS(VisibleAnywhere, FVector2D, MoveInput);
     
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, DeathCameraTransitionTime,  = 3.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, DeathLetterBoxTransitionTime,  = 2.0f)
@@ -72,6 +75,7 @@ public:
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, NoInputLinearDamping, = 7.0f)
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MeshRotationSpeed, = 10.0f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, FVector2D, ControllerRotation)
 
                 
 private:
@@ -79,6 +83,7 @@ private:
     virtual UObject* Duplicate(UObject* InOuter) override;
     virtual void Tick(float DeltaTime) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
+
 
     void DoCameraEffect(float DeltaTime);
 

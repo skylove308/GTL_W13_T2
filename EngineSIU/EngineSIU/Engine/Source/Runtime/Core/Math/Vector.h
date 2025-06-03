@@ -88,6 +88,11 @@ public:
     {
         return FMath::Abs(X - Other.X) <= Tolerance && FMath::Abs(Y - Other.Y) <= Tolerance;
     }
+
+    bool IsNearlyZero(float Tolerance = KINDA_SMALL_NUMBER) const
+    {
+        return FMath::Abs(X) <= Tolerance && FMath::Abs(Y) <= Tolerance;
+    }
 };
 
 // 3D 벡터

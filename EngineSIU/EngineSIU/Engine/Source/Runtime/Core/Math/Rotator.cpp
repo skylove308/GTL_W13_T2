@@ -154,6 +154,16 @@ FVector FRotator::RotateVector(const FVector& Vec) const
     return Quaternion().RotateVector(Vec);
 }
 
+FVector FRotator::Vector() const
+{
+    float CP = FMath::Cos(FMath::DegreesToRadians(Pitch));
+    float SP = FMath::Sin(FMath::DegreesToRadians(Pitch));
+    float CY = FMath::Cos(FMath::DegreesToRadians(Yaw));
+    float SY = FMath::Sin(FMath::DegreesToRadians(Yaw));
+
+    return FVector(CP * CY, CP * SY, SP);
+}
+
 FMatrix FRotator::ToMatrix() const
 {
     return FMatrix::CreateRotationMatrix(*this);

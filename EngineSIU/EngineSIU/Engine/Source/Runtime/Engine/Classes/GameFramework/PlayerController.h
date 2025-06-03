@@ -34,7 +34,11 @@ public:
 
     virtual void UnPossess();
     
-    virtual void BindAction(const FString& Key, const std::function<void(float)>& Callback);
+    virtual void BindKeyPressAction(const FString& Key, const std::function<void(float)>& Callback);
+
+    virtual void BindOnKeyPressAction(const FString& Key, const std::function<void()>& Callback);
+
+    virtual void BindOnKeyReleaseAction(const FString& Key, const std::function<void()>& Callback);
 
     AActor* GetPossessedActor() const { return PossessedActor; }
     
