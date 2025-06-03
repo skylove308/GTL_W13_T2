@@ -19,6 +19,14 @@ void FResourceManager::Initialize(FRenderer* Renderer, FGraphicsDevice* Device)
     LoadTextureFromFile(Device->Device, L"Assets/Texture/T_Explosion_SubUV.png");
     LoadTextureFromFile(Device->Device, L"Assets/Texture/UUID_Font.png");
     LoadTextureFromFile(Device->Device, L"Assets/Texture/spotLight.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/WhiteBox.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/CrossyRoad/StartBG.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/CrossyRoad/Play.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/CrossyRoad/Settings.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/CrossyRoad/Exit.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/CrossyRoad/GameOver.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/CrossyRoad/Restart.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/CrossyRoad/Quit.png");
 
     LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/S_Actor.PNG");
     LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/S_LightSpot.PNG");

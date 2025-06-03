@@ -2,11 +2,13 @@
 #include "EditorPanel.h"
 
 #include "PropertyEditor/ControlEditorPanel.h"
+#include "PropertyEditor/GameUIPanel.h"
 #include "PropertyEditor/OutlinerEditorPanel.h"
 #include "PropertyEditor/ParticleViewerPanel.h"
 #include "PropertyEditor/PropertyEditorPanel.h"
 #include "PropertyEditor/SkeletalMeshViewerPanel.h"
 #include "PropertyEditor/PhysicsAssetViewerPanel.h"
+#include "PropertyEditor/LuaUIPanel.h"
 #include "World/World.h"
 void UnrealEd::Initialize()
 {
@@ -28,6 +30,12 @@ void UnrealEd::Initialize()
 
     auto PhysicsAssetPanel = std::make_shared<PhysicsAssetViewerPanel>();
     Panels["PhysicsAssetViewerPanel"] = PhysicsAssetPanel;
+
+    auto LuaUIPanel = std::make_shared<LuaUIViewPanel>();
+    PreRenderPanels["LuaUIViewPanel"] = LuaUIPanel;
+
+    auto GameUIPanel = std::make_shared<class GameUIPanel>();
+    PreRenderPanels["GameUIPanel"] = GameUIPanel;
 }
 
 void UnrealEd::Render() const
@@ -70,6 +78,15 @@ void UnrealEd::Render() const
         break;
         
     }
+
+    for (const auto& Panel : PreRenderPanels)
+    {
+        if (HasFlag(Panel.Value->GetSupportedWorldTypes(), currentMask))
+        {
+            Panel.Value->Render();
+        }
+    }
+
     for (const auto& Panel : Panels)
     {
         if (HasFlag(Panel.Value->GetSupportedWorldTypes(), currentMask))
@@ -87,6 +104,11 @@ void UnrealEd::AddEditorPanel(const FString& PanelId, const std::shared_ptr<UEdi
 void UnrealEd::OnResize(HWND hWnd) const
 {
     for (auto& Panel : Panels)
+    {
+        Panel.Value->OnResize(hWnd);
+    }
+
+    for (auto& Panel : PreRenderPanels)
     {
         Panel.Value->OnResize(hWnd);
     }

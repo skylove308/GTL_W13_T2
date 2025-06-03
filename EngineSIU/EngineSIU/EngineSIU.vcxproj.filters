@@ -418,6 +418,18 @@
     <ClInclude Include="LightGridGenerator.h" />
     <ClCompile Include="SoundManager.cpp" />
     <ClInclude Include="SoundManager.h" />
+    <ClCompile Include="Engine\Source\Developer\LuaTypes\LuaUserTypes.cpp">
+      <Filter>Engine\Source\Developer\LuaTypes</Filter>
+    </ClCompile>
+    <ClInclude Include="Engine\Source\Developer\LuaTypes\LuaUserTypes.h">
+      <Filter>Engine\Source\Developer\LuaTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Developer\LuaUtils\LuaBindMacros.h">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Developer\LuaUtils\LuaBindUtils.h">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClInclude>
     <ClCompile Include="Engine\Source\Editor\LevelEditor\SlateAppMessageHandler.cpp">
       <Filter>Engine\Source\Editor\LevelEditor</Filter>
     </ClCompile>
@@ -1602,6 +1614,7 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particles\Acceleration\ParticleModuleAcceleration.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particles\Acceleration\ParticleModuleAccelerationBase.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Physics\PhysicsManager.cpp" />
+    <ClCompile Include="Engine\Contents\AnimInstance\MyAnimInstance.cpp" />
     <ClCompile Include="Engine\Contents\Objects\DamageCameraShake.cpp" />
     <ClCompile Include="Engine\Source\Editor\PropertyEditor\PhysicsAssetViewerPanel.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Core\Container\ArrayHelper.cpp" />
@@ -1609,6 +1622,24 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\ConstraintInstance.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\PhysicsAsset.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\World\PhysicsViewerWorld.cpp" />
+    <ClCompile Include="Engine\Source\Developer\LuaUtils\LuaUI.cpp">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaScripts\LuaUIManager.cpp">
+      <Filter>LuaScripts</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Source\Editor\PropertyEditor\LuaUIPanel.cpp">
+      <Filter>Engine\Source\Editor\PropertyEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Source\Developer\LuaUtils\LuaButtonUI.cpp">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Source\Developer\LuaUtils\LuaImageUI.cpp">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Source\Developer\LuaUtils\LuaTextUI.cpp">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Source\Runtime\Renderer\GeometryDebugRenderPass.cpp">
       <Filter>Engine\Source\Runtime\Renderer</Filter>
     </ClCompile>
@@ -1745,6 +1776,7 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\Acceleration\ParticleModuleAcceleration.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particles\Acceleration\ParticleModuleAccelerationBase.h" />
     <ClInclude Include="Engine\Source\Runtime\Physics\PhysicsManager.h" />
+    <ClInclude Include="Engine\Contents\AnimInstance\MyAnimInstance.h" />
     <ClInclude Include="Engine\Contents\Objects\DamageCameraShake.h" />
     <ClInclude Include="Engine\Source\Editor\PropertyEditor\PhysicsAssetViewerPanel.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Container\ArrayHelper.h" />
@@ -1752,6 +1784,24 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\ConstraintInstance.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\PhysicsEngine\PhysicsAsset.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\World\PhysicsViewerWorld.h" />
+    <ClInclude Include="Engine\Source\Developer\LuaUtils\LuaUI.h">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaScripts\LuaUIManager.h">
+      <Filter>LuaScripts</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\LuaUIPanel.h">
+      <Filter>Engine\Source\Editor\PropertyEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Developer\LuaUtils\LuaButtonUI.h">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Developer\LuaUtils\LuaImageUI.h">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Developer\LuaUtils\LuaTextUI.h">
+      <Filter>Engine\Source\Developer\LuaUtils</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Source\Runtime\Renderer\GeometryDebugRenderPass.h">
       <Filter>Engine\Source\Runtime\Renderer</Filter>
     </ClInclude>
