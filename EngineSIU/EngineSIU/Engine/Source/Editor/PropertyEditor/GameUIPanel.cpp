@@ -19,8 +19,11 @@ void GameUIPanel::Render()
     ImFont* IconFont = IO.Fonts->Fonts[FEATHER_FONT];
     constexpr ImVec2 IconSize = ImVec2(32, 32);
 
+    float PanelWidth = (Width) * 0.8f;  // 1.0f
+    float PanelHeight = (Height) * 0.9f;  // 1.0f
+
     constexpr float PanelPosX = 0.0f;
-    constexpr float PanelPosY = 0.0f;
+    constexpr float PanelPosY = 72.0f;
 
     constexpr ImVec2 MinSize(300, 72);
     constexpr ImVec2 MaxSize(FLT_MAX, FLT_MAX);
@@ -32,7 +35,7 @@ void GameUIPanel::Render()
     ImGui::SetNextWindowPos(ImVec2(PanelPosX, PanelPosY), ImGuiCond_Always);
 
     /* Panel Size */
-    ImGui::SetNextWindowSize(ImVec2(Width, Height), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(PanelWidth, PanelHeight), ImGuiCond_Always);
 
     /* Panel Flags */
     constexpr ImGuiWindowFlags PanelFlags =
@@ -202,7 +205,7 @@ void GameUIPanel::RenderEndUI()
     ImGui::SetCursorPos(ImVec2(ImageStartX, ImageStartY));
 
     ImGui::Image((ImTextureID)GameOverSRV, ImVec2(TargetW, TargetH));
-    float NextY = ImageStartY + TargetH - 300.0f;
+    float NextY = ImageStartY + TargetH - 200.0f;
 
     std::shared_ptr<FTexture> RestartTexPtr = 
         FEngineLoop::ResourceManager.GetTexture(L"Assets/Texture/CrossyRoad/Restart.png");
