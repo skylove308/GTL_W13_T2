@@ -569,7 +569,7 @@ void UEditorEngine::BindEssentialObjects()
     GameManager->SetActorTickInEditor(false);
     for (int i = 0; i < 10; i++)
     {
-        GameManager->SpawnMap();
+        GameManager->SpawnMap(1);
     }
 
     APlayerController* PlayerController = ActiveWorld->SpawnActor<APlayerController>();

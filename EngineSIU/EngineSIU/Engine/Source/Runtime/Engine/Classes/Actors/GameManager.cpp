@@ -49,9 +49,9 @@ void AGameManager::SetState(EGameState State)
     }
 }
 
-void AGameManager::SpawnMap()
+void AGameManager::SpawnMap(int MaxRoadNum)
 {
-    MapModule->SpawnRoadMap();
+    MapModule->SpawnRoadMap(MaxRoadNum);
 }
 
 void AGameManager::DestroyMap()

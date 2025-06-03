@@ -9,7 +9,7 @@ void FMapModule::Initialize()
 
 }
 
-void FMapModule::SpawnRoadMap()
+void FMapModule::SpawnRoadMap(int MaxRoadNum)
 {
     FMap* Map = new FMap();
 
@@ -22,7 +22,7 @@ void FMapModule::SpawnRoadMap()
 
     SpawnLocation += FVector(600.0f, -0.0f, 0.0f);
 
-    int RandomCarRoadCount = FMath::RandHelper(4) + 1;
+    int RandomCarRoadCount = FMath::RandHelper(4) + MaxRoadNum;
 
     for(int i= 0; i < RandomCarRoadCount; ++i)
     {
