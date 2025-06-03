@@ -2,6 +2,8 @@
 #include "Gameframework/Actor.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnCharacterDeath);
+DECLARE_MULTICAST_DELEGATE(FOnCharacterRed);
+DECLARE_MULTICAST_DELEGATE(FOnCharacterNoRed);
 
 enum class ERoadState : uint8
 {
@@ -48,6 +50,8 @@ public:
 
 public:
     FOnCharacterDeath OnDeath;
+    FOnCharacterRed OnRed;
+    FOnCharacterNoRed OnNoRed;
 
 private:
     UStaticMeshComponent* RoadMesh = nullptr;

@@ -18,6 +18,7 @@
 #include "Actors/Road.h"
 #include <Particles/ParticleSystemComponent.h>
 #include "ParticleHelper.h"
+#include "Engine/SkeletalMesh.h"
 #include "SoundManager.h"
 
 ACharacter::ACharacter()
@@ -61,6 +62,19 @@ void ACharacter::BeginPlay()
     ExplosionParticle = UAssetManager::Get().GetParticleSystem("Contents/ParticleSystem/UParticleSystem_368");
     FSoundManager::GetInstance().PlaySound("Title");
 
+}
+
+void ACharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
+    
+    USkeletalMesh* SkeletalMeshAsset = MeshComponent->GetSkeletalMeshAsset();
+    for (int i = 0; i < SkeletalMeshAsset->GetRenderData()->MaterialSubsets.Num(); i++)
+    {
+        FName MaterialName = SkeletalMeshAsset->GetRenderData()->MaterialSubsets[i].MaterialName;
+        FVector EmissiveColor = FVector(0.0f, 0.0f, 0.0f);
+        UAssetManager::Get().GetMaterial(MaterialName)->SetEmissive(EmissiveColor);
+    }
 }
 
 UObject* ACharacter::Duplicate(UObject* InOuter)
@@ -223,14 +237,36 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
         FSoundManager::GetInstance().PlaySound("Wasted", 1000);
     }
 
-    if( HitComponent && 
-        OtherComp && 
-        MeshComponent && 
-        HitComponent == CapsuleComponent && 
+    if (HitComponent &&
+        OtherComp &&
+        MeshComponent &&
+        HitComponent == CapsuleComponent &&
         OtherComp->GetOwner() &&
         OtherComp->GetOwner()->IsA<ARoad>())
     {
         ARoad* Road = Cast<ARoad>(OtherComp->GetOwner());
+        Road->OnRed.AddLambda([this]()
+        {
+            USkeletalMesh* SkeletalMeshAsset = MeshComponent->GetSkeletalMeshAsset();
+            for (int i = 0; i < SkeletalMeshAsset->GetRenderData()->MaterialSubsets.Num(); i++)
+            {
+                FName MaterialName = SkeletalMeshAsset->GetRenderData()->MaterialSubsets[i].MaterialName;
+                FVector EmissiveColor = FVector(0.03f, 0.0f, 0.0f);
+                UAssetManager::Get().GetMaterial(MaterialName)->SetEmissive(EmissiveColor);
+            }
+        });
+
+        Road->OnNoRed.AddLambda([this]()
+            {
+                USkeletalMesh* SkeletalMeshAsset = MeshComponent->GetSkeletalMeshAsset();
+                for (int i = 0; i < SkeletalMeshAsset->GetRenderData()->MaterialSubsets.Num(); i++)
+                {
+                    FName MaterialName = SkeletalMeshAsset->GetRenderData()->MaterialSubsets[i].MaterialName;
+                    FVector EmissiveColor = FVector(0.0f, 0.0f, 0.0f);
+                    UAssetManager::Get().GetMaterial(MaterialName)->SetEmissive(EmissiveColor);
+                }
+            });
+
         Road->OnDeath.AddLambda([this]()
         {
             bIsDead = true;
@@ -240,6 +276,21 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
         {
             Road->SetIsOverlapped(true);
         }
+    }
+}
+
+void ACharacter::OnCollisionExit(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp)
+{
+    if (HitComponent && 
+        OtherComp && 
+        MeshComponent && 
+        HitComponent == CapsuleComponent && 
+        OtherComp->GetOwner() &&
+        OtherComp->GetOwner()->IsA<ARoad>())
+    {
+        ARoad* Road = Cast<ARoad>(OtherComp->GetOwner());
+        Road->SetIsOverlapped(false);
+
     }
 }
 

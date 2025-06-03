@@ -7,19 +7,6 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "AAmbientLight_246",
-                        "ComponentOwnerClass": "AAmbientLight",
-                        "ScriptName": "",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
                     "ComponentClass": "UAmbientLightComponent",
                     "ComponentID": "UAmbientLightComponent_0",
                     "Properties": {
@@ -34,6 +21,19 @@
                         "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "AAmbientLight_246",
+                        "ComponentOwnerClass": "AAmbientLight",
+                        "ScriptName": "",
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }
@@ -118,7 +118,7 @@
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
                         "GeomsCount": "0",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=-50.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "RigidBodyType": "2",
@@ -211,6 +211,19 @@
                     }
                 },
                 {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "ACar_232",
+                        "ComponentOwnerClass": "ACar",
+                        "ScriptName": "LuaScripts/Actors/Car.lua",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
                     "ComponentClass": "UCameraComponent",
                     "ComponentID": "UCameraComponent_297",
                     "Properties": {
@@ -222,19 +235,6 @@
                         "RelativeLocation": "X=150.000 Y=0.000 Z=150.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "ACar_232",
-                        "ComponentOwnerClass": "ACar",
-                        "ScriptName": "LuaScripts/Actors/Car.lua",
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }
@@ -266,7 +266,7 @@
                         "Geom_0Rotation": "Pitch=0.000 Yaw=0.000 Roll=0.000",
                         "Geom_0Type": "1",
                         "GeomsCount": "1",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=-100.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=100000.000 Y=100000.000 Z=100.000",
                         "RigidBodyType": "0",
@@ -398,32 +398,32 @@
             "RootComponentID": "SkySphereMeshComp"
         },
         {
-            "ActorClass": "ACar",
-            "ActorID": "ACar_501",
-            "ActorLabel": "OBJ_CAR_501",
+            "ActorClass": "ARoad",
+            "ActorID": "ARoad_388",
+            "ActorLabel": "OBJ_ROAD_388",
             "ActorTickInEditor": "false",
             "Components": [
                 {
                     "ComponentClass": "UStaticMeshComponent",
-                    "ComponentID": "CarMesh",
+                    "ComponentID": "Road",
                     "Properties": {
-                        "AABB_max": "X=1.429 Y=22.518 Z=5.146",
-                        "AABB_min": "X=-1.429 Y=-22.518 Z=-0.030",
+                        "AABB_max": "X=13.990 Y=0.010 Z=123.045",
+                        "AABB_min": "X=0.304 Y=-0.000 Z=9.265",
                         "AttachParentID": "nullptr",
                         "ComponentClass": "UStaticMeshComponent",
-                        "ComponentName": "CarMesh",
-                        "ComponentOwner": "ACar_501",
-                        "ComponentOwnerClass": "ACar",
+                        "ComponentName": "Road",
+                        "ComponentOwner": "ARoad_388",
+                        "ComponentOwnerClass": "ARoad",
                         "GeomsCount": "0",
-                        "RelativeLocation": "X=121.700 Y=2000.000 Z=100.500",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=50.000 Y=50.000 Z=50.000",
-                        "RigidBodyType": "1",
-                        "StaticMeshPath": "Contents/Cars/Train/Train.obj",
+                        "RelativeLocation": "X=0.100 Y=-50000.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=90.000",
+                        "RelativeScale3D": "X=30.000 Y=30.000 Z=1000.000",
+                        "RigidBodyType": "0",
+                        "StaticMeshPath": "Contents/Road/road.obj",
                         "bApplyGravity": "false",
                         "bAutoActive": "true",
                         "bIsActive": "true",
-                        "bSimulate": "false",
+                        "bSimulate": "true",
                         "m_Type": ""
                     }
                 },
@@ -433,15 +433,61 @@
                     "Properties": {
                         "ComponentClass": "ULuaScriptComponent",
                         "ComponentName": "LuaComponent",
-                        "ComponentOwner": "ACar_501",
-                        "ComponentOwnerClass": "ACar",
-                        "ScriptName": "LuaScripts/Actors/Car.lua",
+                        "ComponentOwner": "ARoad_388",
+                        "ComponentOwnerClass": "ARoad",
+                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }
                 }
             ],
-            "RootComponentID": "CarMesh"
+            "RootComponentID": "Road"
+        },
+        {
+            "ActorClass": "ARoad",
+            "ActorID": "ARoad_846",
+            "ActorLabel": "OBJ_ROAD_846",
+            "ActorTickInEditor": "false",
+            "Components": [
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "ARoad_846",
+                        "ComponentOwnerClass": "ARoad",
+                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "UStaticMeshComponent",
+                    "ComponentID": "Road",
+                    "Properties": {
+                        "AABB_max": "X=13.990 Y=0.010 Z=123.045",
+                        "AABB_min": "X=0.304 Y=-0.000 Z=9.265",
+                        "AttachParentID": "nullptr",
+                        "ComponentClass": "UStaticMeshComponent",
+                        "ComponentName": "Road",
+                        "ComponentOwner": "ARoad_846",
+                        "ComponentOwnerClass": "ARoad",
+                        "GeomsCount": "0",
+                        "RelativeLocation": "X=385.000 Y=-50000.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=90.000",
+                        "RelativeScale3D": "X=30.000 Y=30.000 Z=1000.000",
+                        "RigidBodyType": "0",
+                        "StaticMeshPath": "Contents/Road/road.obj",
+                        "bApplyGravity": "false",
+                        "bAutoActive": "true",
+                        "bIsActive": "true",
+                        "bSimulate": "true",
+                        "m_Type": ""
+                    }
+                }
+            ],
+            "RootComponentID": "Road"
         }
     ],
     "NextUUID": 0,
