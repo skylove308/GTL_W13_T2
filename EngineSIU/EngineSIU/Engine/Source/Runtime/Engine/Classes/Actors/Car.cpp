@@ -34,7 +34,7 @@ void ACar::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if(GetActorLocation().Y > 12000.0f || GetActorLocation().Y < -12000.0f)
+    if(GetActorLocation().Y > 9000.0f || GetActorLocation().Y < -9000.0f)
     {
         Destroy();
 

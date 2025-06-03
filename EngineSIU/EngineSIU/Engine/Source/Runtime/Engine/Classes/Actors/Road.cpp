@@ -58,12 +58,12 @@ void ARoad::Tick(float DeltaTime)
         ACar* Car = GEngine->ActiveWorld->SpawnActor<ACar>();
         if (DirectionNum == 0)
         {
-            Car->SetActorLocation(FVector(GetActorLocation().X, 10000.0f, 350.0f));
+            Car->SetActorLocation(FVector(GetActorLocation().X, 8000.0f, 350.0f));
             Car->SetSpawnDirectionRight(true);
         }
         else
         {
-            Car->SetActorLocation(FVector(GetActorLocation().X, -10000.0f, 350.0f));
+            Car->SetActorLocation(FVector(GetActorLocation().X, -8000.0f, 350.0f));
             Car->SetSpawnDirectionRight(false);
         }
 

@@ -124,6 +124,8 @@ void UActorComponent::DestroyComponent(bool bPromoteChildren)
         }
     }
 
+    OwnerPrivate = nullptr; // Owner를 nullptr로 설정하여 더 이상 참조하지 않도록 함
+
     if (bHasBegunPlay)
     {
         EndPlay(EEndPlayReason::Destroyed);
