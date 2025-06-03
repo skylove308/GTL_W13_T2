@@ -62,6 +62,7 @@ void ACharacter::BeginPlay()
     ExplosionParticle = UAssetManager::Get().GetParticleSystem("Contents/ParticleSystem/UParticleSystem_368");
     FSoundManager::GetInstance().PlaySound("Title");
 
+    BindInput();
 }
 
 void ACharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -104,6 +105,7 @@ void ACharacter::Tick(float DeltaTime)
 {
     APawn::Tick(DeltaTime);
 
+    RotateCharacterMesh(DeltaTime);
     DoCameraEffect(DeltaTime);
     // 물리 결과 동기화
     // if (bPhysXInitialized &&  PhysXActor)
@@ -114,6 +116,8 @@ void ACharacter::Tick(float DeltaTime)
     //
     //     cation(FVector(PxTr.p.x, PxTr.p.y, PxTr.p.z));
     // }
+    float Velocity = GetSpeed();
+    UE_LOG(ELogLevel::Display, TEXT("Speed: %f"), Velocity);
 }
 
 void ACharacter::DoCameraEffect(float DeltaTime)
@@ -300,7 +304,6 @@ float ACharacter::GetSpeed()
     if (bIsStop)
         CurrVelocity = PxVec3(0.0f, 0.0f, 0.0f);
     
-    // UE_LOG(ELogLevel::Display, TEXT("Speed: %f"), CurrVelocity.magnitude());
     return CurrVelocity.magnitude();
 }
 
@@ -308,121 +311,131 @@ void ACharacter::SetSpeed(float NewVelocity)
 {
 }
 
-void ACharacter::MoveForward(float Value)
+void ACharacter::BindInput()
 {
-    bIsStop = false;
-    
-    if (bIsRunning)
-        CurrentForce *= 2.0f;
-
-    physx::PxRigidDynamic* PxCharActor = static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
-    if (PxCharActor == nullptr)
+    UWorld* ActiveWorld = GetWorld();
+    if (!ActiveWorld)
         return;
 
-    CurrentForce = FMath::Min(CurrentForce + ForceIncrement, MaxForce);
-    FVector Forward = GetActorForwardVector().GetSafeNormal();
-    float ForceScalar = CurrentForce * Value;
-    physx::PxVec3 PushForce(
-        Forward.X * ForceScalar,
-        Forward.Y * ForceScalar,
-        Forward.Z * ForceScalar
+    ActiveWorld->GetPlayerController()->BindAction("W",
+        [&](float Value) {
+            MoveForward(0.1f);
+        }
     );
+    ActiveWorld->GetPlayerController()->BindAction("S",
+        [&](float Value) {
+            MoveForward(-0.1f);
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("A",
+        [&](float Value) {
+            MoveRight(-0.1f);
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("D",
+        [&](float Value) {
+            MoveRight(0.1f);
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("Run",
+        [&](float Value) {
+            bIsRunning = true;
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("RunRelease",
+        [&](float Value) {
+            bIsRunning = false;
+        }
+    );
+    ActiveWorld->GetPlayerController()->BindAction("Idle",
+        [&](float Value) {
+            Stop();
+        }
+    );
+}
 
-    // PushForce: PhysX 액터에 가할 힘 벡터 (PxVec3) — 뉴턴 단위, 월드 좌표 기준으로 적용됩니다.
-    // physx::PxForceMode::eFORCE: 지속적인 힘 모드. 매 시뮬레이션 스텝마다 힘(force) / 질량(mass)에 따라 가속도가 계산되어 적용됩니다.
-    // /*autowake=*/ true: 슬립 상태인 리지드 바디라도 강제로 깨워서 즉시 물리 시뮬레이션에 반영하도록 설정합니다.
-    PxCharActor->addForce(PushForce, physx::PxForceMode::eFORCE, /*autowake=*/ true);
+void ACharacter::UnbindInput()
+{
+}
 
-    if (Value >= 0.0f)
-    {
-        MeshComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
-    }
-    else
-    {
-        MeshComponent->SetRelativeRotation(FRotator(0.0f, 180.0f, 0.0f));
-    }
+void ACharacter::MoveForward(float Value)
+{
+    FVector Direction = GetActorForwardVector().GetSafeNormal() * Value;
+
+    ApplyMovementForce(Direction, 1.0f);
+
+    UE_LOG(ELogLevel::Warning, "MoveForward");
 }
 
 void ACharacter::MoveRight(float Value)
 {
-    bIsStop = false;
-    
-    if (bIsRunning)
-        CurrentForce *= 2.0f;
+    FVector Direction = GetActorRightVector().GetSafeNormal() * Value;
 
-    physx::PxRigidDynamic* PxCharActor = static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
+    ApplyMovementForce(Direction, 1.0f);
+
+    UE_LOG(ELogLevel::Warning, "MoveRight");
+}
+
+void ACharacter::ApplyMovementForce(const FVector& Direction, float Scale)
+{
+    physx::PxRigidDynamic* PxCharActor =
+        static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
     if (PxCharActor == nullptr)
         return;
 
-    CurrentForce = FMath::Min(CurrentForce + ForceIncrement, MaxForce);
-    FVector Right = GetActorRightVector().GetSafeNormal();
-    float ForceScalar = CurrentForce * Value;
-    
-    physx::PxVec3 PushForce(
-        Right.X * ForceScalar,
-        Right.Y * ForceScalar,
-        Right.Z * ForceScalar
-    );
-    
-    PxCharActor->addForce(PushForce, physx::PxForceMode::eFORCE, true);
-
-    if (Value >= 0.0f)
+    if (bIsStop)
     {
-        MeshComponent->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
+        // 현재 속도를 0으로 초기화
+        physx::PxRigidDynamic* PxCharActor = static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
+        if (PxCharActor)
+        {
+            PxCharActor->setLinearDamping(InputLinearDamping);
+        }
+        bIsStop = false;
     }
-    else
+
+    float CurrentMaxSpeed = bIsRunning ? RunMaxSpeed : WalkMaxSpeed;
+    float CurrentForce = bIsRunning ? RunForce : WalkForce;
+
+    float Speed = GetSpeed();
+
+    if (Speed < CurrentMaxSpeed)
     {
-        MeshComponent->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+        PxVec3 PushForce(
+            Direction.X * CurrentForce * Scale,
+            Direction.Y * CurrentForce * Scale,
+            Direction.Z * CurrentForce * Scale
+        );
+
+        PxCharActor->addForce(PushForce, physx::PxForceMode::eFORCE, /*autowake=*/ true);
     }
 }
-
-//void ACharacter::MoveForward(float Value)
-//{
-//    bIsStop = false;
-//
-//    physx::PxRigidDynamic* PxCharActor = static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
-//    if (PxCharActor == nullptr)
-//        return;
-//
-//    FVector Forward = GetActorForwardVector().GetSafeNormal();
-//    float Speed = bIsRunning ? RunSpeed : WalkSpeed;
-//
-//    FVector DesiredVelocity = Forward * Speed * Value;
-//    physx::PxVec3 PxVelocity(DesiredVelocity.X, DesiredVelocity.Y, DesiredVelocity.Z);
-//
-//    PxCharActor->setLinearVelocity(PxVelocity, true); // true = autowake
-//
-//    MeshComponent->SetRelativeRotation(Value >= 0.0f ? FRotator(0.0f, 0.0f, 0.0f) : FRotator(0.0f, 180.0f, 0.0f));
-//}
-//
-//void ACharacter::MoveRight(float Value)
-//{
-//    bIsStop = false;
-//
-//    physx::PxRigidDynamic* PxCharActor = static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
-//    if (PxCharActor == nullptr)
-//        return;
-//
-//    FVector Right = GetActorRightVector().GetSafeNormal();
-//    float Speed = bIsRunning ? RunSpeed : WalkSpeed;
-//
-//    FVector DesiredVelocity = Right * Speed * Value;
-//    physx::PxVec3 PxVelocity(DesiredVelocity.X, DesiredVelocity.Y, DesiredVelocity.Z);
-//
-//    PxCharActor->setLinearVelocity(PxVelocity, true);
-//
-//    MeshComponent->SetRelativeRotation(Value >= 0.0f ? FRotator(0.0f, 90.0f, 0.0f) : FRotator(0.0f, -90.0f, 0.0f));
-//}
 
 void ACharacter::Stop()
 {
     bIsStop = true;
-    CurrentForce = 0.0f;
 
     physx::PxRigidDynamic* PxCharActor =
         static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
     if (PxCharActor == nullptr)
         return;
 
-    PxCharActor->setLinearVelocity(physx::PxVec3(0.0f, 0.0f, 0.0f));
+    PxCharActor->setLinearDamping(NoInputLinearDamping);
+}
+
+void ACharacter::RotateCharacterMesh(float DeltaTime)
+{
+    PxVec3 CurrVelocity = CapsuleComponent->BodyInstance->BIGameObject->DynamicRigidBody->getLinearVelocity();
+    FVector Velocity = FVector(CurrVelocity.x, CurrVelocity.y, 0);
+    if (Velocity.SizeSquared() > KINDA_SMALL_NUMBER)
+    {
+        FRotator TargetRotation = Velocity.Rotation(); // FVector → FRotator
+
+        // 원하는 회전 방향으로 Mesh를 회전
+        FRotator RelativeRotation = TargetRotation - GetActorRotation(); // 월드 → 상대 회전
+
+        FRotator CurrentRotation = MeshComponent->GetRelativeRotation();
+        FRotator NewRotation = FMath::RInterpTo(CurrentRotation, RelativeRotation, DeltaTime, MeshRotationSpeed);
+        MeshComponent->SetRelativeRotation(NewRotation);
+    }
 }
