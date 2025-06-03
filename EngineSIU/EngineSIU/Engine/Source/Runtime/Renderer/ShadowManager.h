@@ -15,7 +15,7 @@ struct FShadowDepthRHI
     TArray<ID3D11DepthStencilView*> ShadowDSVs; // 디렉셔널인경우  cascade
     TArray<ID3D11ShaderResourceView*> ShadowSRVs; // imgui용 각 텍스쳐의 srv
     
-    uint32 ShadowMapResolution = 1024; // 섀도우 맵 해상도 (기본값: 1024x1024)
+    uint32 ShadowMapResolution = 8192; // 섀도우 맵 해상도 (기본값: 1024x1024)
 
     void Release()
     {
@@ -202,6 +202,10 @@ private:
     TArray<FMatrix> CascadesViewProjMatrices;   // 캐스케이드 ViewProj 행렬
     TArray<FMatrix> CascadesInvProjMatrices;    // 캐스케이드 InvProj 행렬
     TArray<float> CascadeSplits;                  // 캐스케이드 분할 거리 (NearClip ~ FarClip)
+
+public:
+    float LogValue = 0.7f;
+private:
 
     // 설정 값
     uint32_t MaxSpotLightShadows = 16;

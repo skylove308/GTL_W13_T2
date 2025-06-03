@@ -1,11 +1,11 @@
 #include "GameUIPanel.h"
 
+#include "ImGuiManager.h"
 #include "Actors/GameManager.h"
 #include "ImGui/imgui.h"
 #include "Engine/Engine.h"
 #include "Engine/World/World.h"
 #include "Engine/Source/Runtime/Engine/Classes/Level.h"
-#include "Engine/Classes/Actors/GameManager.h"
 
 GameUIPanel::GameUIPanel()
 {
@@ -15,10 +15,6 @@ GameUIPanel::GameUIPanel()
 void GameUIPanel::Render()
 {
     /* Pre Setup */
-    const ImGuiIO& IO = ImGui::GetIO();
-    ImFont* IconFont = IO.Fonts->Fonts[FEATHER_FONT];
-    constexpr ImVec2 IconSize = ImVec2(32, 32);
-
     float PanelWidth = (Width) * 0.8f;  // 1.0f
     float PanelHeight = (Height) * 0.9f;  // 1.0f
 
@@ -185,8 +181,12 @@ void GameUIPanel::RenderStartUI()
 void GameUIPanel::RenderGameUI()
 {
     int CurrentScore = GameManager->GetScore();
-    ImGui::SetCursorScreenPos(ImVec2(10.0f, Height*0.15f));
-    ImGui::Text("Score: %d", CurrentScore);
+    ImGui::SetCursorScreenPos(ImVec2(30.0f, Height * 0.1f));
+    ImGui::PushFont(UImGuiManager::GraffitiFont);
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f,  0.1f,  0.0f,  1.0f));
+    ImGui::Text("Score : %d", CurrentScore);
+    ImGui::PopStyleColor();
+    ImGui::PopFont();
 }
 
 void GameUIPanel::RenderEndUI()

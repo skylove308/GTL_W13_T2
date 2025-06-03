@@ -3,6 +3,7 @@
 #include "sol/sol.hpp"
 #include "UnrealEd/EditorPanel.h"
 
+struct ImFont;
 class AGameManager;
 
 class GameUIPanel : public UEditorPanel
