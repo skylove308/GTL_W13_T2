@@ -74,6 +74,44 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
+                    "ComponentClass": "UCameraComponent",
+                    "ComponentID": "FollowCamera",
+                    "Properties": {
+                        "AttachParentID": "CameraBoom",
+                        "ComponentClass": "UCameraComponent",
+                        "ComponentName": "FollowCamera",
+                        "ComponentOwner": "ACharacter_256",
+                        "ComponentOwnerClass": "ACharacter",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "USpringArmComponent",
+                    "ComponentID": "CameraBoom",
+                    "Properties": {
+                        "AttachParentID": "CapsuleComponent",
+                        "ComponentClass": "USpringArmComponent",
+                        "ComponentName": "CameraBoom",
+                        "ComponentOwner": "ACharacter_256",
+                        "ComponentOwnerClass": "ACharacter",
+                        "MaxPitch": "70.000000",
+                        "MaxYaw": "60.000000",
+                        "MinPitch": "0.000000",
+                        "MinYaw": "-60.000000",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=50.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "SocketOffset": "X=0.000 Y=0.000 Z=0.000",
+                        "TargetArmLength": "300.000000",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
                     "ComponentClass": "UCapsuleComponent",
                     "ComponentID": "CapsuleComponent",
                     "Properties": {
@@ -105,31 +143,6 @@
                     }
                 },
                 {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "ACharacter_256",
-                        "ComponentOwnerClass": "ACharacter",
-                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "UCharacterMovementComponent",
-                    "ComponentID": "CharacterMovementComponent",
-                    "Properties": {
-                        "ComponentClass": "UCharacterMovementComponent",
-                        "ComponentName": "CharacterMovementComponent",
-                        "ComponentOwner": "ACharacter_256",
-                        "ComponentOwnerClass": "ACharacter",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
                     "ComponentClass": "USkeletalMeshComponent",
                     "ComponentID": "SkeletalMeshComponent",
                     "Properties": {
@@ -156,53 +169,26 @@
                     }
                 },
                 {
-                    "ComponentClass": "USpringArmComponent",
-                    "ComponentID": "CameraBoom",
+                    "ComponentClass": "UCharacterMovementComponent",
+                    "ComponentID": "CharacterMovementComponent",
                     "Properties": {
-                        "AttachParentID": "CapsuleComponent",
-                        "ComponentClass": "USpringArmComponent",
-                        "ComponentName": "CameraBoom",
+                        "ComponentClass": "UCharacterMovementComponent",
+                        "ComponentName": "CharacterMovementComponent",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
-                        "MaxPitch": "70.000000",
-                        "MinPitch": "-15.000000",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "SocketOffset": "X=0.000 Y=50.000 Z=50.000",
-                        "TargetArmLength": "300.000000",
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }
                 },
                 {
-                    "ComponentClass": "UCameraComponent",
-                    "ComponentID": "FollowCamera",
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
                     "Properties": {
-                        "AttachParentID": "CameraBoom",
-                        "ComponentClass": "UCameraComponent",
-                        "ComponentName": "FollowCamera",
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "UCameraComponent",
-                    "ComponentID": "CameraComponent",
-                    "Properties": {
-                        "AttachParentID": "CapsuleComponent",
-                        "ComponentClass": "UCameraComponent",
-                        "ComponentName": "CameraComponent",
-                        "ComponentOwner": "ACharacter_256",
-                        "ComponentOwnerClass": "ACharacter",
-                        "RelativeLocation": "X=-300.000 Y=0.000 Z=100.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }

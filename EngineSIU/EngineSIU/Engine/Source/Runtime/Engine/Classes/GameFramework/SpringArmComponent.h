@@ -41,6 +41,8 @@ public:
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector, SocketOffset, = FVector(0, 50.0f, 50.0f))
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MinPitch, = -15.f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MaxPitch, = 70.f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, MinYaw, = -70.f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, MaxYaw, = 70.f)
     
     FVector TargetLocation; // 최종 카메라 위치
 

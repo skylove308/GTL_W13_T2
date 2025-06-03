@@ -16,6 +16,8 @@ UObject* USpringArmComponent::Duplicate(UObject* InOuter)
     NewComponent->SocketOffset = SocketOffset;
     NewComponent->MinPitch = MinPitch;
     NewComponent->MaxPitch = MaxPitch;
+    NewComponent->MinYaw = MinYaw;
+    NewComponent->MaxYaw = MaxYaw;
     return NewComponent;
 }
 
@@ -27,6 +29,8 @@ void USpringArmComponent::GetProperties(TMap<FString, FString>& OutProperties) c
     OutProperties.Add(TEXT("SocketOffset"), *SocketOffset.ToString());
     OutProperties.Add(TEXT("MinPitch"), FString::Printf(TEXT("%f"), MinPitch));
     OutProperties.Add(TEXT("MaxPitch"), FString::Printf(TEXT("%f"), MaxPitch));
+    OutProperties.Add(TEXT("MinYaw"), FString::Printf(TEXT("%f"), MinYaw));
+    OutProperties.Add(TEXT("MaxYaw"), FString::Printf(TEXT("%f"), MaxYaw));
 }
 
 void USpringArmComponent::SetProperties(const TMap<FString, FString>& InProperties)
@@ -41,6 +45,10 @@ void USpringArmComponent::SetProperties(const TMap<FString, FString>& InProperti
     if (TempStr) MinPitch = FCString::Atof(**TempStr);
     TempStr = InProperties.Find(TEXT("MaxPitch"));
     if (TempStr) MaxPitch = FCString::Atof(**TempStr);
+    TempStr = InProperties.Find(TEXT("MinYaw"));
+    if (TempStr) MinYaw = FCString::Atof(**TempStr);
+    TempStr = InProperties.Find(TEXT("MaxYaw"));
+    if (TempStr) MaxYaw = FCString::Atof(**TempStr);
 }
 
 void USpringArmComponent::InitializeComponent()
@@ -171,7 +179,7 @@ void USpringArmComponent::HandleRotation(const FVector2D& Vector)
     float pitch = Vector.Y;
 
     CurrentPitchAngle = FMath::Clamp(CurrentPitchAngle + pitch / 10.f, MinPitch, MaxPitch);
-    CurrentYawAngle += yaw / 10.f;
+    CurrentYawAngle = FMath::Clamp(CurrentYawAngle + yaw / 10.f, MinYaw, MaxYaw);
 }
 
 void USpringArmComponent::UpdateCameraTransform(float DeltaTime)
