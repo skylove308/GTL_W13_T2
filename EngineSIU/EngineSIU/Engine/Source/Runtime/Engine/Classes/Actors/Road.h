@@ -66,5 +66,6 @@ private:
     bool bIsCarOnRoad = false;
     bool bIsFirstTimeOnRoad = false;
     ACar* CurrentCar = nullptr;
+    float CarOnRoadTime = 0.0f;
 };
 

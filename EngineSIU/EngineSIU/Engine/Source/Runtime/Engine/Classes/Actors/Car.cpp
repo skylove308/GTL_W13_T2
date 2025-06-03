@@ -12,11 +12,34 @@
 ACar::ACar()
 {
     UStaticMeshComponent* StaticMeshComp = AddComponent<UStaticMeshComponent>("CarMesh");
-    StaticMeshComp->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Cars/Train/Train.obj"));
+    int RandNum = FMath::RandHelper(4);
+    switch (RandNum)
+    {
+    case 0:
+        StaticMeshComp->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Cars/Mercedes_Benz_560_SEL/Mercedes_Benz_560_SEL.obj"));
+        StaticMeshComp->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
+        CarType = ECarType::Benz;
+        break;
+    case 1:
+        StaticMeshComp->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Cars/RangeRover/Range_Rover_Sports_2018.obj"));
+        StaticMeshComp->SetWorldRotation(FRotator(0.0f, 180.0f, 0.0f));
+        CarType = ECarType::RangeRover;
+        break;
+    case 2:
+        StaticMeshComp->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Cars/Truck/Truck.obj"));
+        StaticMeshComp->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
+        CarType = ECarType::Truck;
+        break;
+    case 3:
+        StaticMeshComp->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Cars/Train/Train.obj"));
+        StaticMeshComp->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
+        CarType = ECarType::Train;
+        break;
+    }
+
     StaticMeshComp->bSimulate = true;
+    StaticMeshComp->SetWorldScale3D(FVector(100.0f));
     RootComponent = StaticMeshComp;
-    RootComponent->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
-    RootComponent->SetWorldScale3D(FVector(100.0f));
 }
 
 void ACar::BeginPlay()

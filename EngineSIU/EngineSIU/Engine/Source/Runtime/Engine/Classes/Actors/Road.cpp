@@ -8,6 +8,7 @@
 #include "Actors/Cube.h"
 #include "Actors/Car.h"
 #include "Actors/GameManager.h"
+#include "Engine/Contents/Maps/MapModule.h"
 
 
 ARoad::ARoad()
@@ -62,23 +63,70 @@ void ARoad::Tick(float DeltaTime)
 
     OnOverlappedRoad(DeltaTime);
 
-    int RandNum = FMath::RandHelper(1000);
+    int RandNum = FMath::RandHelper(500);
     int DirectionNum = FMath::RandHelper(2);
-    if (CurrentRoadState == ERoadState::Car && RandNum == 0 && (!CurrentCar || IsValid(CurrentCar)))
+    if (CurrentRoadState == ERoadState::Car && RandNum == 0 && !bIsCarOnRoad)
     {
         CurrentCar = GEngine->ActiveWorld->SpawnActor<ACar>();
         if (DirectionNum == 0)
         {
-            CurrentCar->SetActorLocation(FVector(GetActorLocation().X, 8000.0f, 350.0f));
+            ECarType CarType = CurrentCar->GetCarType();
+            switch (CarType)
+            {
+            case ECarType::Benz:
+                CurrentCar->SetActorLocation(FVector(GetActorLocation().X, 8000.0f, 305.0f));
+                break;
+            case ECarType::RangeRover:
+                CurrentCar->SetActorLocation(FVector(GetActorLocation().X, 8000.0f, 305.0f));
+                break;
+            case ECarType::Truck:
+                CurrentCar->SetActorLocation(FVector(GetActorLocation().X, 8000.0f, 305.0f));
+                break;
+            case ECarType::Train:
+                CurrentCar->SetActorLocation(FVector(GetActorLocation().X, 8000.0f, 350.0f));
+                break;
+            }
+
             CurrentCar->SetSpawnDirectionRight(true);
         }
         else
         {
-            CurrentCar->SetActorLocation(FVector(GetActorLocation().X, -8000.0f, 350.0f));
+            ECarType CarType = CurrentCar->GetCarType();
+            switch (CarType)
+            {
+            case ECarType::Benz:
+                CurrentCar->SetActorLocation(FVector(GetActorLocation().X, -8000.0f, 305.0f));
+                break;
+            case ECarType::RangeRover:
+                CurrentCar->SetActorLocation(FVector(GetActorLocation().X, -8000.0f, 305.0f));
+                break;
+            case ECarType::Truck:
+                CurrentCar->SetActorLocation(FVector(GetActorLocation().X, -8000.0f, 305.0f));
+                break;
+            case ECarType::Train:
+                CurrentCar->SetActorLocation(FVector(GetActorLocation().X, -8000.0f, 350.0f));
+                break;
+            }
+
+            FRotator CarRotation = CurrentCar->GetRootComponent()->GetComponentRotation();
+            CurrentCar->GetRootComponent()->SetWorldRotation(FRotator(CarRotation.Pitch, -CarRotation.Yaw, CarRotation.Roll));
             CurrentCar->SetSpawnDirectionRight(false);
         }
 
         Cast<UPrimitiveComponent>(CurrentCar->GetRootComponent())->CreatePhysXGameObject();
+
+        bIsCarOnRoad = true;
+    }
+
+    if (bIsCarOnRoad && CarOnRoadTime < 10.0f)
+    {
+        CarOnRoadTime += DeltaTime;
+    }
+
+    if (bIsCarOnRoad && CarOnRoadTime >= 10.0f)
+    {
+        CarOnRoadTime = 0.0f;
+        bIsCarOnRoad = false;
     }
 }
 
@@ -163,6 +211,12 @@ void ARoad::OnOverlappedRoad(float DeltaTime)
             GameManager->SetScore(CurrentScore + 1);
             GameManager->SpawnMap();
             GameManager->DestroyMap();
+        }
+
+        // 첫 로드에 있는 경우에는 경고 상태로 가지 않도록 함
+        if (GameManager->GetMapModule()->GetMaps().front()->Roads[0] == this) 
+        {
+            return;
         }
 
         CurrentRoadTime += DeltaTime;

@@ -1,0 +1,215 @@
+# Blender 4.3.2 MTL File: 'uploads_files_2780689_Allscene_blend_file.blend'
+# www.blender.org
+
+newmtl Mat
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.552786
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd -o 0 -1 0 Textures/vehicle_generic_tyrewallblack.jpg
+map_Bump -o 0 -1 0 -bm 1.000000 Textures/vehicle_generic_detail2_normal.jpg
+
+newmtl Mat.1
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+Pr 0.434315
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd -o 0 -1 0 Textures/vehicle_generic_tyrewallblack.jpg
+map_Bump -o 0 -1 0 -bm 1.000000 Textures/vehicle_generic_tyrewall_normal.jpg
+
+newmtl Mat.2
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.552786
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd -o 0 -1 0 Textures/police_new2.jpg
+
+newmtl Mat.3
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+Pr 0.434315
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd -o 0 -1 0 Textures/sheriff_lights.jpg
+
+newmtl Mat.4
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.552786
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd -o 0 -1 0 Textures/vehicle_generic_tyrewallblack.jpg
+map_Bump -o 0 -1 0 -bm 1.000000 Textures/plate05_n.jpg
+
+newmtl police3_xhatch
+Ks 0.300000 0.300000 0.300000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.000000
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd -o 0 -1 0 Textures/taxi_ng_detail.dds.png
+
+newmtl police_badges
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.000000
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd -o 0 -1 0 Textures/taxi_ng_detail.dds.png
+
+newmtl police_rearseat_HD
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.434315
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd -o 0 -1 0 Textures/police_rearseat_hd.jpg
+
+newmtl script_rt_dials_gen_taxi
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.000000
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd -o 0 -1 0 Textures/taxi_ng_detail.dds.png
+
+newmtl taxi2_interior
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.000000
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd -o 0 -1 0 Textures/taxi_ng_detail.dds.png
+
+newmtl taxi_ng_dash
+Kd 0.710000 0.710000 0.710000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.552786
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+
+newmtl taxi_ng_detail
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.000000
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd -o 0 -1 0 Textures/taxi_ng_detail.dds.png
+
+newmtl vehicle_generic_glasswindows2
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 0.100000
+illum 6
+Pr 0.552786
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd -o 0 -1 0 Textures/vehicle_generic_glasswindows2.png
+
+newmtl vehicle_generic_smallspecmap__PAINT_1_
+Ks 0.300000 0.300000 0.300000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+Pr 0.000000
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd -o 0 -1 0 Textures/vehicle_generic_glasswindows2.png

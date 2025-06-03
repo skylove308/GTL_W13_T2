@@ -1,0 +1,80 @@
+# Blender 4.3.2 MTL File: 'uploads_files_2780689_Allscene_blend_file.blend'
+# www.blender.org
+
+newmtl Mat_0_0_body
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd Textures/Mat_0_0/Mat_0_0_body_BaseColor.jpg
+map_Pm Textures/Mat_0_0/Mat_0_0_body_Metallic.jpg
+map_Pr Textures/Mat_0_0/Mat_0_0_body_Roughness.jpg
+map_Ke Textures/Mat_0_0/Mat_0_0_body_Emissive.jpg
+map_Bump -bm 1.000000 Textures/Mat_0_0/Mat_0_0_body_NormalOpenGL.jpg
+
+newmtl Mat_0_1_Chromes
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd Textures/Mat_0_1/Mat_0_1_Chromes_BaseColor.jpg
+map_Pm Textures/Mat_0_1/Mat_0_1_Chromes_Metallic.jpg
+map_Pr Textures/Mat_0_1/Mat_0_1_Chromes_Roughness.jpg
+map_Ke Textures/Mat_0_1/Mat_0_1_Chromes_Emissive.jpg
+map_Bump -bm 1.000000 Textures/Mat_0_1/Mat_0_1_Chromes_NormalOpenGL.jpg
+
+newmtl Mat_0_2_TiresRims
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd Textures/Mat_0_2/Mat_0_2_TiresRims_BaseColor.jpg
+map_Pm Textures/Mat_0_2/Mat_0_2_TiresRims_Metallic.jpg
+map_Pr Textures/Mat_0_2/Mat_0_2_TiresRims_Roughness.jpg
+map_Bump -bm 1.000000 Textures/Mat_0_2/Mat_0_2_TiresRims_NormalOpenGL.jpg
+
+newmtl Mat_0_3_Others
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd Textures/Mat_0_3/Mat_0_3_Others_BaseColor.jpg
+map_Pm Textures/Mat_0_3/Mat_0_3_Others_Metallic.jpg
+map_Pr Textures/Mat_0_3/Mat_0_3_Others_Roughness.jpg
+map_Bump -bm 1.000000 Textures/Mat_0_3/Mat_0_3_Others_NormalOpenGL.jpg
+
+newmtl Mat_0_4_headlights
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+Pr 0.400000
+Pm 0.000000
+map_Kd Textures/Mat_0_4/Mat_0_4_headlights_BaseColor.jpg
+map_Pm Textures/Mat_0_4/Mat_0_4_headlights_Metallic.jpg
+map_Pr Textures/Mat_0_4/Mat_0_4_headlights_Roughness.jpg
+map_Bump -bm 1.000000 Textures/Mat_0_4/Mat_0_4_headlights_NormalOpenGL.jpg
