@@ -892,6 +892,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     <ClInclude Include="LuaScripts\LuaUIBind.h" />
     <ClInclude Include="LuaScripts\LuaUIManager.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Math\Shapes.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SoundManager.h" />
     <None Include="Shaders\EditorShaderConstants.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -1005,6 +1006,12 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
   <ItemGroup>
     <Folder Include="Engine\Contents\Actors\" />
     <Folder Include="Engine\Contents\Components\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="EngineSIU.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Texture\CrossyRoad\Icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
