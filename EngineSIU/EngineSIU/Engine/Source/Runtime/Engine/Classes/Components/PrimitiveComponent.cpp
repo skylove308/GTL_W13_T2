@@ -585,6 +585,12 @@ void UPrimitiveComponent::CreatePhysXGameObject()
     }
     BodyInstance = new FBodyInstance(this);
 
+    BodyInstance->CollisionEnabled = ECollisionEnabled::QueryAndPhysics;  // 물리와 쿼리 모두 활성화Add commentMore actions
+    BodyInstance->bUseCCD = true;                                        // CCD 활성화
+    BodyInstance->bStartAwake = true;                                    // 항상 깨어있는 상태로 시작
+    BodyInstance->PositionSolverIterationCount = 8;                     // 위치 솔버 반복 횟수 증가
+    BodyInstance->VelocitySolverIterationCount = 4;                     // 속도 솔버 반복 횟수 증가
+
     ////////////// 테스트 코드
     BodyInstance->bSimulatePhysics = bSimulate;
     BodyInstance->bEnableGravity = bApplyGravity;
