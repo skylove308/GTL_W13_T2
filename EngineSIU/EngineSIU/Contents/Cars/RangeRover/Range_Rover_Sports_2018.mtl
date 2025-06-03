@@ -1,0 +1,199 @@
+# Blender 4.3.2 MTL File: 'Range Rover Sports 2018 (.Blend).blend'
+# www.blender.org
+
+newmtl Black_Metal_
+Kd 0.000000 0.000000 0.000000
+Ks 0.518182 0.518182 0.518182
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+Pr 0.034545
+Pm 1.000000
+Ps 0.000000
+Pc 1.000000
+Pcr 0.000000
+aniso 0.000000
+anisor 0.000000
+
+newmtl Car_Paint_
+Kd 0.000000 0.000000 0.000000
+Ks 0.600000 0.600000 0.600000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+Pr 0.000000
+Pm 1.000000
+Ps 0.200000
+Pc 1.000000
+Pcr 0.000000
+aniso 0.000000
+anisor 0.000000
+
+newmtl Carbon
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd Textures/TexturesCom_Plastic_CarbonFiber_1K_albedo.png
+map_Pm Textures/TexturesCom_Plastic_CarbonFiber_1K_metallic.png
+map_Pr Textures/TexturesCom_Plastic_CarbonFiber_1K_roughness.jpg
+map_Bump -bm 1.000000 Textures/TexturesCom_Plastic_CarbonFiber_1K_normal.jpg
+
+newmtl Glass
+Kd 0.114921 0.114921 0.114921
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+Pr 0.000000
+Pm 1.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+
+newmtl Head_Light
+Kd 0.067612 0.067612 0.067612
+Ks 0.500000 0.500000 0.500000
+Ke 100.000000 100.000000 100.000000
+Ni 1.450000
+d 1.000000
+illum 3
+Pr 0.154545
+Pm 0.105455
+Ps 0.000000
+Pc 0.941818
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+
+newmtl Metalic
+Kd 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+Pr 0.049091
+Pm 1.000000
+Ps 0.000000
+Pc 1.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+
+newmtl Mirror
+Kd 0.203655 0.203655 0.203655
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+Pr 0.000000
+Pm 0.967273
+Ps 0.000000
+Pc 1.000000
+Pcr 0.000000
+aniso 0.000000
+anisor 0.000000
+
+newmtl Plastic_
+Kd 0.029569 0.029569 0.029569
+Ks 0.430909 0.430909 0.430909
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+Pr 0.298909
+Pm 0.763636
+Ps 0.040000
+Pc 0.083636
+Pcr 0.000000
+aniso 0.000000
+anisor 0.000000
+
+newmtl Red_Metal
+Kd 0.739400 0.000000 0.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+Pr 0.205455
+Pm 0.763636
+Ps 0.200000
+Pc 1.000000
+Pcr 0.000000
+aniso 0.000000
+anisor 0.000000
+
+newmtl Reflectors_
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd Textures/TexturesCom_Various_Retroreflector_1K_metallic.jpg
+map_Pm Textures/TexturesCom_Various_Retroreflector_1K_metallic.jpg
+map_Pr Textures/TexturesCom_Various_Retroreflector_1K_roughness.jpg
+map_Bump -bm 1.000000 Textures/TexturesCom_Various_Retroreflector_1K_normal.jpg
+
+newmtl Tail_Light
+Kd 0.422499 0.000000 0.001658
+Ks 0.500000 0.500000 0.500000
+Ke 42.249901 0.000000 0.165800
+Ni 1.450000
+d 1.000000
+illum 3
+Pr 0.000000
+Pm 0.105455
+Ps 0.000000
+Pc 1.000000
+Pcr 0.000000
+aniso 0.000000
+anisor 0.000000
+
+newmtl Trasnsparent_Glass
+Kd 0.471090 0.471090 0.471090
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 0.130000
+illum 6
+Pr 0.000000
+Pm 0.854545
+Ps 0.000000
+Pc 1.000000
+Pcr 0.000000
+aniso 0.000000
+anisor 0.000000
+
+newmtl Yellow_Glass
+Kd 1.000000 0.692347 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+Pr 0.000000
+Pm 0.701818
+Ps 0.000000
+Pc 1.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000

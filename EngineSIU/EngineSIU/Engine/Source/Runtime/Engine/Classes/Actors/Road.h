@@ -16,6 +16,7 @@ enum class ERoadState : uint8
 
 class AGameManager;
 class UStaticMeshComponent;
+class ACar;
 class ARoad : public AActor
 {
     DECLARE_CLASS(ARoad, AActor)
@@ -64,5 +65,6 @@ private:
     bool bIsOverlapped = false;
     bool bIsCarOnRoad = false;
     bool bIsFirstTimeOnRoad = false;
+    ACar* CurrentCar = nullptr;
 };
 
