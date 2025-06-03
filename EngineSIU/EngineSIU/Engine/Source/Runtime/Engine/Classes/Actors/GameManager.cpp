@@ -1,5 +1,9 @@
 #include "GameManager.h"
 
+#include "Engine/EditorEngine.h"
+#include "Engine/Engine.h"
+#include "World/World.h"
+
 AGameManager::AGameManager()
 {
 }
@@ -10,33 +14,40 @@ AGameManager::~AGameManager()
 
 void AGameManager::BeginPlay()
 {
-    Super::BeginPlay();
-    
+    AActor::BeginPlay();
     SetState(EGameState::WaitingToStart);
+    UE_LOG(ELogLevel::Error, TEXT("BeginPlay"));
     Score = 0;
 }
 
 void AGameManager::Tick(float DeltaTime)
 {
-    Super::Tick(DeltaTime);
+    AActor::Tick(DeltaTime);
 }
 
 void AGameManager::SetState(EGameState State)
 {
+    GameState = State;
     switch (State)
     {
     case EGameState::WaitingToStart:
     {
+        UE_LOG(ELogLevel::Error, TEXT("WaitingToStart"));
         break;
     }
     case EGameState::Playing:
     {
-        // Playing 상태일 때 계속해서 검사할 로직 (타이머, 적 스폰 등)
         break;
     }
     case EGameState::GameOver:
     {
-        // GameOver 상태에서 재시작 대기 로직 등
+        
+        break;
+    }
+    case EGameState::Exit:
+    {
+        UE_LOG(ELogLevel::Error, TEXT("Exit"));
+        ExitGame();
         break;
     }
     default:
@@ -44,14 +55,8 @@ void AGameManager::SetState(EGameState State)
     }
 }
 
-void AGameManager::StartGame()
+void AGameManager::ExitGame()
 {
-}
-
-void AGameManager::EndGame()
-{
-}
-
-void AGameManager::RestartGame()
-{
+    UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
+    Engine->EndPIE();
 }

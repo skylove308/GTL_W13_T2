@@ -3,9 +3,11 @@
 
 enum class EGameState
 {
+    None,
     WaitingToStart,
     Playing,
-    GameOver
+    GameOver,
+    Exit
 };
 
 class AGameManager : public AActor
@@ -13,12 +15,6 @@ class AGameManager : public AActor
     DECLARE_CLASS(AGameManager, AActor)
 
 public:
-    static AGameManager& Instance() {
-        static AGameManager instance;
-        return instance;
-    }
-    
-private:
     AGameManager();
     virtual ~AGameManager();
 
@@ -31,8 +27,7 @@ private:
 public:
     EGameState GetState() const { return GameState; }
     void SetState(EGameState State);
+    int GetScore() const { return Score; }
     
-    void StartGame();
-    void EndGame();
-    void RestartGame();
+    void ExitGame();
 };

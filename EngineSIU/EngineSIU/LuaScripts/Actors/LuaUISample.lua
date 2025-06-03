@@ -155,12 +155,6 @@ function ReturnTable:Tick(DeltaTime)
             self.ManagedImageUI:SetColor(fallbackImageColor)
         end
     end
-
-    -- if self.ElapsedTime >= 3.0 then
-    --     LuaUIBind.DeleteUI(self.ManagedTextUI:GetNameStr())
-    --     self.ManagedTextUI = nil
-    -- end
-
 end
 
 -- EndPlay: Actor가 파괴되거나 레벨이 전환될 때 호출

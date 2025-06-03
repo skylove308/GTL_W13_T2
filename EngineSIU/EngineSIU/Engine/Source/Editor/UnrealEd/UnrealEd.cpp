@@ -2,6 +2,7 @@
 #include "EditorPanel.h"
 
 #include "PropertyEditor/ControlEditorPanel.h"
+#include "PropertyEditor/GameUIPanel.h"
 #include "PropertyEditor/OutlinerEditorPanel.h"
 #include "PropertyEditor/ParticleViewerPanel.h"
 #include "PropertyEditor/PropertyEditorPanel.h"
@@ -32,6 +33,9 @@ void UnrealEd::Initialize()
 
     auto LuaUIPanel = std::make_shared<LuaUIViewPanel>();
     PreRenderPanels["LuaUIViewPanel"] = LuaUIPanel;
+
+    auto GameUIPanel = std::make_shared<class GameUIPanel>();
+    Panels["GameUIPanel"] = GameUIPanel;
 }
 
 void UnrealEd::Render() const

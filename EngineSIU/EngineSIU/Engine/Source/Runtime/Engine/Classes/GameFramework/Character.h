@@ -8,6 +8,7 @@ class UCapsuleComponent;
 class USkeletalMeshComponent;
 class UCharacterMovementComponent;
 class UCameraComponent;
+class AGameManager;
 
 class ACharacter : public APawn
 {
@@ -55,6 +56,8 @@ public:
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, ForceIncrement,  = 1000.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MaxForce,  = 100000.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MovementForceMultiplier,  = 1.0f)
+
+    AGameManager* GameManager = nullptr;
                 
 private:
     virtual void BeginPlay() override;

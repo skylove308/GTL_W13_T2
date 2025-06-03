@@ -16,6 +16,7 @@
 #include "UnrealClient.h"
 #include "Actors/GameManager.h"
 #include "Components/StaticMeshComponent.h"
+#include "Engine/Classes/Actors/GameManager.h"
 
 ACharacter::ACharacter()
 {
@@ -48,6 +49,17 @@ void ACharacter::BeginPlay()
     float Width = ViewportClient->GetViewport()->GetD3DViewport().Width;
     float Height = ViewportClient->GetViewport()->GetD3DViewport().Height;
     GEngine->ActiveWorld->GetPlayerController()->SetLetterBoxWidthHeight(Width, Height);
+
+    auto Actors = GEngine->ActiveWorld->GetActiveLevel()->Actors;
+    for (auto Actor : Actors)
+    {
+        if (Actor->IsA<AGameManager>())
+        {
+            GameManager = Cast<AGameManager>(Actor);
+            break;
+        }
+    }
+    EGameState CurrState = GameManager->GetState();
 }
 
 UObject* ACharacter::Duplicate(UObject* InOuter)
@@ -203,7 +215,7 @@ float ACharacter::GetSpeed()
     if (bIsStop)
         CurrVelocity = PxVec3(0.0f, 0.0f, 0.0f);
     
-    // UE_LOG(ELogLevel::Display, TEXT("Speed: %f"), CurrVelocity.magnitude());
+    UE_LOG(ELogLevel::Display, TEXT("Speed: %f"), CurrVelocity.magnitude());
     return CurrVelocity.magnitude();
 }
 
@@ -213,6 +225,9 @@ void ACharacter::SetSpeed(float NewVelocity)
 
 void ACharacter::MoveForward(float Value)
 {
+    if (GameManager->GetState() != EGameState::Playing)
+        return;
+    
     bIsStop = false;
     
     if (bIsRunning)
@@ -248,6 +263,9 @@ void ACharacter::MoveForward(float Value)
 
 void ACharacter::MoveRight(float Value)
 {
+    if (GameManager->GetState() != EGameState::Playing)
+        return;
+    
     bIsStop = false;
     
     if (bIsRunning)
@@ -281,6 +299,9 @@ void ACharacter::MoveRight(float Value)
 
 void ACharacter::Stop()
 {
+    if (GameManager->GetState() != EGameState::Playing)
+        return;
+    
     bIsStop = true;
     CurrentForce = 0.0f;
 
