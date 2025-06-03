@@ -35,7 +35,7 @@ public:
     virtual void SetProperties(const TMap<FString, FString>& InProperties) override;
 
 public:
-    void InitializeSystem();
+    void InitializeSystem(bool bPlayOneShot = false, float InitialDuration = 0.0f);
     void CreateAndAddSpriteEmitterInstance(UParticleEmitter* EmitterTemplate);
     void CreateAndAddMeshEmitterInstance(UParticleEmitter* EmitterTemplate);
 
@@ -60,4 +60,9 @@ private:
     TArray<FDynamicEmitterDataBase*> EmitterRenderData;
 
     FParticleDynamicData* ParticleDynamicData = nullptr;
+
+    UPROPERTY_WITH_FLAGS(EditAnywhere, bool, bSuppressSpawning, = false)
+
+    bool bPlayOneShot = false;
+    float InitialDuration = 0.0f;
 };

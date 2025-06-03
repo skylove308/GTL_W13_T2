@@ -660,7 +660,7 @@ void UPrimitiveComponent::CreatePhysXGameObject()
         case EGeomType::ECapsule:
         {
             AActor* OwnerActor = GetOwner();
-            PxMaterial* PlayerMaterial = GEngine->PhysicsManager->GetPhysics()->createMaterial(2.0f, 2.0f, 0.0f);
+            PxMaterial* PlayerMaterial = GEngine->PhysicsManager->GetPhysics()->createMaterial(0.3f, 0.5f, 0.5f);
             PxMaterial* CapsuleMaterial = OwnerActor && OwnerActor->IsA<ACharacter>() ? PlayerMaterial : nullptr;
             PxShape = GEngine->PhysicsManager->CreateCapsuleShape(Offset, GeomPQuat, Extent.x, Extent.z, CapsuleMaterial);
             BodySetup->AggGeom.SphereElems.Add(PxShape);
@@ -699,7 +699,11 @@ void UPrimitiveComponent::OnCollisionEnter(UPrimitiveComponent* HitComponent, UP
 
 void UPrimitiveComponent::OnCollisionExit(UPrimitiveComponent* HitComponent, UPrimitiveComponent* OtherComp)
 {
-
+    if( AActor* Actor = GetOwner())
+    {
+        UE_LOG(ELogLevel::Warning, "OnCollisionExit %s, %s", HitComponent->GetName().ToAnsiString(), OtherComp->GetName().ToAnsiString());
+        Actor->OnCollisionExit(HitComponent, OtherComp);
+    }
 }
 
 void UPrimitiveComponent::OnCollisionStay(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& Hit)

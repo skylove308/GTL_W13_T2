@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <cassert>
 #include <compare>
 #include "MathUtility.h"
@@ -223,6 +223,8 @@ public:
 
     FString ToString() const;
     bool InitFromString(const FString& InSourceString);
+
+    FRotator Rotation() const;
 };
 
 inline FVector::FVector(const FRotator& InRotator)

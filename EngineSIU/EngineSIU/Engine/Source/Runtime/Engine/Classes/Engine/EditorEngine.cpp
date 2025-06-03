@@ -22,6 +22,8 @@
 #include "Particles/ParticleSystem.h"
 #include "GameFramework/Character.h"
 #include "Actors/GameManager.h"
+#include "Components/CapsuleComponent.h"
+#include "SoundManager.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -570,42 +572,7 @@ void UEditorEngine::BindEssentialObjects()
     PlayerController->SetActorTickInEditor(false);
     ActiveWorld->SetPlayerController(PlayerController);
     ActiveWorld->GetPlayerController()->Possess(ActiveWorld->GetMainCharacter());
-    
-    ActiveWorld->GetPlayerController()->BindAction("W",
-        [this](float Value) {
-            ActiveWorld->GetMainCharacter()->MoveForward(0.1f);
-        }
-    );
-    ActiveWorld->GetPlayerController()->BindAction("S",
-        [this](float Value) {
-            ActiveWorld->GetMainCharacter()->MoveForward(-0.1f);
-        }
-    );
-    ActiveWorld->GetPlayerController()->BindAction("A",
-        [this](float Value) {
-            ActiveWorld->GetMainCharacter()->MoveRight(-0.1f);
-        }
-    );
-    ActiveWorld->GetPlayerController()->BindAction("D",
-        [this](float Value) {
-            ActiveWorld->GetMainCharacter()->MoveRight(0.1f);
-        }
-    );
-    ActiveWorld->GetPlayerController()->BindAction("Run",
-        [this](float Value) {
-            ActiveWorld->GetMainCharacter()->bIsRunning = true;
-        }
-    );
-    ActiveWorld->GetPlayerController()->BindAction("RunRelease",
-        [this](float Value) {
-            ActiveWorld->GetMainCharacter()->bIsRunning = false;
-        }
-    );
-    ActiveWorld->GetPlayerController()->BindAction("Idle",
-        [this](float Value) {
-            ActiveWorld->GetMainCharacter()->Stop();
-        }
-    );
+
 }
 
 void UEditorEngine::SetPhysXScene(UWorld* World)
@@ -649,6 +616,7 @@ void UEditorEngine::EndPIE()
     Handler->OnPIEModeEnd();
     // 다시 EditorWorld로 돌아옴.
     ActiveWorld = EditorWorld;
+    FSoundManager::GetInstance().StopAllSounds();
 }
 
 void UEditorEngine::EndSkeletalMeshViewer()
