@@ -12,13 +12,13 @@ function ReturnTable:BeginPlay()
 
     print("BeginPlay ", self.Name) -- Table에 등록해 준 Name 출력.
     if self.this.SpawnDirectionRight then
-        self.this.InitialVelocity = FVector.new(0, -3000, 0)
+        self.this.InitialVelocity = FVector.new(0, -5000, 0)
     else
-        self.this.InitialVelocity = FVector.new(0, 3000, 0)
+        self.this.InitialVelocity = FVector.new(0, 5000, 0)
     end
 
     print("InitialVelocity")
-    self.this.Mass = 100000.0
+    self.this.Mass = 1000000000.0
     print("Mass")
     self.this.LinearDamping = 0.1
     print("LinearDamping")
