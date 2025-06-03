@@ -14,12 +14,14 @@ GameUIPanel::GameUIPanel()
 
 void GameUIPanel::Render()
 {
+    if (GEngine->ActiveWorld->WorldType != EWorldType::PIE)
+        return;
     /* Pre Setup */
-    float PanelWidth = (Width) * 0.8f;  // 1.0f
-    float PanelHeight = (Height) * 0.9f;  // 1.0f
+    float PanelWidth = (Width);  // 1.0f
+    float PanelHeight = (Height);  // 1.0f
 
     constexpr float PanelPosX = 0.0f;
-    constexpr float PanelPosY = 72.0f;
+    constexpr float PanelPosY = 0.0f;
 
     constexpr ImVec2 MinSize(300, 72);
     constexpr ImVec2 MaxSize(FLT_MAX, FLT_MAX);

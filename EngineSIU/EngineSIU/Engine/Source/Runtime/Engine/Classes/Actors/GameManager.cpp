@@ -70,6 +70,10 @@ void AGameManager::StartGame()
 
 void AGameManager::ExitGame()
 {
+#if GAME_BUILD
+    PostQuitMessage(0);
+#else 
     UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
     Engine->EndPIE();
+#endif
 }

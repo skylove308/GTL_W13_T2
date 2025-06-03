@@ -21,10 +21,15 @@ SLevelEditor::SLevelEditor()
 
 void SLevelEditor::Initialize(uint32 InEditorWidth, uint32 InEditorHeight)
 {
+#if !GAME_BUILD
     EditorWidth = InEditorWidth * 0.8f;
     EditorHeight = InEditorHeight - 104.f;
-    
     ResizeEditor(EditorWidth, EditorHeight);
+#else
+    EditorWidth = InEditorWidth;
+    EditorHeight = InEditorHeight;
+#endif
+    
     
     VSplitter = new SSplitterV();
     VSplitter->Initialize(FRect(0.0f, 0.f, EditorWidth, EditorHeight));
@@ -121,9 +126,13 @@ void SLevelEditor::ResizeEditor(uint32 InEditorWidth, uint32 InEditorHeight)
     {
         return;
     }
-    
+#if !GAME_BUILD
     EditorWidth = static_cast<uint32>(static_cast<float>(InEditorWidth) * 0.8f);
     EditorHeight = static_cast<uint32>(static_cast<float>(InEditorHeight) - 104.f);
+#else
+    EditorWidth = InEditorWidth;
+    EditorHeight = InEditorHeight;
+#endif
 
     if (UEditorEngine* EditorEngine = Cast<UEditorEngine>(GEngine))
     {

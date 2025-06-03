@@ -54,6 +54,9 @@ void UEditorEngine::Init()
     EditorPlayer = FObjectFactory::ConstructObject<AEditorPlayer>(this);
     
     LoadLevel("Saved/AutoSaves.scene");
+#if GAME_BUILD
+    StartPIE();
+#endif
 }
 
 void UEditorEngine::Release()

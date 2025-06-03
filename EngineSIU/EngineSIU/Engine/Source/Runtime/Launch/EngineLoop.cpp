@@ -17,6 +17,7 @@
 
 #include "SoundManager.h"
 #include "Lua/LuaScriptManager.h"
+#include <PropertyEditor/GameUIPanel.h>
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
@@ -97,12 +98,9 @@ int32 FEngineLoop::Init(HINSTANCE hInstance)
     GEngine->Init();
 
     FSoundManager::GetInstance().Initialize();
-    FSoundManager::GetInstance().LoadSound("fishdream", "Contents/Sounds/fishdream.mp3");
-    FSoundManager::GetInstance().LoadSound("sizzle", "Contents/Sounds/sizzle.mp3");
-    //FSoundManager::GetInstance().PlaySound("fishdream");
-
+    GameUI = std::make_shared<GameUIPanel>();
+    GameUI->OnResize(AppWnd);
     UpdateUI();
-
     return 0;
 }
 
@@ -173,11 +171,17 @@ void FEngineLoop::Tick()
         LevelEditor->Tick(DeltaTime);
         Render();
         UIManager->BeginFrame();
+        if (GameUI)
+        {
+            GameUI->Render();
+        }
+#if !GAME_BUILD
         UnrealEditor->Render();
 
         FConsole::GetInstance().Draw();
         EngineProfiler.Render(GraphicDevice.DeviceContext, GraphicDevice.ScreenWidth, GraphicDevice.ScreenHeight);
 
+#endif
         UIManager->EndFrame();
 
         // Pending 처리된 오브젝트 제거
