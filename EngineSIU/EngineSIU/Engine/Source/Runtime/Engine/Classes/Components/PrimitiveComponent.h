@@ -116,7 +116,7 @@ public:
     /** Returns list of components this component is overlapping. */
     const TArray<FOverlapInfo>& GetOverlapInfos() const;
 
-    virtual FBodyInstance* CreatePhysXGameObject();
+    virtual void CreatePhysXGameObject();
 
     virtual void BeginPlay() override;
 

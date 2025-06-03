@@ -122,7 +122,7 @@ public:
 
     virtual void InitAnim();
 
-    virtual FBodyInstance* CreatePhysXGameObject() override;
+    virtual void CreatePhysXGameObject() override;
 
     TArray<FBodyInstance*>& GetBodies() { return Bodies; }
     TArray<FConstraintInstance*>& GetConstraints() { return Constraints; }

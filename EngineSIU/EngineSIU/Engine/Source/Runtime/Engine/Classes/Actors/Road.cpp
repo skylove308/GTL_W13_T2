@@ -39,6 +39,16 @@ void ARoad::Initialize(ERoadState RoadState, FVector SpawnWorldLocation)
         RoadMesh->bSimulate = true;
         RoadMesh->RigidBodyType = ERigidBodyType::STATIC;
     }
+
+    int DirectionNum = FMath::RandHelper(2);
+    if (DirectionNum == 0)
+    {
+        bIsRoadRightSpawned = true;
+    }
+    else
+    {
+        bIsRoadRightSpawned = false;
+    }
 }
 
 void ARoad::BeginPlay()
@@ -64,12 +74,14 @@ void ARoad::Tick(float DeltaTime)
 
     OnOverlappedRoad(DeltaTime);
 
-    int RandNum = FMath::RandHelper(300);
-    int DirectionNum = FMath::RandHelper(2);
+    int CurrentScore = GameManager->GetScore();
+    int SpawnRate = FMath::Clamp(350 - CurrentScore * 5, 100, 350);
+    int RandNum = FMath::RandHelper(SpawnRate);
+
     if (CurrentRoadState == ERoadState::Car && RandNum == 0 && !bIsCarOnRoad)
     {
         CurrentCar = GEngine->ActiveWorld->SpawnActor<ACar>();
-        if (DirectionNum == 0)
+        if (bIsRoadRightSpawned)
         {
             ECarType CarType = CurrentCar->GetCarType();
             switch (CarType)
@@ -113,23 +125,28 @@ void ARoad::Tick(float DeltaTime)
             CurrentCar->GetRootComponent()->SetWorldRotation(FRotator(CarRotation.Pitch, CarRotation.Yaw - 180, CarRotation.Roll));
             CurrentCar->SetSpawnDirectionRight(false);
         }
-
-        FBodyInstance* CarBodyInstance = Cast<UPrimitiveComponent>(CurrentCar->GetRootComponent())->CreatePhysXGameObject();
-        if (CarBodyInstance)
+        UPrimitiveComponent* PrimComp = Cast<UPrimitiveComponent>(CurrentCar->GetRootComponent());
+        if(PrimComp)
         {
-            CarBodyInstance->BIGameObject->DynamicRigidBody->setMass(1e10);
-            CarBodyInstance->BIGameObject->DynamicRigidBody->setMassSpaceInertiaTensor(PxVec3(1e10));
+            PrimComp->CreatePhysXGameObject();
+            FBodyInstance* CarBodyInstance = PrimComp->BodyInstance;
+            if (CarBodyInstance)
+            {
+                CarBodyInstance->BIGameObject->DynamicRigidBody->setMass(1e10);
+                CarBodyInstance->BIGameObject->DynamicRigidBody->setMassSpaceInertiaTensor(PxVec3(1e10));
+            }
         }
+        
 
         bIsCarOnRoad = true;
     }
 
-    if (bIsCarOnRoad && CarOnRoadTime < 10.0f)
+    if (bIsCarOnRoad && CarOnRoadTime < 1.0f)
     {
         CarOnRoadTime += DeltaTime;
     }
 
-    if (bIsCarOnRoad && CarOnRoadTime >= 10.0f)
+    if (bIsCarOnRoad && CarOnRoadTime >= 1.0f)
     {
         CarOnRoadTime = 0.0f;
         bIsCarOnRoad = false;
@@ -221,7 +238,8 @@ void ARoad::OnOverlappedRoad(float DeltaTime)
             bIsFirstTimeOnRoad = true;
             int CurrentScore = GameManager->GetScore();
             GameManager->SetScore(CurrentScore + 1);
-            GameManager->SpawnMap();
+
+            GameManager->SpawnMap(1 + CurrentScore / 5);
             GameManager->DestroyMap();
         }
 

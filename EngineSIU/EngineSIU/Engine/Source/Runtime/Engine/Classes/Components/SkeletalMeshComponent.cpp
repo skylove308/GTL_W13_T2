@@ -560,7 +560,7 @@ void USkeletalMeshComponent::InitAnim()
     }
 }
 
-FBodyInstance* USkeletalMeshComponent::CreatePhysXGameObject()
+void USkeletalMeshComponent::CreatePhysXGameObject()
 {
     if (RigidBodyType == ERigidBodyType::STATIC)
     {
