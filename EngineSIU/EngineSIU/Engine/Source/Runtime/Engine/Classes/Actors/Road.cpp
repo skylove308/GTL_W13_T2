@@ -6,6 +6,7 @@
 #include "Engine/Engine.h"
 #include "World/World.h"
 #include "Actors/Cube.h"
+#include "Actors/Car.h"
 
 
 ARoad::ARoad()
@@ -18,18 +19,20 @@ void ARoad::Initialize(ERoadState RoadState, FVector SpawnWorldLocation)
 {
     CurrentRoadState = RoadState;
     RoadMesh->SetWorldLocation(SpawnWorldLocation);
-    RoadMesh->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
-    RoadMesh->SetWorldScale3D(FVector(30.0f, 30.0f, 1000.0f));
 
     if (RoadState == ERoadState::Safe)
     {
-        RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road.obj"));
+        RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Sidewalk/Sidewalk.obj"));
+        RoadMesh->SetWorldRotation(FRotator(0.0f, 0.0f, -90.0f));
+        RoadMesh->SetWorldScale3D(FVector(300.0f, 300.0f, 300.0f));
         RoadMesh->bSimulate = true;
         RoadMesh->RigidBodyType = ERigidBodyType::STATIC;
     }
     else if (RoadState == ERoadState::Car)
     {
         RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road.obj"));
+        RoadMesh->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
+        RoadMesh->SetWorldScale3D(FVector(30.0f, 30.0f, 1000.0f));
         RoadMesh->bSimulate = true;
         RoadMesh->RigidBodyType = ERigidBodyType::STATIC;
     }
@@ -47,6 +50,14 @@ void ARoad::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 
     OnOverlappedRoad(DeltaTime);
+
+    int RandNum = FMath::RandHelper(100);
+    if (CurrentRoadState == ERoadState::Car && RandNum == 0)
+    {
+        ACar* Car = GEngine->ActiveWorld->SpawnActor<ACar>();
+        Car->SetActorLocation(FVector(GetActorLocation().X, 3000.0f, 0.0f));
+        Car->Drive();
+    }
 }
 
 void ARoad::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -109,7 +120,7 @@ bool ARoad::BindSelfLuaProperties()
 
 void ARoad::OnOverlappedRoad(float DeltaTime)
 {
-    if (!bIsOverlapped)
+    if (!bIsOverlapped && CurrentRoadState != ERoadState::Car)
     {
         CurrentRoadState = ERoadState::Safe;
         if (CurrentRoadTime > SafeJoneTime)

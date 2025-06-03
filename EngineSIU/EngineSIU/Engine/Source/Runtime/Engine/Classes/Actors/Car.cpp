@@ -1,21 +1,34 @@
 #include "Car.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/FObjLoader.h"
+#include "Engine/FbxLoader.h"
 #include "Physics/PhysicsManager.h"
 #include "Lua/LuaUtils/LuaTypeMacros.h"
 #include "Lua/LuaScriptComponent.h"
+#include "Engine/AssetManager.h"
 
 
 ACar::ACar()
 {
     UStaticMeshComponent* StaticMeshComp = AddComponent<UStaticMeshComponent>("CarMesh");
-    StaticMeshComp->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Primitives/CubePrimitive.Obj"));
+    StaticMeshComp->SetStaticMesh(UAssetManager::Get().GetStaticMesh(L"Contents/Cars/VW_Touran_2007"));
+    StaticMeshComp->bSimulate = true;
     RootComponent = StaticMeshComp;
+    RootComponent->SetWorldRotation(FRotator(0.0f, -90.0f, 0.0f));
+    RootComponent->SetWorldScale3D(FVector(100.0f));
 }
 
 void ACar::BeginPlay()
 {
     Super::BeginPlay();
+}
+
+void ACar::PostSpawnInitialize() 
+{
+    Super::PostSpawnInitialize();
+    LuaScriptComponent->SetScriptName("LuaScripts/Actors/Car.lua");
+    UStaticMeshComponent* CarMeshComp = Cast<UStaticMeshComponent>(GetRootComponent());
+    //CarMeshComp->CreatePhysXGameObject();
 }
 
 UObject* ACar::Duplicate(UObject* InOuter)

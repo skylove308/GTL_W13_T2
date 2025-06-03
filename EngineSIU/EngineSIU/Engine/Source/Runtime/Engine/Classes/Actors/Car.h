@@ -8,6 +8,7 @@ public:
     ACar();
     virtual void BeginPlay() override;
     virtual UObject* Duplicate(UObject* InOuter) override;
+    virtual void PostSpawnInitialize() override;
 
 public:
     virtual void RegisterLuaType(sol::state& Lua) override; // Lua에 클래스 등록해주는 함수.
