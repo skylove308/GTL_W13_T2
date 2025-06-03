@@ -11,6 +11,8 @@ void FMapModule::Initialize()
 
 void FMapModule::SpawnRoadMap()
 {
+    return;
+
     ARoad* Road = GEngine->ActiveWorld->SpawnActor<ARoad>();
     if (Road)
     {

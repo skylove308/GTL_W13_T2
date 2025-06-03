@@ -11,10 +11,10 @@
 ACar::ACar()
 {
     UStaticMeshComponent* StaticMeshComp = AddComponent<UStaticMeshComponent>("CarMesh");
-    StaticMeshComp->SetStaticMesh(UAssetManager::Get().GetStaticMesh(L"Contents/Cars/VW_Touran_2007"));
+    StaticMeshComp->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Cars/Train/Train.obj"));
     StaticMeshComp->bSimulate = true;
     RootComponent = StaticMeshComp;
-    RootComponent->SetWorldRotation(FRotator(0.0f, -90.0f, 0.0f));
+    RootComponent->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
     RootComponent->SetWorldScale3D(FVector(100.0f));
 }
 
