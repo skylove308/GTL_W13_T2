@@ -6,6 +6,7 @@
 #include "Lua/LuaUtils/LuaTypeMacros.h"
 #include "Lua/LuaScriptComponent.h"
 #include "Engine/AssetManager.h"
+#include <Engine/Engine.h>
 
 
 ACar::ACar()
@@ -36,8 +37,13 @@ void ACar::Tick(float DeltaTime)
 
     if(GetActorLocation().Y > 9000.0f || GetActorLocation().Y < -9000.0f)
     {
+        PxRigidDynamic* PhysXActor = Cast<UStaticMeshComponent>(GetRootComponent())->BodyInstance->BIGameObject->DynamicRigidBody;
+        if (PhysXActor)
+        {
+            // PhysXActor를 씬에서 제거
+            GEngine->PhysicsManager->GetScene(GetWorld())->removeActor(*PhysXActor);
+        }
         Destroy();
-
         return;
     }
 }
