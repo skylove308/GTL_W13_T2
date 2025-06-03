@@ -3,6 +3,7 @@
 #include "Engine/EditorEngine.h"
 #include "Engine/Engine.h"
 #include "World/World.h"
+#include "GameFramework/Character.h"
 
 AGameManager::AGameManager()
 {
@@ -16,7 +17,6 @@ void AGameManager::BeginPlay()
 {
     AActor::BeginPlay();
     SetState(EGameState::WaitingToStart);
-    UE_LOG(ELogLevel::Error, TEXT("BeginPlay"));
     Score = 0;
 }
 
@@ -30,29 +30,26 @@ void AGameManager::SetState(EGameState State)
     GameState = State;
     switch (State)
     {
-    case EGameState::WaitingToStart:
+    case EGameState::Restart:
     {
-        UE_LOG(ELogLevel::Error, TEXT("WaitingToStart"));
-        break;
-    }
-    case EGameState::Playing:
-    {
-        break;
-    }
-    case EGameState::GameOver:
-    {
-        
+        ExitGame();
+        StartGame();
         break;
     }
     case EGameState::Exit:
     {
-        UE_LOG(ELogLevel::Error, TEXT("Exit"));
         ExitGame();
         break;
     }
     default:
         break;
     }
+}
+
+void AGameManager::StartGame()
+{
+    UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
+    Engine->StartPIE();
 }
 
 void AGameManager::ExitGame()

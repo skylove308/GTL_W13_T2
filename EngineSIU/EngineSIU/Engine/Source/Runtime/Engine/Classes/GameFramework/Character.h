@@ -4,6 +4,7 @@
 #include "PhysicsManager.h"
 #include "Components/CapsuleComponent.h"
 
+class ARoad;
 class UCapsuleComponent;
 class USkeletalMeshComponent;
 class UCharacterMovementComponent;
@@ -75,7 +76,7 @@ public:
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MeshRotationSpeed, = 10.0f)
 
     AGameManager* GameManager = nullptr;
-
+    ARoad* CurrentRoad = nullptr;
                 
 private:
     virtual void BeginPlay() override;

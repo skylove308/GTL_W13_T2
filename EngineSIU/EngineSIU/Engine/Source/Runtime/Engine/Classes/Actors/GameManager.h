@@ -3,11 +3,12 @@
 
 enum class EGameState
 {
-    None,
+    None = 0,
     WaitingToStart,
     Playing,
     GameOver,
-    Exit
+    Exit,
+    Restart
 };
 
 class AGameManager : public AActor
@@ -28,6 +29,7 @@ public:
     EGameState GetState() const { return GameState; }
     void SetState(EGameState State);
     int GetScore() const { return Score; }
-    
+
+    void StartGame();
     void ExitGame();
 };

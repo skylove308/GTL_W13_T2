@@ -58,6 +58,7 @@ void GameUIPanel::Render()
         }
     }
     EGameState CurrState = GameManager->GetState();
+
     switch (CurrState)
     {
     case EGameState::WaitingToStart:
@@ -183,10 +184,6 @@ void GameUIPanel::RenderGameUI()
     int CurrentScore = GameManager->GetScore();
     ImGui::SetCursorScreenPos(ImVec2(10.0f, Height*0.15f));
     ImGui::Text("Score: %d", CurrentScore);
-    if (ImGui::Button("Game over", ImVec2(100.0f, 100.0f)))
-    {
-        GameManager->SetState(EGameState::GameOver);
-    }
 }
 
 void GameUIPanel::RenderEndUI()
@@ -205,7 +202,7 @@ void GameUIPanel::RenderEndUI()
     ImGui::SetCursorPos(ImVec2(ImageStartX, ImageStartY));
 
     ImGui::Image((ImTextureID)GameOverSRV, ImVec2(TargetW, TargetH));
-    float ButtonsY = ImageStartY + TargetH - 300.0f;
+    float NextY = ImageStartY + TargetH - 300.0f;
 
     std::shared_ptr<FTexture> RestartTexPtr = 
         FEngineLoop::ResourceManager.GetTexture(L"Assets/Texture/CrossyRoad/Restart.png");
@@ -222,7 +219,6 @@ void GameUIPanel::RenderEndUI()
     float ButtonTargetH = BtnOrigH * (ButtonTargetW / BtnOrigW);
     ImVec2 ButtonSize(ButtonTargetW, ButtonTargetH);
 
-    // 버튼 그룹 전체 너비 = (Restart 너비) + (Quit 너비) + (두 버튼 사이 간격)
     float TotalButtonsWidth = ButtonSize.x * 2;
     float ButtonsStartX = (Width - TotalButtonsWidth) * 0.4f;
 
@@ -257,12 +253,12 @@ void GameUIPanel::RenderEndUI()
     };
     if (RestartSRV)
     {
-        ImVec2 PosRestart(ButtonsStartX, ButtonsY);
-        DrawImageButton("##RestartBtn", (ImTextureID)RestartSRV, PosRestart, EGameState::WaitingToStart);
+        ImVec2 PosRestart(ButtonsStartX, NextY);
+        DrawImageButton("##RestartBtn", (ImTextureID)RestartSRV, PosRestart, EGameState::Restart);
     }
     if (QuitSRV)
     {
-        ImVec2 PosQuit(ButtonsStartX + ButtonSize.x, ButtonsY);
+        ImVec2 PosQuit(ButtonsStartX + ButtonSize.x + 20.0f, NextY);
         DrawImageButton("##QuitBtn", (ImTextureID)QuitSRV, PosQuit, EGameState::Exit);
     }
 }
