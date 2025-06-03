@@ -79,8 +79,6 @@ void ACharacter::BeginPlay()
     FSoundManager::GetInstance().PlaySound("Title");
     CapsuleComponent->BodyInstance->BIGameObject->DynamicRigidBody->setMass(10.0f);
 
-
-
     BindInput();
 }
 
@@ -156,7 +154,7 @@ void ACharacter::DoCameraEffect(float DeltaTime)
         {
             CurrentDeathCameraTransitionTime = DeathCameraTransitionTime; // 카메라 전환 시간 초기화
             bCameraEffect = false; // 카메라 효과 종료
-
+            GameManager->SetState(EGameState::GameOver);
         }
     }
 
@@ -254,8 +252,6 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
 
         FSoundManager::GetInstance().PlaySound("CarCrash");
         FSoundManager::GetInstance().PlaySound("Wasted", 1000);
-
-        GameManager->SetState(EGameState::GameOver);
     }
 
     if (HitComponent &&
