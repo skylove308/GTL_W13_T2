@@ -35,8 +35,9 @@ void AGameManager::SetState(EGameState State)
     {
     case EGameState::Restart:
     {
-        ExitGame();
-        StartGame();
+        UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
+        Engine->EndPIE();
+        Engine->StartPIE();
         break;
     }
     case EGameState::Exit:
@@ -49,9 +50,9 @@ void AGameManager::SetState(EGameState State)
     }
 }
 
-void AGameManager::SpawnMap()
+void AGameManager::SpawnMap(int MaxRoadNum)
 {
-    MapModule->SpawnRoadMap();
+    MapModule->SpawnRoadMap(MaxRoadNum);
 }
 
 void AGameManager::DestroyMap()
@@ -70,6 +71,10 @@ void AGameManager::StartGame()
 
 void AGameManager::ExitGame()
 {
+#if GAME_BUILD
+    PostQuitMessage(0);
+#else 
     UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
     Engine->EndPIE();
+#endif
 }

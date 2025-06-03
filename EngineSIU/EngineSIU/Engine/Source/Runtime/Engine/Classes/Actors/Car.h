@@ -28,7 +28,7 @@ public:
 private:
     UPROPERTY_WITH_FLAGS(VisibleAnywhere, FVector, InitialVelocity, = FVector::ZeroVector)
     UPROPERTY_WITH_FLAGS(VisibleAnywhere, FVector, InitialAngularVelocity, = FVector::ZeroVector)
-    UPROPERTY_WITH_FLAGS(EditAnywhere, float, Mass, = 1000.f) // 킬로그램 단위
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, Mass, = 1000000.f) // 킬로그램 단위
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, LinearDamping, = 0.1f) // 선형 감쇠
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, AngularDamping, = 0.1f) // 각 감쇠
     

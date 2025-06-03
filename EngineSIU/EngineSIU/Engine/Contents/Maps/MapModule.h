@@ -19,7 +19,7 @@ public:
     ~FMapModule() = default;
 
     void Initialize();
-    void SpawnRoadMap();
+    void SpawnRoadMap(int MaxRoadNum);
     void DestroyRoadMap();
 
     FVector SpawnLocation = FVector(0.0f, 0.0f, 1.0f);

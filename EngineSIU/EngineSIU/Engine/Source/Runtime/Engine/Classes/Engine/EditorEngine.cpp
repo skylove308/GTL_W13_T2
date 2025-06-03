@@ -54,6 +54,9 @@ void UEditorEngine::Init()
     EditorPlayer = FObjectFactory::ConstructObject<AEditorPlayer>(this);
     
     LoadLevel("Saved/AutoSaves.scene");
+#if GAME_BUILD
+    StartPIE();
+#endif
 }
 
 void UEditorEngine::Release()
@@ -569,7 +572,7 @@ void UEditorEngine::BindEssentialObjects()
     GameManager->SetActorTickInEditor(false);
     for (int i = 0; i < 10; i++)
     {
-        GameManager->SpawnMap();
+        GameManager->SpawnMap(1);
     }
 
     APlayerController* PlayerController = ActiveWorld->SpawnActor<APlayerController>();

@@ -33,7 +33,7 @@ public:
     void SetState(EGameState State);
     int GetScore() const { return Score; }
     void SetScore(int NewScore) { Score = NewScore; }
-    void SpawnMap();
+    void SpawnMap(int MaxRoadNum);
     void DestroyMap();
 
     void StartGame();

@@ -574,6 +574,7 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
     {
         FBodyInstance* NewBody = new FBodyInstance(this);
 
+
         for (auto& GeomAttribute : BodySetups[i]->GeomAttributes)
         {
             PxVec3 Offset = PxVec3(GeomAttribute.Offset.X, GeomAttribute.Offset.Y, GeomAttribute.Offset.Z);
@@ -750,6 +751,10 @@ void USkeletalMeshComponent::OnChangeRigidBodyFlag()
         if (Body->BIGameObject && Body->BIGameObject->DynamicRigidBody)
         {
             Body->BIGameObject->DynamicRigidBody->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, bIsKinematic);
+            if (!bIsKinematic)
+            {
+                Body->BIGameObject->DynamicRigidBody->wakeUp();
+            }
         }
     }
 }

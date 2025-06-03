@@ -7,6 +7,19 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "AAmbientLight_246",
+                        "ComponentOwnerClass": "AAmbientLight",
+                        "ScriptName": "",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
                     "ComponentClass": "UAmbientLightComponent",
                     "ComponentID": "UAmbientLightComponent_0",
                     "Properties": {
@@ -50,19 +63,6 @@
                         "bSimulate": "false",
                         "m_Type": "UBillboardComponent"
                     }
-                },
-                {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "AAmbientLight_246",
-                        "ComponentOwnerClass": "AAmbientLight",
-                        "ScriptName": "",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
                 }
             ],
             "RootComponentID": "UBillboardComponent_0"
@@ -74,26 +74,17 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
+                    "ComponentClass": "UCameraComponent",
+                    "ComponentID": "FollowCamera",
                     "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
+                        "AttachParentID": "CameraBoom",
+                        "ComponentClass": "UCameraComponent",
+                        "ComponentName": "FollowCamera",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
-                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "UCharacterMovementComponent",
-                    "ComponentID": "CharacterMovementComponent",
-                    "Properties": {
-                        "ComponentClass": "UCharacterMovementComponent",
-                        "ComponentName": "CharacterMovementComponent",
-                        "ComponentOwner": "ACharacter_256",
-                        "ComponentOwnerClass": "ACharacter",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }
@@ -130,18 +121,6 @@
                     }
                 },
                 {
-                    "ComponentClass": "UCharacterMovementComponent",
-                    "ComponentID": "CharacterMovementComponent",
-                    "Properties": {
-                        "ComponentClass": "UCharacterMovementComponent",
-                        "ComponentName": "CharacterMovementComponent",
-                        "ComponentOwner": "ACharacter_256",
-                        "ComponentOwnerClass": "ACharacter",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
                     "ComponentClass": "USkeletalMeshComponent",
                     "ComponentID": "SkeletalMeshComponent",
                     "Properties": {
@@ -168,6 +147,31 @@
                     }
                 },
                 {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "ACharacter_256",
+                        "ComponentOwnerClass": "ACharacter",
+                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "UCharacterMovementComponent",
+                    "ComponentID": "CharacterMovementComponent",
+                    "Properties": {
+                        "ComponentClass": "UCharacterMovementComponent",
+                        "ComponentName": "CharacterMovementComponent",
+                        "ComponentOwner": "ACharacter_256",
+                        "ComponentOwnerClass": "ACharacter",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
                     "ComponentClass": "USpringArmComponent",
                     "ComponentID": "CameraBoom",
                     "Properties": {
@@ -176,15 +180,15 @@
                         "ComponentName": "CameraBoom",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
-                        "MaxPitch": "70.000000",
-                        "MaxYaw": "60.000000",
-                        "MinPitch": "0.000000",
-                        "MinYaw": "-60.000000",
+                        "MaxPitch": "50.000000",
+                        "MaxYaw": "50.000000",
+                        "MinPitch": "10.000000",
+                        "MinYaw": "-50.000000",
                         "RelativeLocation": "X=0.000 Y=0.000 Z=50.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "SocketOffset": "X=0.000 Y=0.000 Z=0.000",
-                        "TargetArmLength": "300.000000",
+                        "TargetArmLength": "400.000000",
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }
@@ -347,19 +351,6 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "AHeightFogActor_678",
-                        "ComponentOwnerClass": "AHeightFogActor",
-                        "ScriptName": "",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
                     "ComponentClass": "UHeightFogComponent",
                     "ComponentID": "UHeightFogComponent_0",
                     "Properties": {
@@ -387,6 +378,19 @@
                         "bSimulate": "false",
                         "m_Type": ""
                     }
+                },
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "AHeightFogActor_678",
+                        "ComponentOwnerClass": "AHeightFogActor",
+                        "ScriptName": "",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
                 }
             ],
             "RootComponentID": "UHeightFogComponent_0"
@@ -412,11 +416,11 @@
                 },
                 {
                     "ComponentClass": "USceneComponent",
-                    "ComponentID": "USceneComponent_501",
+                    "ComponentID": "USceneComponent_573",
                     "Properties": {
                         "AttachParentID": "UParticleSystemComponent_468",
                         "ComponentClass": "USceneComponent",
-                        "ComponentName": "USceneComponent_501",
+                        "ComponentName": "USceneComponent_573",
                         "ComponentOwner": "AActor_465",
                         "ComponentOwnerClass": "AActor",
                         "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
@@ -449,9 +453,100 @@
                         "bSimulate": "false",
                         "m_Type": ""
                     }
+                },
+                {
+                    "ComponentClass": "USceneComponent",
+                    "ComponentID": "USceneComponent_501",
+                    "Properties": {
+                        "AttachParentID": "UParticleSystemComponent_468",
+                        "ComponentClass": "USceneComponent",
+                        "ComponentName": "USceneComponent_501",
+                        "ComponentOwner": "AActor_465",
+                        "ComponentOwnerClass": "AActor",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
                 }
             ],
             "RootComponentID": "UParticleSystemComponent_468"
+        },
+        {
+            "ActorClass": "ASpotLight",
+            "ActorID": "ASpotLight_797",
+            "ActorLabel": "OBJ_SPOTLIGHT_797",
+            "ActorTickInEditor": "false",
+            "Components": [
+                {
+                    "ComponentClass": "USpotLightComponent",
+                    "ComponentID": "USpotLightComponent_0",
+                    "Properties": {
+                        "AABB_Max": "X=1.000 Y=1.000 Z=0.100",
+                        "AABB_Min": "X=-1.000 Y=-1.000 Z=-0.100",
+                        "AttachParentID": "UBillboardComponent_0",
+                        "Attenuation": "20.000000",
+                        "ComponentClass": "USpotLightComponent",
+                        "ComponentName": "USpotLightComponent_0",
+                        "ComponentOwner": "ASpotLight_797",
+                        "ComponentOwnerClass": "ASpotLight",
+                        "Direction": "X=0.019 Y=0.371 Z=-0.928",
+                        "InnerRad": "1.029744",
+                        "Intensity": "60000.000000",
+                        "LightColor": "R=1.000 G=1.000 B=1.000 A=1.000",
+                        "OuterRad": "1.029744",
+                        "Position": "X=75.360 Y=4.256 Z=529.248",
+                        "Radius": "200.000000",
+                        "RelativeLocation": "X=75.360 Y=4.256 Z=22.611",
+                        "RelativeRotation": "Pitch=-68.196 Yaw=87.016 Roll=-86.787",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "Type": "2",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "UBillboardComponent",
+                    "ComponentID": "UBillboardComponent_0",
+                    "Properties": {
+                        "AABB_max": "X=0.000 Y=0.000 Z=0.000",
+                        "AABB_min": "X=0.000 Y=0.000 Z=0.000",
+                        "AttachParentID": "nullptr",
+                        "BufferKey": "Assets/Editor/Icon/S_LightSpot.PNG",
+                        "ComponentClass": "UBillboardComponent",
+                        "ComponentName": "UBillboardComponent_0",
+                        "ComponentOwner": "ASpotLight_797",
+                        "ComponentOwnerClass": "ASpotLight",
+                        "FinalIndexU": "0.000000",
+                        "FinalIndexV": "0.000000",
+                        "GeomsCount": "0",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=506.637",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "RigidBodyType": "1",
+                        "bApplyGravity": "false",
+                        "bAutoActive": "true",
+                        "bIsActive": "true",
+                        "bSimulate": "false",
+                        "m_Type": "UBillboardComponent"
+                    }
+                },
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "ASpotLight_797",
+                        "ComponentOwnerClass": "ASpotLight",
+                        "ScriptName": "",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                }
+            ],
+            "RootComponentID": "UBillboardComponent_0"
         }
     ],
     "NextUUID": 0,

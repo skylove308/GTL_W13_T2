@@ -1650,6 +1650,7 @@
     <ClCompile Include="Engine\Source\Editor\PropertyEditor\GameUIPanel.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\GameManager.cpp" />
     <ClCompile Include="LuaScripts\LuaUIBind.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="EngineSIU.natvis" />
@@ -1821,6 +1822,7 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\GameManager.h" />
     <ClInclude Include="LuaScripts\LuaUIBind.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\CompositingShader.hlsl" />
