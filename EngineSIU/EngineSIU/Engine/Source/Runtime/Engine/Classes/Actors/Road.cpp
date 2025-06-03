@@ -7,6 +7,7 @@
 #include "World/World.h"
 #include "Actors/Cube.h"
 #include "Actors/Car.h"
+#include "Actors/GameManager.h"
 
 
 ARoad::ARoad()
@@ -43,6 +44,16 @@ void ARoad::BeginPlay()
     Super::BeginPlay();
 
     RoadMesh->CreatePhysXGameObject();
+
+    auto Actors = GEngine->ActiveWorld->GetActiveLevel()->Actors;
+    for (auto Actor : Actors)
+    {
+        if (Actor->IsA<AGameManager>())
+        {
+            GameManager = Cast<AGameManager>(Actor);
+            break;
+        }
+    }
 }
 
 void ARoad::Tick(float DeltaTime)
@@ -146,6 +157,15 @@ void ARoad::OnOverlappedRoad(float DeltaTime)
 
     if (CurrentRoadState == ERoadState::Safe)
     {
+        if (!bIsFirstTimeOnRoad)
+        {
+            bIsFirstTimeOnRoad = true;
+            int CurrentScore = GameManager->GetScore();
+            GameManager->SetScore(CurrentScore + 1);
+            GameManager->SpawnMap();
+            GameManager->DestroyMap();
+        }
+
         CurrentRoadTime += DeltaTime;
         if (CurrentRoadTime >= SafeJoneTime)
         {

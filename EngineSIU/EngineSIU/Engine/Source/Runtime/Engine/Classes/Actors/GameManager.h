@@ -11,6 +11,7 @@ enum class EGameState
     Restart
 };
 
+class FMapModule;
 class AGameManager : public AActor
 {
     DECLARE_CLASS(AGameManager, AActor)
@@ -29,7 +30,13 @@ public:
     EGameState GetState() const { return GameState; }
     void SetState(EGameState State);
     int GetScore() const { return Score; }
+    void SetScore(int NewScore) { Score = NewScore; }
+    void SpawnMap();
+    void DestroyMap();
 
     void StartGame();
     void ExitGame();
+
+private:
+    FMapModule* MapModule = nullptr;
 };

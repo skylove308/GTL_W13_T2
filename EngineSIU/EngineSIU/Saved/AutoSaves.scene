@@ -74,41 +74,29 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
-                    "ComponentClass": "UCameraComponent",
-                    "ComponentID": "FollowCamera",
+                    "ComponentClass": "USkeletalMeshComponent",
+                    "ComponentID": "SkeletalMeshComponent",
                     "Properties": {
-                        "AttachParentID": "CameraBoom",
-                        "ComponentClass": "UCameraComponent",
-                        "ComponentName": "FollowCamera",
+                        "AABB_max": "X=21.460 Y=89.011 Z=182.488",
+                        "AABB_min": "X=-16.749 Y=-89.011 Z=-0.205",
+                        "AnimClass": "None",
+                        "AnimationMode": "0",
+                        "AttachParentID": "CapsuleComponent",
+                        "ComponentClass": "USkeletalMeshComponent",
+                        "ComponentName": "SkeletalMeshComponent",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
+                        "GeomsCount": "0",
                         "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "RigidBodyType": "2",
+                        "SkeletalMeshKey": "Contents/James/James",
+                        "bApplyGravity": "true",
                         "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "USpringArmComponent",
-                    "ComponentID": "CameraBoom",
-                    "Properties": {
-                        "AttachParentID": "CapsuleComponent",
-                        "ComponentClass": "USpringArmComponent",
-                        "ComponentName": "CameraBoom",
-                        "ComponentOwner": "ACharacter_256",
-                        "ComponentOwnerClass": "ACharacter",
-                        "MaxPitch": "70.000000",
-                        "MaxYaw": "60.000000",
-                        "MinPitch": "0.000000",
-                        "MinYaw": "-60.000000",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=50.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "SocketOffset": "X=0.000 Y=0.000 Z=0.000",
-                        "TargetArmLength": "300.000000",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
+                        "bIsActive": "true",
+                        "bSimulate": "true",
+                        "m_Type": ""
                     }
                 },
                 {
@@ -143,32 +131,6 @@
                     }
                 },
                 {
-                    "ComponentClass": "USkeletalMeshComponent",
-                    "ComponentID": "SkeletalMeshComponent",
-                    "Properties": {
-                        "AABB_max": "X=21.460 Y=89.011 Z=182.488",
-                        "AABB_min": "X=-16.749 Y=-89.011 Z=-0.205",
-                        "AnimClass": "None",
-                        "AnimationMode": "0",
-                        "AttachParentID": "CapsuleComponent",
-                        "ComponentClass": "USkeletalMeshComponent",
-                        "ComponentName": "SkeletalMeshComponent",
-                        "ComponentOwner": "ACharacter_256",
-                        "ComponentOwnerClass": "ACharacter",
-                        "GeomsCount": "0",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "RigidBodyType": "2",
-                        "SkeletalMeshKey": "Contents/James/James",
-                        "bApplyGravity": "true",
-                        "bAutoActive": "true",
-                        "bIsActive": "true",
-                        "bSimulate": "true",
-                        "m_Type": ""
-                    }
-                },
-                {
                     "ComponentClass": "UCharacterMovementComponent",
                     "ComponentID": "CharacterMovementComponent",
                     "Properties": {
@@ -176,6 +138,44 @@
                         "ComponentName": "CharacterMovementComponent",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "USpringArmComponent",
+                    "ComponentID": "CameraBoom",
+                    "Properties": {
+                        "AttachParentID": "CapsuleComponent",
+                        "ComponentClass": "USpringArmComponent",
+                        "ComponentName": "CameraBoom",
+                        "ComponentOwner": "ACharacter_256",
+                        "ComponentOwnerClass": "ACharacter",
+                        "MaxPitch": "70.000000",
+                        "MaxYaw": "60.000000",
+                        "MinPitch": "0.000000",
+                        "MinYaw": "-60.000000",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=50.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "SocketOffset": "X=0.000 Y=0.000 Z=0.000",
+                        "TargetArmLength": "300.000000",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "UCameraComponent",
+                    "ComponentID": "FollowCamera",
+                    "Properties": {
+                        "AttachParentID": "CameraBoom",
+                        "ComponentClass": "UCameraComponent",
+                        "ComponentName": "FollowCamera",
+                        "ComponentOwner": "ACharacter_256",
+                        "ComponentOwnerClass": "ACharacter",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }
@@ -203,6 +203,43 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
+                    "ComponentClass": "UParticleSystemComponent",
+                    "ComponentID": "UParticleSystemComponent_662",
+                    "Properties": {
+                        "AABB_max": "X=0.000 Y=0.000 Z=0.000",
+                        "AABB_min": "X=0.000 Y=0.000 Z=0.000",
+                        "AttachParentID": "StaticMeshComponent_0",
+                        "ComponentClass": "UParticleSystemComponent",
+                        "ComponentName": "UParticleSystemComponent_662",
+                        "ComponentOwner": "ACube_232",
+                        "ComponentOwnerClass": "ACube",
+                        "GeomsCount": "0",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "RigidBodyType": "1",
+                        "TemplateKey": "Contents/ParticleSystem/UParticleSystem_368",
+                        "bApplyGravity": "false",
+                        "bAutoActive": "true",
+                        "bIsActive": "true",
+                        "bSimulate": "false",
+                        "m_Type": ""
+                    }
+                },
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "ACube_232",
+                        "ComponentOwnerClass": "ACube",
+                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
                     "ComponentClass": "UStaticMeshComponent",
                     "ComponentID": "StaticMeshComponent_0",
                     "Properties": {
@@ -229,43 +266,6 @@
                         "bAutoActive": "true",
                         "bIsActive": "true",
                         "bSimulate": "true",
-                        "m_Type": ""
-                    }
-                },
-                {
-                    "ComponentClass": "ULuaScriptComponent",
-                    "ComponentID": "LuaComponent",
-                    "Properties": {
-                        "ComponentClass": "ULuaScriptComponent",
-                        "ComponentName": "LuaComponent",
-                        "ComponentOwner": "ACube_232",
-                        "ComponentOwnerClass": "ACube",
-                        "ScriptName": "LuaScripts/Actors/DefaultActor.lua",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
-                    }
-                },
-                {
-                    "ComponentClass": "UParticleSystemComponent",
-                    "ComponentID": "UParticleSystemComponent_662",
-                    "Properties": {
-                        "AABB_max": "X=0.000 Y=0.000 Z=0.000",
-                        "AABB_min": "X=0.000 Y=0.000 Z=0.000",
-                        "AttachParentID": "StaticMeshComponent_0",
-                        "ComponentClass": "UParticleSystemComponent",
-                        "ComponentName": "UParticleSystemComponent_662",
-                        "ComponentOwner": "ACube_232",
-                        "ComponentOwnerClass": "ACube",
-                        "GeomsCount": "0",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
-                        "RigidBodyType": "1",
-                        "TemplateKey": "Contents/ParticleSystem/UParticleSystem_368",
-                        "bApplyGravity": "false",
-                        "bAutoActive": "true",
-                        "bIsActive": "true",
-                        "bSimulate": "false",
                         "m_Type": ""
                     }
                 }

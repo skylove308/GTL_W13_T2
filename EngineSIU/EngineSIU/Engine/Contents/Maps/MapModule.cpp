@@ -11,10 +11,13 @@ void FMapModule::Initialize()
 
 void FMapModule::SpawnRoadMap()
 {
+    FMap* Map = new FMap();
+
     ARoad* Road = GEngine->ActiveWorld->SpawnActor<ARoad>();
     if (Road)
     {
         Road->Initialize(ERoadState::Safe, SpawnLocation);
+        Map->Roads.Add(Road);
     }
 
     SpawnLocation += FVector(600.0f, -0.0f, 0.0f);
@@ -27,9 +30,33 @@ void FMapModule::SpawnRoadMap()
         if (CarRoad)
         {
             CarRoad->Initialize(ERoadState::Car, SpawnLocation);
+            Map->Roads.Add(CarRoad);
         }
         SpawnLocation += FVector(600.0f, 0.0f, 0.0f);
     }
 
+    Maps.push(Map);
+    MapSize++;
+}
+
+void FMapModule::DestroyRoadMap()
+{
+    if (Maps.size() > 0)
+    {
+        FMap* Map = Maps.front();
+        Maps.pop();
+        if (Map)
+        {
+            for(ARoad* Road : Map->Roads)
+            {
+                if (Road)
+                {
+                    Road->Destroy();
+                }
+            }
+        }
+        MapSize--;
+        delete Map;
+    }
 }
 

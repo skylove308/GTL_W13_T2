@@ -280,12 +280,6 @@ void UEditorEngine::StartPIE()
     SetPhysXScene(PIEWorld);
     
     BindEssentialObjects();
-
-    FMapModule* MapModule = new FMapModule();
-    for (int i = 0; i < 10; i++)
-    {
-        MapModule->SpawnRoadMap();
-    }
     
     PIEWorld->BeginPlay();
     // 여기서 Actor들의 BeginPlay를 해줄지 안에서 해줄 지 고민.
@@ -573,7 +567,11 @@ void UEditorEngine::BindEssentialObjects()
     AGameManager* GameManager = ActiveWorld->SpawnActor<AGameManager>();
     GameManager->SetActorLabel(TEXT("OBJ_GAME_MANAGER"));
     GameManager->SetActorTickInEditor(false);
-    
+    for (int i = 0; i < 10; i++)
+    {
+        GameManager->SpawnMap();
+    }
+
     APlayerController* PlayerController = ActiveWorld->SpawnActor<APlayerController>();
     PlayerController->SetActorLabel(TEXT("OBJ_PLAYER_CONTROLLER"));
     PlayerController->SetActorTickInEditor(false);
