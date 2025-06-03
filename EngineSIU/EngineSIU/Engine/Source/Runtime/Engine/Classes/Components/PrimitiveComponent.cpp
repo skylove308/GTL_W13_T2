@@ -577,11 +577,11 @@ const TArray<FOverlapInfo>& UPrimitiveComponent::GetOverlapInfos() const
     return OverlappingComponents;
 }
 
-void UPrimitiveComponent::CreatePhysXGameObject()
+FBodyInstance* UPrimitiveComponent::CreatePhysXGameObject()
 {
     if (!bSimulate)
     {
-        return;
+        return nullptr;
     }
     BodyInstance = new FBodyInstance(this);
 
@@ -687,6 +687,8 @@ void UPrimitiveComponent::CreatePhysXGameObject()
     BodyInstance->SetGameObject(Obj);
     BodyInstance->RigidActorSync = Obj->DynamicRigidBody;
     BodyInstance->RigidActorAsync = Obj->DynamicRigidBody;
+
+    return BodyInstance;
 }
 
 void UPrimitiveComponent::BeginPlay()

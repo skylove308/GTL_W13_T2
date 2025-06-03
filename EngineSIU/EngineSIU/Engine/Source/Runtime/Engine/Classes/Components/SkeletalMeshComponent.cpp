@@ -560,7 +560,7 @@ void USkeletalMeshComponent::InitAnim()
     }
 }
 
-void USkeletalMeshComponent::CreatePhysXGameObject()
+FBodyInstance* USkeletalMeshComponent::CreatePhysXGameObject()
 {
     if (RigidBodyType == ERigidBodyType::STATIC)
     {
@@ -573,6 +573,7 @@ void USkeletalMeshComponent::CreatePhysXGameObject()
     for (int i = 0; i < BodySetups.Num(); i++)
     {
         FBodyInstance* NewBody = new FBodyInstance(this);
+
 
         for (auto& GeomAttribute : BodySetups[i]->GeomAttributes)
         {
@@ -750,6 +751,10 @@ void USkeletalMeshComponent::OnChangeRigidBodyFlag()
         if (Body->BIGameObject && Body->BIGameObject->DynamicRigidBody)
         {
             Body->BIGameObject->DynamicRigidBody->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, bIsKinematic);
+            if (!bIsKinematic)
+            {
+                Body->BIGameObject->DynamicRigidBody->wakeUp();
+            }
         }
     }
 }

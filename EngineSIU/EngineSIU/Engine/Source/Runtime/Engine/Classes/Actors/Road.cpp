@@ -8,6 +8,7 @@
 #include "Actors/Cube.h"
 #include "Actors/Car.h"
 #include "Actors/GameManager.h"
+#include "Physics/PhysicsManager.h"
 
 
 ARoad::ARoad()
@@ -112,7 +113,12 @@ void ARoad::Tick(float DeltaTime)
             CurrentCar->SetSpawnDirectionRight(false);
         }
 
-        Cast<UPrimitiveComponent>(CurrentCar->GetRootComponent())->CreatePhysXGameObject();
+        FBodyInstance* CarBodyInstance = Cast<UPrimitiveComponent>(CurrentCar->GetRootComponent())->CreatePhysXGameObject();
+        if (CarBodyInstance)
+        {
+            CarBodyInstance->BIGameObject->DynamicRigidBody->setMass(1e10);
+            CarBodyInstance->BIGameObject->DynamicRigidBody->setMassSpaceInertiaTensor(PxVec3(1e10));
+        }
 
         bIsCarOnRoad = true;
     }
