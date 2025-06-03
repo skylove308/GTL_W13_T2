@@ -25,6 +25,7 @@ enum OBJECTS : uint8
     OBJ_MAP,
     OBJ_ROAD,
     OBJ_SKYSPHERE,
+    OBJ_STREETLIGHT,
     OBJ_END
 };
 

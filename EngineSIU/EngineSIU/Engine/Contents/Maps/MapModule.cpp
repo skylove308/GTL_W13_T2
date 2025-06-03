@@ -1,5 +1,6 @@
 #include "MapModule.h"
 #include "Actors/Road.h"
+#include "Actors/StreetLight.h"
 #include "Engine/Engine.h"
 #include "World/World.h"
 #include "Math/MathUtility.h"
@@ -20,6 +21,29 @@ void FMapModule::SpawnRoadMap()
         Map->Roads.Add(Road);
     }
 
+    if (Road->GetCurrentRoadState() == ERoadState::Safe)
+    {
+        int StreetLightCount = 20;
+        float Spacing = 1000.0f;
+
+        float randomShift = FMath::FRandRange(-Spacing * 0.5f, Spacing * 0.5f);
+
+        int mid = StreetLightCount / 2;
+
+        for (int i = 0; i < StreetLightCount; ++i)
+        {
+            AStreetLight* Light = GEngine->ActiveWorld->SpawnActor<AStreetLight>();
+            if (Light)
+            {
+                float yOffset = ( (float)i - (float)mid ) * Spacing + randomShift;
+
+                FVector LightLocation = SpawnLocation + FVector(120.0f, yOffset + 200.0f, 300.0f);
+                Light->Initialize(LightLocation);
+                Map->StreetLights.Add(Light);
+            }
+        }
+    }
+    
     SpawnLocation += FVector(600.0f, -0.0f, 0.0f);
 
     int RandomCarRoadCount = FMath::RandHelper(4) + 1;
@@ -54,9 +78,16 @@ void FMapModule::DestroyRoadMap()
                     Road->Destroy();
                 }
             }
+
+            for (AStreetLight* Light : Map->StreetLights)
+            {
+                if (Light)
+                {
+                    Light->Destroy();
+                }
+            }
         }
         MapSize--;
         delete Map;
     }
 }
-

@@ -26,6 +26,8 @@
 
 ACharacter::ACharacter()
 {
+    // SetActorLocation(FVector(0.0f, ))
+    
     CapsuleComponent = AddComponent<UCapsuleComponent>("CapsuleComponent");
     CapsuleComponent->InitCapsuleSize(42.f, 96.f);
     CapsuleComponent->bSimulate = true;

@@ -3,10 +3,13 @@
 #include "Container/Array.h"
 #include <queue>
 
+class AStreetLight;
 class ARoad;
+
 struct FMap
 {
     TArray<ARoad*> Roads;
+    TArray<AStreetLight*> StreetLights;
 };
 
 class FMapModule

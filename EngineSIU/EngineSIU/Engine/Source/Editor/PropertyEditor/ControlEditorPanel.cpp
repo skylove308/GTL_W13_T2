@@ -48,6 +48,7 @@
 #include "Actors/Road.h"
 #include <Actors/SkySphereActor.h>
 #include "ShadowManager.h"
+#include "Actors/StreetLight.h"
 
 ControlEditorPanel::ControlEditorPanel()
 {
@@ -393,6 +394,7 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
             { .Label = "Car",               .OBJ = OBJ_CAR },
             { .Label = "Map",               .OBJ = OBJ_MAP },
             { .Label = "Road",              .OBJ = OBJ_ROAD },
+                { .Label = "StreetLight",              .OBJ = OBJ_STREETLIGHT },
             { .Label = "SkySphere",         .OBJ = OBJ_SKYSPHERE },
 
         };
@@ -541,17 +543,24 @@ void ControlEditorPanel::CreateModifyButton(const ImVec2 ButtonSize, ImFont* Ico
                     Cast<ARoad>(SpawnedActor)->Initialize(ERoadState::Safe, FVector(0.0f));
                     SpawnedActor->SetActorLabel(TEXT("OBJ_ROAD"));
                     break;
+                }
                 case OBJ_SKYSPHERE:
                 {
                     SpawnedActor = World->SpawnActor<ASkySphere>();
                     SpawnedActor->SetActorLabel(TEXT("OBJ_SKYSPHERE"));
                     break;
                 }
+                case OBJ_STREETLIGHT:
+                {
+                    SpawnedActor = World->SpawnActor<AStreetLight>();
+                    Cast<AStreetLight>(SpawnedActor)->Initialize(FVector(0.0f));
+                    SpawnedActor->SetActorLabel(TEXT("OBJ_STREETLIGHT"));
+                    break;
+                }
                 case OBJ_CAMERA:
                 case OBJ_PLAYER:
                 case OBJ_END:
                     break;
-                }
                 }
 
                 if (SpawnedActor)
