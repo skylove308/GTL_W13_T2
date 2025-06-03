@@ -22,7 +22,10 @@ public:
 
     void MoveForward(float Value);
     void MoveRight(float Value);
+    void ApplyMovementForce(const FVector& Direction, float Scale);
     void Stop();
+    void RotateCharacterMesh(float DeltaTime);
+
 
     virtual void RegisterLuaType(sol::state& Lua) override; // Lua에 클래스 등록해주는 함수.
     virtual bool BindSelfLuaProperties() override; // LuaEnv에서 사용할 멤버 변수 등록 함수.
@@ -40,6 +43,9 @@ public:
     bool GetIsDead() { return bIsDead; }
     void SetIsDead(bool bInIsDead) { bIsDead = bInIsDead; }
 
+    void BindInput();
+    void UnbindInput();
+
 public:
     bool bIsRunning = false;
     bool bIsDead = false;
@@ -53,13 +59,19 @@ public:
     float CurrentForce = 0.0f;
     float TotalForce = 0.0f;
     
-    UPROPERTY_WITH_FLAGS(EditAnywhere, float, ForceIncrement,  = 1000.0f)
-    UPROPERTY_WITH_FLAGS(EditAnywhere, float, MaxForce,  = 100000.0f)
-    UPROPERTY_WITH_FLAGS(EditAnywhere, float, MovementForceMultiplier,  = 1.0f)
- 
-
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, DeathCameraTransitionTime,  = 3.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, DeathLetterBoxTransitionTime,  = 2.0f)
+
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, WalkForce, = 200000.f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, RunForce, = 400000.f)
+
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, WalkMaxSpeed, = 300.f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, RunMaxSpeed, = 600.f)
+
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, InputLinearDamping, = 2.0f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, NoInputLinearDamping, = 7.0f)
+
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, MeshRotationSpeed, = 10.0f)
 
                 
 private:
@@ -69,7 +81,6 @@ private:
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 
     void DoCameraEffect(float DeltaTime);
-    void UpdateParticleEffectLocation();
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, ImpulseScale, = 100000.f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, class UParticleSystem*, ExplosionParticle, = nullptr)

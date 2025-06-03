@@ -1,4 +1,4 @@
-﻿#include "Vector.h"
+#include "Vector.h"
 
 #include "Vector4.h"
 #include "Misc/Parse.h"
@@ -60,4 +60,12 @@ bool FVector::InitFromString(const FString& InSourceString)
     const bool bSuccessful = FParse::Value(*InSourceString, TEXT("X=") , X) && FParse::Value(*InSourceString, TEXT("Y="), Y) && FParse::Value(*InSourceString, TEXT("Z="), Z);
 
     return bSuccessful;
+}
+
+FRotator FVector::Rotation() const
+{
+    float Yaw = FMath::Atan2(Y, X) * (180.f / PI); // 수평 회전 (Z축 기준)
+    float Pitch = FMath::Atan2(Z, FVector(X, Y, 0).Size()) * (180.f / PI); // 위/아래 각도
+
+    return FRotator(Pitch, Yaw, 0);
 }
