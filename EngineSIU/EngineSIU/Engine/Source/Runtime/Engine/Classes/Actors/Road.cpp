@@ -64,22 +64,21 @@ void ARoad::Tick(float DeltaTime)
 
     int RandNum = FMath::RandHelper(1000);
     int DirectionNum = FMath::RandHelper(2);
-    if (CurrentRoadState == ERoadState::Car && RandNum == 0 && !bIsCarOnRoad)
+    if (CurrentRoadState == ERoadState::Car && RandNum == 0 && (!CurrentCar || IsValid(CurrentCar)))
     {
-        ACar* Car = GEngine->ActiveWorld->SpawnActor<ACar>();
+        CurrentCar = GEngine->ActiveWorld->SpawnActor<ACar>();
         if (DirectionNum == 0)
         {
-            Car->SetActorLocation(FVector(GetActorLocation().X, 8000.0f, 350.0f));
-            Car->SetSpawnDirectionRight(true);
+            CurrentCar->SetActorLocation(FVector(GetActorLocation().X, 8000.0f, 350.0f));
+            CurrentCar->SetSpawnDirectionRight(true);
         }
         else
         {
-            Car->SetActorLocation(FVector(GetActorLocation().X, -8000.0f, 350.0f));
-            Car->SetSpawnDirectionRight(false);
+            CurrentCar->SetActorLocation(FVector(GetActorLocation().X, -8000.0f, 350.0f));
+            CurrentCar->SetSpawnDirectionRight(false);
         }
 
-        Cast<UPrimitiveComponent>(Car->GetRootComponent())->CreatePhysXGameObject();
-        bIsCarOnRoad = true;
+        Cast<UPrimitiveComponent>(CurrentCar->GetRootComponent())->CreatePhysXGameObject();
     }
 }
 
