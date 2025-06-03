@@ -79,6 +79,7 @@ std::shared_ptr<FTexture> FResourceManager::GetTexture(const FWString& Name) con
     return TempValue ? *TempValue : nullptr;
 }
 
+
 HRESULT FResourceManager::LoadTextureFromFile(ID3D11Device* Device, const wchar_t* Filename, bool bIsSRGB)
 {
     IWICImagingFactory* WicFactory = nullptr;

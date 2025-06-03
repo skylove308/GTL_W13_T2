@@ -22,6 +22,7 @@
 #include "SoundManager.h"
 #include "Actors/GameManager.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Actors/Camera.h"
 
 ACharacter::ACharacter()
 {
@@ -166,15 +167,20 @@ void ACharacter::DoCameraEffect(float DeltaTime)
                 FViewTargetTransitionParams Params;
                 Params.BlendTime = DeathCameraTransitionTime; // 카메라 전환 시간
                 {
-                    auto* RigidDynamic = Cast<UStaticMeshComponent>(Car->GetRootComponent())->BodyInstance->BIGameObject->DynamicRigidBody;
-                    PxVec3 CurVelocity = RigidDynamic->getLinearVelocity();
-                    CurVelocity *= 0.1f;
-                    RigidDynamic->setLinearVelocity(CurVelocity);
+                    //auto* RigidDynamic = Cast<UStaticMeshComponent>(Car->GetRootComponent())->BodyInstance->BIGameObject->DynamicRigidBody;
+                    //PxVec3 CurVelocity = RigidDynamic->getLinearVelocity();
+                    //CurVelocity *= 0.1f;
+                    //RigidDynamic->setLinearVelocity(CurVelocity);
 
                     UClass* CameraShakeClass = UDamageCameraShake::StaticClass();
                     GEngine->ActiveWorld->GetPlayerController()->ClientStartCameraShake(CameraShakeClass);
-                    GEngine->ActiveWorld->GetPlayerController()->SetViewTarget(Car, Params);
-                    GEngine->ActiveWorld->GetPlayerController()->Possess(Car);
+
+                    ACamera* DeathCam = GEngine->ActiveWorld->SpawnActor<ACamera>();
+                    DeathCam->SetActorLocation(GetActorLocation() + FVector(0.0f, 0.0f, 1000.0f));
+                    DeathCam->SetActorRotation(FRotator(-30.0f, -90.0f, 0.0f));
+
+                    GEngine->ActiveWorld->GetPlayerController()->SetViewTarget(DeathCam, Params);
+                    GEngine->ActiveWorld->GetPlayerController()->Possess(DeathCam);
                 }
                 bSwitchCamera = true;
                 break;

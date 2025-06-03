@@ -60,5 +60,6 @@ private:
     float SafeJoneTime = 2.0f;
     float WarningJoneTime = 2.0f;
     bool bIsOverlapped = false;
+    bool bIsCarOnRoad = false;
 };
 

@@ -1,21 +1,45 @@
 #include "Car.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/FObjLoader.h"
+#include "Engine/FbxLoader.h"
 #include "Physics/PhysicsManager.h"
 #include "Lua/LuaUtils/LuaTypeMacros.h"
 #include "Lua/LuaScriptComponent.h"
+#include "Engine/AssetManager.h"
 
 
 ACar::ACar()
 {
     UStaticMeshComponent* StaticMeshComp = AddComponent<UStaticMeshComponent>("CarMesh");
-    StaticMeshComp->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Primitives/CubePrimitive.Obj"));
+    StaticMeshComp->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Cars/Train/Train.obj"));
+    StaticMeshComp->bSimulate = true;
     RootComponent = StaticMeshComp;
+    RootComponent->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
+    RootComponent->SetWorldScale3D(FVector(100.0f));
 }
 
 void ACar::BeginPlay()
 {
     Super::BeginPlay();
+}
+
+void ACar::PostSpawnInitialize() 
+{
+    Super::PostSpawnInitialize();
+    LuaScriptComponent->SetScriptName("Car");
+    UStaticMeshComponent* CarMeshComp = Cast<UStaticMeshComponent>(GetRootComponent());
+}
+
+void ACar::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    if(GetActorLocation().Y > 12000.0f || GetActorLocation().Y < -12000.0f)
+    {
+        Destroy();
+
+        return;
+    }
 }
 
 UObject* ACar::Duplicate(UObject* InOuter)
@@ -38,6 +62,7 @@ void ACar::RegisterLuaType(sol::state& Lua)
         "Mass", sol::property(&ThisClass::GetMass, &ThisClass::SetMass),
         "LinearDamping", sol::property(&ThisClass::GetLinearDamping, &ThisClass::SetLinearDamping),
         "AngularDamping", sol::property(&ThisClass::GetAngularDamping, &ThisClass::SetAngularDamping),
+        "SpawnDirectionRight", sol::property(&ThisClass::GetSpawnDirectionRight, &ThisClass::SetSpawnDirectionRight),
         "Drive", &ThisClass::Drive
     )
 }

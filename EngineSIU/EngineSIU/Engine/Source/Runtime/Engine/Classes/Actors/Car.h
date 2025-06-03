@@ -8,6 +8,8 @@ public:
     ACar();
     virtual void BeginPlay() override;
     virtual UObject* Duplicate(UObject* InOuter) override;
+    virtual void PostSpawnInitialize() override;
+    virtual void Tick(float DeltaTime) override;
 
 public:
     virtual void RegisterLuaType(sol::state& Lua) override; // Lua에 클래스 등록해주는 함수.
@@ -21,6 +23,8 @@ private:
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, Mass, = 1000.f) // 킬로그램 단위
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, LinearDamping, = 0.1f) // 선형 감쇠
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, AngularDamping, = 0.1f) // 각 감쇠
+    
+    bool SpawnDirectionRight; // 차량이 생성될 방향을 결정하는 변수 (true: 오른쪽, false: 왼쪽)
 
 public:
     //getter
@@ -29,6 +33,7 @@ public:
     float GetMass() const { return Mass; }
     float GetLinearDamping() const { return LinearDamping; }
     float GetAngularDamping() const { return AngularDamping; }
+    bool GetSpawnDirectionRight() const { return SpawnDirectionRight; }
 
     //setter
     void SetInitialVelocity(const FVector& InVelocity) { InitialVelocity = InVelocity; }
@@ -36,4 +41,5 @@ public:
     void SetMass(float InMass) { Mass = InMass; }
     void SetLinearDamping(float InLinearDamping) { LinearDamping = InLinearDamping; }
     void SetAngularDamping(float InAngularDamping) { AngularDamping = InAngularDamping; }
+    void SetSpawnDirectionRight(bool InSpawnDirection) { SpawnDirectionRight = InSpawnDirection; } // 차량 생성 방향 설정 함수
 };

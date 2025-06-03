@@ -6,6 +6,7 @@
 #include "Engine/Engine.h"
 #include "World/World.h"
 #include "Actors/Cube.h"
+#include "Actors/Car.h"
 
 
 ARoad::ARoad()
@@ -18,28 +19,30 @@ void ARoad::Initialize(ERoadState RoadState, FVector SpawnWorldLocation)
 {
     CurrentRoadState = RoadState;
     RoadMesh->SetWorldLocation(SpawnWorldLocation);
-    RoadMesh->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
-    RoadMesh->SetWorldScale3D(FVector(30.0f, 30.0f, 1000.0f));
 
     if (RoadState == ERoadState::Safe)
     {
-        RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road.obj"));
+        RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road2/Ground.obj"));
+        RoadMesh->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
+        RoadMesh->SetWorldScale3D(FVector(10.0f, 10.0f, 10.0f));
         RoadMesh->bSimulate = true;
         RoadMesh->RigidBodyType = ERigidBodyType::STATIC;
     }
     else if (RoadState == ERoadState::Car)
     {
-        RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road.obj"));
+        RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road2/Road2.obj"));
+        RoadMesh->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
+        RoadMesh->SetWorldScale3D(FVector(10.0, 10.0, 10.0));
         RoadMesh->bSimulate = true;
         RoadMesh->RigidBodyType = ERigidBodyType::STATIC;
     }
-
-
 }
 
 void ARoad::BeginPlay()
 {
     Super::BeginPlay();
+
+    RoadMesh->CreatePhysXGameObject();
 }
 
 void ARoad::Tick(float DeltaTime)
@@ -47,6 +50,26 @@ void ARoad::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 
     OnOverlappedRoad(DeltaTime);
+
+    int RandNum = FMath::RandHelper(1000);
+    int DirectionNum = FMath::RandHelper(2);
+    if (CurrentRoadState == ERoadState::Car && RandNum == 0 && !bIsCarOnRoad)
+    {
+        ACar* Car = GEngine->ActiveWorld->SpawnActor<ACar>();
+        if (DirectionNum == 0)
+        {
+            Car->SetActorLocation(FVector(GetActorLocation().X, 10000.0f, 350.0f));
+            Car->SetSpawnDirectionRight(true);
+        }
+        else
+        {
+            Car->SetActorLocation(FVector(GetActorLocation().X, -10000.0f, 350.0f));
+            Car->SetSpawnDirectionRight(false);
+        }
+
+        Cast<UPrimitiveComponent>(Car->GetRootComponent())->CreatePhysXGameObject();
+        bIsCarOnRoad = true;
+    }
 }
 
 void ARoad::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -109,7 +132,7 @@ bool ARoad::BindSelfLuaProperties()
 
 void ARoad::OnOverlappedRoad(float DeltaTime)
 {
-    if (!bIsOverlapped)
+    if (!bIsOverlapped && CurrentRoadState != ERoadState::Car)
     {
         CurrentRoadState = ERoadState::Safe;
         if (CurrentRoadTime > SafeJoneTime)

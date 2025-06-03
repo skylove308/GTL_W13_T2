@@ -24,6 +24,7 @@
 #include "Actors/GameManager.h"
 #include "Components/CapsuleComponent.h"
 #include "SoundManager.h"
+#include "Engine/Contents/Maps/MapModule.h"
 
 extern FEngineLoop GEngineLoop;
 
@@ -279,6 +280,12 @@ void UEditorEngine::StartPIE()
     SetPhysXScene(PIEWorld);
     
     BindEssentialObjects();
+
+    FMapModule* MapModule = new FMapModule();
+    for (int i = 0; i < 10; i++)
+    {
+        MapModule->SpawnRoadMap();
+    }
     
     PIEWorld->BeginPlay();
     // 여기서 Actor들의 BeginPlay를 해줄지 안에서 해줄 지 고민.
