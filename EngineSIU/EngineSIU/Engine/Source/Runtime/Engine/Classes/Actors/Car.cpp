@@ -30,6 +30,18 @@ void ACar::PostSpawnInitialize()
     UStaticMeshComponent* CarMeshComp = Cast<UStaticMeshComponent>(GetRootComponent());
 }
 
+void ACar::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    if(GetActorLocation().Y > 12000.0f || GetActorLocation().Y < -12000.0f)
+    {
+        Destroy();
+
+        return;
+    }
+}
+
 UObject* ACar::Duplicate(UObject* InOuter)
 {
     ThisClass* NewActor = Cast<ThisClass>(Super::Duplicate(InOuter));
@@ -50,6 +62,7 @@ void ACar::RegisterLuaType(sol::state& Lua)
         "Mass", sol::property(&ThisClass::GetMass, &ThisClass::SetMass),
         "LinearDamping", sol::property(&ThisClass::GetLinearDamping, &ThisClass::SetLinearDamping),
         "AngularDamping", sol::property(&ThisClass::GetAngularDamping, &ThisClass::SetAngularDamping),
+        "SpawnDirectionRight", sol::property(&ThisClass::GetSpawnDirectionRight, &ThisClass::SetSpawnDirectionRight),
         "Drive", &ThisClass::Drive
     )
 }

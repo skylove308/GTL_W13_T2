@@ -17,7 +17,7 @@ void FMapModule::SpawnRoadMap()
         Road->Initialize(ERoadState::Safe, SpawnLocation);
     }
 
-    SpawnLocation += FVector(130.0f, -50000.0f, -1.0f);
+    SpawnLocation += FVector(600.0f, -0.0f, 0.0f);
 
     int RandomCarRoadCount = FMath::RandHelper(4) + 1;
 
@@ -28,10 +28,8 @@ void FMapModule::SpawnRoadMap()
         {
             CarRoad->Initialize(ERoadState::Car, SpawnLocation);
         }
-        SpawnLocation += FVector(385.0f, 0.0f, 0.0f);
+        SpawnLocation += FVector(600.0f, 0.0f, 0.0f);
     }
-
-    SpawnLocation += FVector(145.0f, 50000.0f, 1.0f);
 
 }
 

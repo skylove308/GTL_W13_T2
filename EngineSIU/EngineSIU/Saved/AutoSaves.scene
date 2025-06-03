@@ -74,17 +74,13 @@
             "ActorTickInEditor": "false",
             "Components": [
                 {
-                    "ComponentClass": "UCameraComponent",
-                    "ComponentID": "CameraComponent",
+                    "ComponentClass": "UCharacterMovementComponent",
+                    "ComponentID": "CharacterMovementComponent",
                     "Properties": {
-                        "AttachParentID": "CapsuleComponent",
-                        "ComponentClass": "UCameraComponent",
-                        "ComponentName": "CameraComponent",
+                        "ComponentClass": "UCharacterMovementComponent",
+                        "ComponentName": "CharacterMovementComponent",
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
-                        "RelativeLocation": "X=-300.000 Y=0.000 Z=100.000",
-                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
-                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "bAutoActive": "true",
                         "bIsActive": "true"
                     }
@@ -109,7 +105,7 @@
                         "Geom_0Rotation": "Pitch=0.000 Yaw=0.000 Roll=0.000",
                         "Geom_0Type": "2",
                         "GeomsCount": "1",
-                        "RelativeLocation": "X=105.329 Y=7.500 Z=54.050",
+                        "RelativeLocation": "X=105.329 Y=7.500 Z=330.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "RigidBodyType": "1",
@@ -134,7 +130,7 @@
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
                         "GeomsCount": "0",
-                        "RelativeLocation": "X=0.000 Y=0.000 Z=-50.000",
+                        "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "RigidBodyType": "2",
@@ -144,18 +140,6 @@
                         "bIsActive": "true",
                         "bSimulate": "true",
                         "m_Type": ""
-                    }
-                },
-                {
-                    "ComponentClass": "UCharacterMovementComponent",
-                    "ComponentID": "CharacterMovementComponent",
-                    "Properties": {
-                        "ComponentClass": "UCharacterMovementComponent",
-                        "ComponentName": "CharacterMovementComponent",
-                        "ComponentOwner": "ACharacter_256",
-                        "ComponentOwnerClass": "ACharacter",
-                        "bAutoActive": "true",
-                        "bIsActive": "true"
                     }
                 },
                 {
@@ -188,6 +172,22 @@
                         "ComponentOwner": "ACharacter_256",
                         "ComponentOwnerClass": "ACharacter",
                         "RelativeLocation": "X=0.000 Y=0.000 Z=0.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "UCameraComponent",
+                    "ComponentID": "CameraComponent",
+                    "Properties": {
+                        "AttachParentID": "CapsuleComponent",
+                        "ComponentClass": "UCameraComponent",
+                        "ComponentName": "CameraComponent",
+                        "ComponentOwner": "ACharacter_256",
+                        "ComponentOwnerClass": "ACharacter",
+                        "RelativeLocation": "X=-300.000 Y=0.000 Z=100.000",
                         "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
                         "RelativeScale3D": "X=1.000 Y=1.000 Z=1.000",
                         "bAutoActive": "true",
@@ -364,6 +364,52 @@
                 }
             ],
             "RootComponentID": "SkySphereMeshComp"
+        },
+        {
+            "ActorClass": "ACar",
+            "ActorID": "ACar_430",
+            "ActorLabel": "OBJ_CAR_430",
+            "ActorTickInEditor": "false",
+            "Components": [
+                {
+                    "ComponentClass": "ULuaScriptComponent",
+                    "ComponentID": "LuaComponent",
+                    "Properties": {
+                        "ComponentClass": "ULuaScriptComponent",
+                        "ComponentName": "LuaComponent",
+                        "ComponentOwner": "ACar_430",
+                        "ComponentOwnerClass": "ACar",
+                        "ScriptName": "Car",
+                        "bAutoActive": "true",
+                        "bIsActive": "true"
+                    }
+                },
+                {
+                    "ComponentClass": "UStaticMeshComponent",
+                    "ComponentID": "CarMesh",
+                    "Properties": {
+                        "AABB_max": "X=1.429 Y=22.518 Z=5.146",
+                        "AABB_min": "X=-1.429 Y=-22.518 Z=-0.030",
+                        "AttachParentID": "nullptr",
+                        "ComponentClass": "UStaticMeshComponent",
+                        "ComponentName": "CarMesh",
+                        "ComponentOwner": "ACar_430",
+                        "ComponentOwnerClass": "ACar",
+                        "GeomsCount": "0",
+                        "RelativeLocation": "X=0.000 Y=5000.000 Z=300.000",
+                        "RelativeRotation": "Pitch=0.000 Yaw=0.000 Roll=-0.000",
+                        "RelativeScale3D": "X=100.000 Y=100.000 Z=100.000",
+                        "RigidBodyType": "1",
+                        "StaticMeshPath": "Contents/Cars/Train/Train.obj",
+                        "bApplyGravity": "false",
+                        "bAutoActive": "true",
+                        "bIsActive": "true",
+                        "bSimulate": "true",
+                        "m_Type": ""
+                    }
+                }
+            ],
+            "RootComponentID": "CarMesh"
         }
     ],
     "NextUUID": 0,

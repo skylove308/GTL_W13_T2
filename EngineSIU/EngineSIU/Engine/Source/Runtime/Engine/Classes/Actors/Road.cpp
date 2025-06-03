@@ -22,27 +22,27 @@ void ARoad::Initialize(ERoadState RoadState, FVector SpawnWorldLocation)
 
     if (RoadState == ERoadState::Safe)
     {
-        RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Sidewalk/Sidewalk.obj"));
-        RoadMesh->SetWorldRotation(FRotator(0.0f, 0.0f, -90.0f));
-        RoadMesh->SetWorldScale3D(FVector(300.0f, 300.0f, 300.0f));
+        RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road2/Ground.obj"));
+        RoadMesh->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
+        RoadMesh->SetWorldScale3D(FVector(10.0f, 10.0f, 10.0f));
         RoadMesh->bSimulate = true;
         RoadMesh->RigidBodyType = ERigidBodyType::STATIC;
     }
     else if (RoadState == ERoadState::Car)
     {
-        RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road.obj"));
-        RoadMesh->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
-        RoadMesh->SetWorldScale3D(FVector(30.0f, 30.0f, 1000.0f));
+        RoadMesh->SetStaticMesh(FObjManager::GetStaticMesh(L"Contents/Road/Road2/Road2.obj"));
+        RoadMesh->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
+        RoadMesh->SetWorldScale3D(FVector(10.0, 10.0, 10.0));
         RoadMesh->bSimulate = true;
         RoadMesh->RigidBodyType = ERigidBodyType::STATIC;
     }
-
-
 }
 
 void ARoad::BeginPlay()
 {
     Super::BeginPlay();
+
+    RoadMesh->CreatePhysXGameObject();
 }
 
 void ARoad::Tick(float DeltaTime)
@@ -51,12 +51,24 @@ void ARoad::Tick(float DeltaTime)
 
     OnOverlappedRoad(DeltaTime);
 
-    int RandNum = FMath::RandHelper(10000);
-    if (CurrentRoadState == ERoadState::Car && RandNum == 0)
+    int RandNum = FMath::RandHelper(1000);
+    int DirectionNum = FMath::RandHelper(2);
+    if (CurrentRoadState == ERoadState::Car && RandNum == 0 && !bIsCarOnRoad)
     {
         ACar* Car = GEngine->ActiveWorld->SpawnActor<ACar>();
-        Car->SetActorLocation(FVector(GetActorLocation().X, 3000.0f, 0.0f));
+        if (DirectionNum == 0)
+        {
+            Car->SetActorLocation(FVector(GetActorLocation().X, 10000.0f, 350.0f));
+            Car->SetSpawnDirectionRight(true);
+        }
+        else
+        {
+            Car->SetActorLocation(FVector(GetActorLocation().X, -10000.0f, 350.0f));
+            Car->SetSpawnDirectionRight(false);
+        }
+
         Cast<UPrimitiveComponent>(Car->GetRootComponent())->CreatePhysXGameObject();
+        bIsCarOnRoad = true;
     }
 }
 
