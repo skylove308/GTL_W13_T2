@@ -9,5 +9,7 @@ public:
     void EndFrame() const;
     void PreferenceStyle() const;
     void Shutdown();
+
+    static ImFont* GraffitiFont;
 };
 
