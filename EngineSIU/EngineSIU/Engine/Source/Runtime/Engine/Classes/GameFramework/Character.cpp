@@ -248,7 +248,7 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
         bCameraEffect = true;
 
         //ParticleUtils::CreateParticleOnWorld(GetWorld(), ExplosionParticle, Hit.ImpactPoint);
-        ParticleUtils::CreateParticleOnWorld(GetWorld(), ExplosionParticle, Hit.ImpactPoint, true, 0.2f);
+        ParticleUtils::CreateParticleOnWorld(GetWorld(), ExplosionParticle, Hit.ImpactPoint, true, 1.f);
 
         FSoundManager::GetInstance().PlaySound("CarCrash");
         FSoundManager::GetInstance().PlaySound("Wasted", 1000);

@@ -102,12 +102,13 @@ namespace ParticleUtils
             return nullptr;
 
         AActor* ParticleActor = World->SpawnActor<AActor>();
-        ParticleActor->SetActorLocation(SpawnLocation);
         UParticleSystemComponent* PSC = ParticleActor->AddComponent<UParticleSystemComponent>();
         ParticleActor->SetRootComponent(PSC);
+        ParticleActor->SetActorLocation(SpawnLocation);
         PSC->SetParticleSystem(InParticleSystem);
         PSC->InitializeSystem(bPlayOneShot, InitialDuration);
 
+        UE_LOG(ELogLevel::Warning, "Particle at %f, %f, %f", SpawnLocation.X, SpawnLocation.Y, SpawnLocation.Z);
         return PSC;
     }
 }

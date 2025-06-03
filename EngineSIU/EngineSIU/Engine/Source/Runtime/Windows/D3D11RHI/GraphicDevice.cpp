@@ -130,7 +130,7 @@ void FGraphicsDevice::CreateDepthStencilState()
     }
     
     // Depth test parameters
-    DepthStencilStateDesc.DepthEnable = true;
+    DepthStencilStateDesc.DepthEnable = false;
     DepthStencilStateDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
     DepthStencilStateDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
