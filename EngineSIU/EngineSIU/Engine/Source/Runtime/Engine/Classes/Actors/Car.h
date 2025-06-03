@@ -1,6 +1,14 @@
 #pragma once
 #include "GameFramework/Actor.h"
 
+enum class ECarType : uint8
+{
+    Benz,
+    RangeRover,
+    Truck,
+    Train
+};
+
 class ACar : public AActor
 {
     DECLARE_CLASS(ACar, AActor)
@@ -25,6 +33,7 @@ private:
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, AngularDamping, = 0.1f) // 각 감쇠
     
     bool SpawnDirectionRight; // 차량이 생성될 방향을 결정하는 변수 (true: 오른쪽, false: 왼쪽)
+    ECarType CarType; // 차량의 종류를 나타내는 변수
 
 public:
     //getter
@@ -34,6 +43,7 @@ public:
     float GetLinearDamping() const { return LinearDamping; }
     float GetAngularDamping() const { return AngularDamping; }
     bool GetSpawnDirectionRight() const { return SpawnDirectionRight; }
+    ECarType GetCarType() const { return CarType; } // 차량 종류를 반환하는 함수
 
     //setter
     void SetInitialVelocity(const FVector& InVelocity) { InitialVelocity = InVelocity; }
@@ -42,4 +52,5 @@ public:
     void SetLinearDamping(float InLinearDamping) { LinearDamping = InLinearDamping; }
     void SetAngularDamping(float InAngularDamping) { AngularDamping = InAngularDamping; }
     void SetSpawnDirectionRight(bool InSpawnDirection) { SpawnDirectionRight = InSpawnDirection; } // 차량 생성 방향 설정 함수
+    void SetCarType(ECarType InCarType) { CarType = InCarType; } // 차량 종류 설정 함수
 };
