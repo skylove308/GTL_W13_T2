@@ -4,9 +4,11 @@
 #include "Engine/Engine.h"
 #include "World/World.h"
 #include "GameFramework/Character.h"
+#include "Engine/Contents/Maps/MapModule.h"
 
 AGameManager::AGameManager()
 {
+    MapModule = new FMapModule();
 }
 
 AGameManager::~AGameManager()
@@ -15,14 +17,15 @@ AGameManager::~AGameManager()
 
 void AGameManager::BeginPlay()
 {
-    AActor::BeginPlay();
+    Super::BeginPlay();
+
     SetState(EGameState::WaitingToStart);
     Score = 0;
 }
 
 void AGameManager::Tick(float DeltaTime)
 {
-    AActor::Tick(DeltaTime);
+    Super::Tick(DeltaTime);
 }
 
 void AGameManager::SetState(EGameState State)
@@ -43,6 +46,19 @@ void AGameManager::SetState(EGameState State)
     }
     default:
         break;
+    }
+}
+
+void AGameManager::SpawnMap()
+{
+    MapModule->SpawnRoadMap();
+}
+
+void AGameManager::DestroyMap()
+{
+    if (MapModule->MapSize > 12)
+    {
+        MapModule->DestroyRoadMap();
     }
 }
 

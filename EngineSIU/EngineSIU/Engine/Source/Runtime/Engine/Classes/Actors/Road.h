@@ -14,6 +14,7 @@ enum class ERoadState : uint8
     Destroy
 };
 
+class AGameManager;
 class UStaticMeshComponent;
 class ARoad : public AActor
 {
@@ -56,10 +57,12 @@ public:
 private:
     UStaticMeshComponent* RoadMesh = nullptr;
     ERoadState CurrentRoadState = ERoadState::Safe;
+    AGameManager* GameManager = nullptr;
     float CurrentRoadTime = 0.0f;
     float SafeJoneTime = 2.0f;
     float WarningJoneTime = 2.0f;
     bool bIsOverlapped = false;
     bool bIsCarOnRoad = false;
+    bool bIsFirstTimeOnRoad = false;
 };
 
