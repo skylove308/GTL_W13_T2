@@ -35,7 +35,7 @@ void UnrealEd::Initialize()
     PreRenderPanels["LuaUIViewPanel"] = LuaUIPanel;
 
     auto GameUIPanel = std::make_shared<class GameUIPanel>();
-    Panels["GameUIPanel"] = GameUIPanel;
+    PreRenderPanels["GameUIPanel"] = GameUIPanel;
 }
 
 void UnrealEd::Render() const

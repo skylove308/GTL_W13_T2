@@ -46,8 +46,6 @@
 #include <Actors/Car.h>
 #include <Actors/SkySphereActor.h>
 
-
-
 ControlEditorPanel::ControlEditorPanel()
 {
     SetSupportedWorldTypes(EWorldTypeBitFlag::Editor | EWorldTypeBitFlag::PIE | EWorldTypeBitFlag::SkeletalViewer | EWorldTypeBitFlag::PhysicsAssetViewer);

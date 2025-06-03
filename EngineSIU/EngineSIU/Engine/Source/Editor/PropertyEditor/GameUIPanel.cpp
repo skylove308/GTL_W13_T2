@@ -116,37 +116,44 @@ void GameUIPanel::RenderStartUI()
 
     float StartX = WinPos.x + (WinSize.x * 0.23f);
     float StartY = WinPos.y + WinSize.y * 0.5f;
-    float verticalGap = -40.0f;
+    float VerticalGap = -40.0f;
 
     auto DrawImageButton = [&](const char* id, ImTextureID texture, ImVec2 pos, EGameState targetState)
     {
-        ImVec2 drawSize = ButtonSize;
+        ImVec2 DrawSize = ButtonSize;
 
         if (strcmp(id, "##SettingsBtn") == 0)
         {
-            drawSize.x *= 1.2f;
-            drawSize.y *= 1.2f;
-            pos.x -= (drawSize.x - ButtonSize.x) * 0.5f;
-            pos.y -= (drawSize.y - ButtonSize.y) * 0.5f;
+            DrawSize.x *= 1.2f;
+            DrawSize.y *= 1.2f;
+            pos.x -= (DrawSize.x - ButtonSize.x) * 0.5f;
+            pos.y -= (DrawSize.y - ButtonSize.y) * 0.5f;
         }
 
         ImGui::SetCursorScreenPos(pos);
 
-        bool hovered = false;
+        bool Hovered = false;
         ImGui::SetCursorScreenPos(pos);
-        hovered = ImGui::InvisibleButton(id, drawSize);
+        Hovered = ImGui::InvisibleButton(id, DrawSize);
 
         ImGui::SetCursorScreenPos(pos);
         if (ImGui::IsItemHovered())
         {
-            ImGui::Image(texture, drawSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1.5f, 1.2f, 2.0f, 1.0f));
+            float Scale = 1.2f;
+            ImVec2 ScaledSize(DrawSize.x * Scale, DrawSize.y * Scale);
+            ImVec2 Center = ImVec2(pos.x + DrawSize.x * 0.5f, pos.y + DrawSize.y * 0.5f);
+            ImVec2 ScaledPos = ImVec2(Center.x - ScaledSize.x * 0.5f, Center.y - ScaledSize.y * 0.5f);
+
+            ImGui::SetCursorScreenPos(ScaledPos);
+            ImGui::Image(texture, ScaledSize);
         }
         else
         {
-            ImGui::Image(texture, drawSize);
+            ImGui::SetCursorScreenPos(pos);
+            ImGui::Image(texture, DrawSize);
         }
 
-        if (hovered && targetState != EGameState::WaitingToStart)
+        if (Hovered && targetState != EGameState::WaitingToStart)
         {
             GameManager->SetState(targetState);
         }
@@ -160,52 +167,102 @@ void GameUIPanel::RenderStartUI()
 
     if (SettingsSRV)
     {
-        ImVec2 pos(StartX - (ButtonSize.x * 0.5f), StartY + ButtonSize.y + verticalGap);
+        ImVec2 pos(StartX - (ButtonSize.x * 0.5f), StartY + ButtonSize.y + VerticalGap);
         DrawImageButton("##SettingsBtn", (ImTextureID)SettingsSRV, pos, EGameState::None);
     }
 
     if (ExitSRV)
     {
-        ImVec2 pos(StartX - (ButtonSize.x * 0.5f), StartY + 2 * (ButtonSize.y + verticalGap));
+        ImVec2 pos(StartX - (ButtonSize.x * 0.5f), StartY + 2 * (ButtonSize.y + VerticalGap));
         DrawImageButton("##ExitBtn", (ImTextureID)ExitSRV, pos, EGameState::Exit);
     }
 }
 
 void GameUIPanel::RenderGameUI()
 {
-    int currentScore = GameManager->GetScore();
-    ImGui::Text("Score: %d", currentScore);
+    int CurrentScore = GameManager->GetScore();
+    ImGui::SetCursorScreenPos(ImVec2(10.0f, Height*0.15f));
+    ImGui::Text("Score: %d", CurrentScore);
+    if (ImGui::Button("Game over", ImVec2(100.0f, 100.0f)))
+    {
+        GameManager->SetState(EGameState::GameOver);
+    }
 }
 
 void GameUIPanel::RenderEndUI()
 {
-    std::shared_ptr<FTexture> GameOverTex = FEngineLoop::ResourceManager.GetTexture(L"Assets/Texture/CrossyRoad/Logo.png");
-    ID3D11ShaderResourceView* GameOverSRV     = GameOverTex     ? GameOverTex->TextureSRV     : nullptr;
-    GameOverSRV = GameOverTex->TextureSRV;
-    ImVec2 RestartLogoSize(GameOverTex->Width, GameOverTex->Height);
-    ImGui::SetCursorPosX(0.0f);
-    if (GameOverSRV)
+    std::shared_ptr<FTexture> GameOverTex = FEngineLoop::ResourceManager.GetTexture(L"Assets/Texture/CrossyRoad/GameOver.png");
+    ID3D11ShaderResourceView* GameOverSRV = GameOverTex ? GameOverTex->TextureSRV : nullptr;
+
+    float OrigW = (float)GameOverTex->Width;
+    float OrigH = (float)GameOverTex->Height;
+    
+    float TargetW = Width * 0.4f;
+    float TargetH = OrigH * (TargetW / OrigW);
+    
+    float ImageStartX = (Width - TargetW) * 0.4f;
+    float ImageStartY = Height * 0.1f; 
+    ImGui::SetCursorPos(ImVec2(ImageStartX, ImageStartY));
+
+    ImGui::Image((ImTextureID)GameOverSRV, ImVec2(TargetW, TargetH));
+    float ButtonsY = ImageStartY + TargetH - 300.0f;
+
+    std::shared_ptr<FTexture> RestartTexPtr = 
+        FEngineLoop::ResourceManager.GetTexture(L"Assets/Texture/CrossyRoad/Restart.png");
+    std::shared_ptr<FTexture> QuitTexPtr    = 
+        FEngineLoop::ResourceManager.GetTexture(L"Assets/Texture/CrossyRoad/Quit.png");
+
+    ID3D11ShaderResourceView* RestartSRV = RestartTexPtr ? RestartTexPtr->TextureSRV : nullptr;
+    ID3D11ShaderResourceView* QuitSRV    = QuitTexPtr    ? QuitTexPtr->TextureSRV    : nullptr;
+
+    float BtnOrigW = (float)RestartTexPtr->Width;
+    float BtnOrigH = (float)RestartTexPtr->Height;
+
+    float ButtonTargetW = TargetW * 0.4f;
+    float ButtonTargetH = BtnOrigH * (ButtonTargetW / BtnOrigW);
+    ImVec2 ButtonSize(ButtonTargetW, ButtonTargetH);
+
+    // 버튼 그룹 전체 너비 = (Restart 너비) + (Quit 너비) + (두 버튼 사이 간격)
+    float TotalButtonsWidth = ButtonSize.x * 2;
+    float ButtonsStartX = (Width - TotalButtonsWidth) * 0.4f;
+
+    auto DrawImageButton = [&](const char* id, 
+                               ImTextureID   texture, 
+                               ImVec2        pos, 
+                               EGameState    targetState)
     {
-        ImTextureID texID = (ImTextureID)GameOverSRV;
-        ImGui::Image(texID, RestartLogoSize);
-    }
+        ImGui::SetCursorScreenPos(pos);
+        bool HoveredAndClicked = ImGui::InvisibleButton(id, ButtonSize);
+        ImGui::SetCursorScreenPos(pos);
+        if (ImGui::IsItemHovered())
+        {
+            float scale = 1.2f;
+            ImVec2 scaledSize(ButtonTargetW * scale, ButtonTargetH * scale);
+            ImVec2 center = ImVec2(pos.x + ButtonTargetW * 0.5f, pos.y + ButtonTargetH * 0.5f);
+            ImVec2 scaledPos = ImVec2(center.x - scaledSize.x * 0.5f, center.y - scaledSize.y * 0.5f);
 
-    ImGui::Spacing();
+            ImGui::SetCursorScreenPos(scaledPos);
+            ImGui::Image(texture, scaledSize);
+        }
+        else
+        {
+            ImGui::SetCursorScreenPos(pos);
+            ImGui::Image(texture, ImVec2(ButtonTargetW, ButtonTargetH));
+        }
 
-    ImVec2 BtnSize(100, 0);
-    float SpacingBetween = 20.0f;
-    float TotalButtonsWidth = BtnSize.x * 2 + SpacingBetween;
-    float ButtonsStartX = (Width - TotalButtonsWidth) * 0.5f;
-
-    ImGui::SetCursorPosX(ButtonsStartX);
-    if (ImGui::Button("Restart", BtnSize))
+        if (HoveredAndClicked)
+        {
+            GameManager->SetState(targetState);
+        }
+    };
+    if (RestartSRV)
     {
-        GameManager->SetState(EGameState::WaitingToStart);
+        ImVec2 PosRestart(ButtonsStartX, ButtonsY);
+        DrawImageButton("##RestartBtn", (ImTextureID)RestartSRV, PosRestart, EGameState::WaitingToStart);
     }
-
-    // ImGui::SameLine(ButtonsStartX + BtnSize.x + SpacingBetween);
-    // if (ImGui::Button("Exit", BtnSize))
-    // {
-    //     GameManager.SetState(EGameState::WaitingToStart);
-    // }
+    if (QuitSRV)
+    {
+        ImVec2 PosQuit(ButtonsStartX + ButtonSize.x, ButtonsY);
+        DrawImageButton("##QuitBtn", (ImTextureID)QuitSRV, PosQuit, EGameState::Exit);
+    }
 }
