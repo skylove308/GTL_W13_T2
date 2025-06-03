@@ -67,8 +67,8 @@ public:
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, DeathCameraTransitionTime,  = 3.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, DeathLetterBoxTransitionTime,  = 2.0f)
 
-    UPROPERTY_WITH_FLAGS(EditAnywhere, float, WalkForce, = 200.f)
-    UPROPERTY_WITH_FLAGS(EditAnywhere, float, RunForce, = 400.f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, WalkForce, = 20000.f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, RunForce, = 40000.f)
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, WalkMaxSpeed, = 300.f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, RunMaxSpeed, = 600.f)
