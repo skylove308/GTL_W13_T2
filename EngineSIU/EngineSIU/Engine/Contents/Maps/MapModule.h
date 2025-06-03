@@ -22,6 +22,8 @@ public:
     FVector SpawnLocation = FVector(0.0f, 0.0f, 1.0f);
     int MapSize = 0;
 
+    std::queue<FMap*> GetMaps() const { return Maps; }
+
 private:
     std::queue<FMap*> Maps;
 };

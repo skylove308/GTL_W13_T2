@@ -8,6 +8,7 @@
 #include "Actors/Cube.h"
 #include "Actors/Car.h"
 #include "Actors/GameManager.h"
+#include "Engine/Contents/Maps/MapModule.h"
 
 
 ARoad::ARoad()
@@ -210,6 +211,12 @@ void ARoad::OnOverlappedRoad(float DeltaTime)
             GameManager->SetScore(CurrentScore + 1);
             GameManager->SpawnMap();
             GameManager->DestroyMap();
+        }
+
+        // 첫 로드에 있는 경우에는 경고 상태로 가지 않도록 함
+        if (GameManager->GetMapModule()->GetMaps().front()->Roads[0] == this) 
+        {
+            return;
         }
 
         CurrentRoadTime += DeltaTime;
