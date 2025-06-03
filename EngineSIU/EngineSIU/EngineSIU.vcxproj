@@ -274,7 +274,6 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\GameManager.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\HeightFogActor.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\LightActor.cpp" />
-    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\GameUIManager.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\Map.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\Player.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\PointLightActor.cpp" />
@@ -638,7 +637,6 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\GameManager.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\HeightFogActor.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\LightActor.h" />
-    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\GameUIManager.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\Map.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\Player.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\PointLightActor.h" />
