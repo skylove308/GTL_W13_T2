@@ -17,8 +17,8 @@ void GameUIPanel::Render()
     if (GEngine->ActiveWorld->WorldType != EWorldType::PIE)
         return;
     /* Pre Setup */
-    float PanelWidth = (Width);  // 1.0f
-    float PanelHeight = (Height);  // 1.0f
+    float PanelWidth = Width;
+    float PanelHeight = Height;
 
     constexpr float PanelPosX = 0.0f;
     constexpr float PanelPosY = 0.0f;
@@ -155,8 +155,9 @@ void GameUIPanel::RenderStartUI()
             ImGui::Image(texture, DrawSize);
         }
 
-        if (Hovered && targetState != EGameState::WaitingToStart)
+        if (Hovered && targetState != EGameState::WaitingToStart && targetState != EGameState::None)
         {
+            UE_LOG(ELogLevel::Error, TEXT("EGameState : %d", (int)targetState));
             GameManager->SetState(targetState);
         }
     };
@@ -202,12 +203,12 @@ void GameUIPanel::RenderEndUI()
     float TargetW = Width * 0.4f;
     float TargetH = OrigH * (TargetW / OrigW);
     
-    float ImageStartX = (Width - TargetW) * 0.4f;
+    float ImageStartX = (Width - TargetW) * 0.5f;
     float ImageStartY = Height * 0.1f; 
     ImGui::SetCursorPos(ImVec2(ImageStartX, ImageStartY));
 
     ImGui::Image((ImTextureID)GameOverSRV, ImVec2(TargetW, TargetH));
-    float NextY = ImageStartY + TargetH - 200.0f;
+    float NextY = ImageStartY + TargetH - 280.0f;
 
     std::shared_ptr<FTexture> RestartTexPtr = 
         FEngineLoop::ResourceManager.GetTexture(L"Assets/Texture/CrossyRoad/Restart.png");
@@ -225,7 +226,7 @@ void GameUIPanel::RenderEndUI()
     ImVec2 ButtonSize(ButtonTargetW, ButtonTargetH);
 
     float TotalButtonsWidth = ButtonSize.x * 2;
-    float ButtonsStartX = (Width - TotalButtonsWidth) * 0.4f;
+    float ButtonsStartX = (Width - TotalButtonsWidth) * 0.5f;
 
     auto DrawImageButton = [&](const char* id, 
                                ImTextureID   texture, 
