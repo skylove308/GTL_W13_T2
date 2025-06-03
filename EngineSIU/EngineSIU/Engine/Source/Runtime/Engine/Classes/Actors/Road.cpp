@@ -51,12 +51,12 @@ void ARoad::Tick(float DeltaTime)
 
     OnOverlappedRoad(DeltaTime);
 
-    int RandNum = FMath::RandHelper(100);
+    int RandNum = FMath::RandHelper(10000);
     if (CurrentRoadState == ERoadState::Car && RandNum == 0)
     {
         ACar* Car = GEngine->ActiveWorld->SpawnActor<ACar>();
         Car->SetActorLocation(FVector(GetActorLocation().X, 3000.0f, 0.0f));
-        Car->Drive();
+        Cast<UPrimitiveComponent>(Car->GetRootComponent())->CreatePhysXGameObject();
     }
 }
 

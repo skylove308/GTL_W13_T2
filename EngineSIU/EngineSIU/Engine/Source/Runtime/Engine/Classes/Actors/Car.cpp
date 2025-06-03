@@ -26,9 +26,8 @@ void ACar::BeginPlay()
 void ACar::PostSpawnInitialize() 
 {
     Super::PostSpawnInitialize();
-    LuaScriptComponent->SetScriptName("LuaScripts/Actors/Car.lua");
+    LuaScriptComponent->SetScriptName("Car");
     UStaticMeshComponent* CarMeshComp = Cast<UStaticMeshComponent>(GetRootComponent());
-    //CarMeshComp->CreatePhysXGameObject();
 }
 
 UObject* ACar::Duplicate(UObject* InOuter)
