@@ -89,10 +89,12 @@ void UInputComponent::InputKey(const FKeyEvent& InKeyEvent)
             if (InKeyEvent.GetInputEvent() == IE_Pressed)
             {
                 PressedKeys.Add(EKeys::W);
+                OnKeyPressedBindDelegate[FString("W")].Broadcast();
             }
             else if (InKeyEvent.GetInputEvent() == IE_Released)
             {
                 PressedKeys.Remove(EKeys::W);
+                OnKeyReleasedBindDelegate[FString("W")].Broadcast();
             }
             break;
         }
@@ -101,10 +103,12 @@ void UInputComponent::InputKey(const FKeyEvent& InKeyEvent)
             if (InKeyEvent.GetInputEvent() == IE_Pressed)
             {
                 PressedKeys.Add(EKeys::A);
+                OnKeyPressedBindDelegate[FString("A")].Broadcast();
             }
             else if (InKeyEvent.GetInputEvent() == IE_Released)
             {
                 PressedKeys.Remove(EKeys::A);
+                OnKeyReleasedBindDelegate[FString("A")].Broadcast();
             }
             break;
         }
@@ -113,10 +117,12 @@ void UInputComponent::InputKey(const FKeyEvent& InKeyEvent)
             if (InKeyEvent.GetInputEvent() == IE_Pressed)
             {
                 PressedKeys.Add(EKeys::S);
+                OnKeyPressedBindDelegate[FString("S")].Broadcast();
             }
             else if (InKeyEvent.GetInputEvent() == IE_Released)
             {
                 PressedKeys.Remove(EKeys::S);
+                OnKeyReleasedBindDelegate[FString("S")].Broadcast();
             }
             break;
         }
@@ -125,25 +131,26 @@ void UInputComponent::InputKey(const FKeyEvent& InKeyEvent)
             if (InKeyEvent.GetInputEvent() == IE_Pressed)
             {
                 PressedKeys.Add(EKeys::D);
+                OnKeyPressedBindDelegate[FString("D")].Broadcast();
             }
             else if (InKeyEvent.GetInputEvent() == IE_Released)
             {
                 PressedKeys.Remove(EKeys::D);
+                OnKeyReleasedBindDelegate[FString("D")].Broadcast();
             }
             break;
         }
     case 32: // SpaceBar
         {
             if (InKeyEvent.GetInputEvent() == IE_Pressed)
-
-
-                
             {
                 PressedKeys.Add(EKeys::SpaceBar);
+                OnKeyPressedBindDelegate[FString("Run")].Broadcast();
             }
             else if (InKeyEvent.GetInputEvent() == IE_Released)
             {
                 PressedKeys.Remove(EKeys::SpaceBar);
+                OnKeyReleasedBindDelegate[FString("RunRelease")].Broadcast();
             }
             break;
         }
@@ -152,8 +159,7 @@ void UInputComponent::InputKey(const FKeyEvent& InKeyEvent)
     }
 }
 
-
-void UInputComponent::BindAction(const FString& Key, const std::function<void(float)>& Callback)
+void UInputComponent::BindKeyPressAction(const FString& Key, const std::function<void(float)>& Callback)
 {
     if (Callback == nullptr)
     {
@@ -164,4 +170,30 @@ void UInputComponent::BindAction(const FString& Key, const std::function<void(fl
     {
         Callback(DeltaTime);
     });
+}
+
+void UInputComponent::BindOnKeyPressAction(const FString& Key, const std::function<void()>& Callback)
+{
+    if (Callback == nullptr)
+    {
+        return;
+    }
+
+    OnKeyPressedBindDelegate[Key].AddLambda([this, Callback]()
+        {
+            Callback();
+        });
+}
+
+void UInputComponent::BindOnKeyReleasedAction(const FString& Key, const std::function<void()>& Callback)
+{
+    if (Callback == nullptr)
+    {
+        return;
+    }
+
+    OnKeyReleasedBindDelegate[Key].AddLambda([this, Callback]()
+        {
+            Callback();
+        });
 }

@@ -21,6 +21,7 @@
 #include "Engine/SkeletalMesh.h"
 #include "SoundManager.h"
 #include "Actors/GameManager.h"
+#include "GameFramework/SpringArmComponent.h"
 
 ACharacter::ACharacter()
 {
@@ -40,8 +41,12 @@ ACharacter::ACharacter()
     MovementComponent = AddComponent<UCharacterMovementComponent>("CharacterMovementComponent");
     MovementComponent->UpdatedComponent = CapsuleComponent;
 
-    CameraComponent = AddComponent<UCameraComponent>("CameraComponent");
-    CameraComponent->SetupAttachment(RootComponent);
+    CameraBoom = AddComponent<USpringArmComponent>("CameraBoom");
+    CameraBoom->SetupAttachment(RootComponent);
+    CameraBoom->TargetArmLength = 300.0f; // 카메라와 캐릭터 사이의 거리
+
+    CameraComponent = AddComponent<UCameraComponent>("FollowCamera");
+    CameraComponent->SetupAttachment(CameraBoom);
 
     FSoundManager::GetInstance().LoadSound("CarCrash", "Contents/Sounds/CarCrash.wav");
     FSoundManager::GetInstance().LoadSound("Wasted", "Contents/Sounds/Wasted.wav");
@@ -77,7 +82,6 @@ void ACharacter::BeginPlay()
 
 void ACharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-    Super::EndPlay(EndPlayReason);
     
     USkeletalMesh* SkeletalMeshAsset = MeshComponent->GetSkeletalMeshAsset();
     for (int i = 0; i < SkeletalMeshAsset->GetRenderData()->MaterialSubsets.Num(); i++)
@@ -86,6 +90,8 @@ void ACharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
         FVector EmissiveColor = FVector(0.0f, 0.0f, 0.0f);
         UAssetManager::Get().GetMaterial(MaterialName)->SetEmissive(EmissiveColor);
     }
+    UnbindInput();
+    Super::EndPlay(EndPlayReason);
 }
 
 UObject* ACharacter::Duplicate(UObject* InOuter)
@@ -97,6 +103,7 @@ UObject* ACharacter::Duplicate(UObject* InOuter)
     NewActor->MeshComponent = NewActor->GetComponentByClass<USkeletalMeshComponent>();
     NewActor->MovementComponent = NewActor->GetComponentByClass<UCharacterMovementComponent>();
     NewActor->CameraComponent = NewActor->GetComponentByClass<UCameraComponent>();
+    NewActor->CameraBoom = NewActor->GetComponentByClass<USpringArmComponent>();
 
     if (NewActor->MovementComponent && NewActor->CapsuleComponent)
     {
@@ -115,19 +122,9 @@ void ACharacter::Tick(float DeltaTime)
 {
     APawn::Tick(DeltaTime);
 
-    RotateCharacterMesh(DeltaTime);
+    Move(DeltaTime);
+    //Rotate(DeltaTime);
     DoCameraEffect(DeltaTime);
-    // 물리 결과 동기화
-    // if (bPhysXInitialized &&  PhysXActor)
-    // {
-    //     PxTransform PxTr = PhysXActor->getGlobalPose();
-    //     SetActorLo
-    //
-    //
-    //     cation(FVector(PxTr.p.x, PxTr.p.y, PxTr.p.z));
-    // }
-    float Velocity = GetSpeed();
-    // UE_LOG(ELogLevel::Display, TEXT("Speed: %f"), Velocity);
 }
 
 void ACharacter::DoCameraEffect(float DeltaTime)
@@ -330,64 +327,102 @@ void ACharacter::BindInput()
     if (!ActiveWorld)
         return;
 
-    ActiveWorld->GetPlayerController()->BindAction("W",
-        [&](float Value) {
-            MoveForward(0.1f);
-        }
-    );
-    ActiveWorld->GetPlayerController()->BindAction("S",
-        [&](float Value) {
-            MoveForward(-0.1f);
-        }
-    );
-    ActiveWorld->GetPlayerController()->BindAction("A",
-        [&](float Value) {
-            MoveRight(-0.1f);
-        }
-    );
-    ActiveWorld->GetPlayerController()->BindAction("D",
-        [&](float Value) {
-            MoveRight(0.1f);
-        }
-    );
-    ActiveWorld->GetPlayerController()->BindAction("Run",
+    ActiveWorld->GetPlayerController()->BindKeyPressAction("Run",
         [&](float Value) {
             bIsRunning = true;
         }
     );
-    ActiveWorld->GetPlayerController()->BindAction("RunRelease",
+    ActiveWorld->GetPlayerController()->BindKeyPressAction("RunRelease",
         [&](float Value) {
             bIsRunning = false;
         }
     );
-    ActiveWorld->GetPlayerController()->BindAction("Idle",
+    ActiveWorld->GetPlayerController()->BindKeyPressAction("Idle",
         [&](float Value) {
             Stop();
-        }
-    );
+        });
+
+    ActiveWorld->GetPlayerController()->BindOnKeyPressAction("W",
+        [&]() {
+            MoveInput.Y = 1.0f;
+        });
+
+    ActiveWorld->GetPlayerController()->BindOnKeyReleaseAction("W",
+        [&]() {
+            MoveInput.Y = 0.0f;
+        });
+
+    ActiveWorld->GetPlayerController()->BindOnKeyPressAction("S",
+        [&]() {
+            MoveInput.Y = -1.0f;
+        });
+
+    ActiveWorld->GetPlayerController()->BindOnKeyReleaseAction("S",
+        [&]() {
+            MoveInput.Y = 0.0f;
+        });
+
+    ActiveWorld->GetPlayerController()->BindOnKeyPressAction("A",
+        [&]() {
+            MoveInput.X = -1.0f;
+        });
+
+    ActiveWorld->GetPlayerController()->BindOnKeyReleaseAction("A",
+        [&]() {
+            MoveInput.X = 0.0f;
+        });
+
+    ActiveWorld->GetPlayerController()->BindOnKeyPressAction("D",
+        [&]() {
+            MoveInput.X = 1.0f;
+        });
+
+    ActiveWorld->GetPlayerController()->BindOnKeyReleaseAction("D",
+        [&]() {
+            MoveInput.X = 0.0f;
+        });
 }
 
 void ACharacter::UnbindInput()
 {
+
 }
 
-void ACharacter::MoveForward(float Value)
+void ACharacter::Move(float DeltaTime)
 {
-    FVector Direction = GetActorForwardVector().GetSafeNormal() * Value;
+    if (MoveInput.IsNearlyZero() || !CameraBoom)
+        return;
 
-    ApplyMovementForce(Direction, 1.0f);
+    // 1. 카메라 기준 방향 구하기
+    FVector CameraForward = CameraBoom->GetCameraForwardVector();
+    FVector CameraRight = CameraBoom->GetCameraRightVector();
 
-    UE_LOG(ELogLevel::Warning, "MoveForward");
+    // 수평면으로 투영 (Pitch 제거)
+    CameraForward.Z = 0;
+    CameraRight.Z = 0;
+    CameraForward.Normalize();
+    CameraRight.Normalize();
+
+    // 2. 입력값을 카메라 방향 기준으로 변환
+    FVector MoveDirection = CameraForward * MoveInput.Y + CameraRight * MoveInput.X;
+
+    if (!MoveDirection.IsNearlyZero())
+    {
+        MoveDirection.Normalize();
+
+        // 3. 이동 적용
+        ApplyMovementForce(MoveDirection, 1.0f);
+
+        // 4. 회전 적용 (부드럽게)
+        FRotator TargetRotation = MoveDirection.Rotation();
+        FRotator CurrentRotation = CapsuleComponent->GetRelativeRotation();
+
+        FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, MeshRotationSpeed);
+        CapsuleComponent->SetRelativeRotation(NewRotation);
+        UpdatePhysXTransform(GetActorLocation(), NewRotation.Quaternion());
+    }
 }
 
-void ACharacter::MoveRight(float Value)
-{
-    FVector Direction = GetActorRightVector().GetSafeNormal() * Value;
-
-    ApplyMovementForce(Direction, 1.0f);
-
-    UE_LOG(ELogLevel::Warning, "MoveRight");
-}
 
 void ACharacter::ApplyMovementForce(const FVector& Direction, float Scale)
 {
@@ -439,19 +474,47 @@ void ACharacter::Stop()
     PxCharActor->setLinearDamping(NoInputLinearDamping);
 }
 
-void ACharacter::RotateCharacterMesh(float DeltaTime)
+void ACharacter::Rotate(float DeltaTime)
 {
-    PxVec3 CurrVelocity = CapsuleComponent->BodyInstance->BIGameObject->DynamicRigidBody->getLinearVelocity();
+    PxRigidDynamic* PxCharActor =
+        static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
+
+    if (PxCharActor == nullptr)
+        return;
+
+    PxVec3 CurrVelocity = PxCharActor->getLinearVelocity();
     FVector Velocity = FVector(CurrVelocity.x, CurrVelocity.y, 0);
-    if (Velocity.SizeSquared() > KINDA_SMALL_NUMBER)
+    if (Velocity.SizeSquared() > KINDA_SMALL_NUMBER && !bIsStop)
     {
-        FRotator TargetRotation = Velocity.Rotation(); // FVector → FRotator
+        FRotator TargetRotation = CameraBoom ? CameraBoom->GetCameraForwardVector().Rotation() : Velocity.Rotation();// FVector → FRotator
 
-        // 원하는 회전 방향으로 Mesh를 회전
-        FRotator RelativeRotation = TargetRotation - GetActorRotation(); // 월드 → 상대 회전
+        FRotator CurrentRotation = GetActorRotation();
+        FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, MeshRotationSpeed);
+        FQuat NewRotQuat = NewRotation.Quaternion();
 
-        FRotator CurrentRotation = MeshComponent->GetRelativeRotation();
-        FRotator NewRotation = FMath::RInterpTo(CurrentRotation, RelativeRotation, DeltaTime, MeshRotationSpeed);
-        MeshComponent->SetRelativeRotation(NewRotation);
+        SetActorRotation(TargetRotation);
+        UpdatePhysXTransform(GetActorLocation(), NewRotQuat);
+
+        UE_LOG(ELogLevel::Warning, "Character Rotation %f, %f, %f", CurrentRotation.Pitch, CurrentRotation.Yaw, CurrentRotation.Roll);
+        UE_LOG(ELogLevel::Warning, "TargetRotation Rotation %f, %f, %f", TargetRotation.Pitch, TargetRotation.Yaw, TargetRotation.Roll);
     }
+}
+
+void ACharacter::UpdatePhysXTransform(const FVector& Location, const FQuat& Rotation)
+{
+    PxRigidDynamic* PxCharActor =
+        static_cast<physx::PxRigidDynamic*>(CapsuleComponent->BodyInstance->RigidActorSync);
+
+    if (PxCharActor == nullptr)
+        return;
+
+    FVector CurLocation = GetActorLocation();
+    FQuat CurRotation = GetActorRotation().Quaternion();
+
+    PxTransform TargetTransform = PxTransform(
+        PxVec3(Location.X, Location.Y, Location.Z),
+        PxQuat(Rotation.X, Rotation.Y, Rotation.Z, Rotation.W)
+    );
+
+    PxCharActor->setGlobalPose(TargetTransform);
 }

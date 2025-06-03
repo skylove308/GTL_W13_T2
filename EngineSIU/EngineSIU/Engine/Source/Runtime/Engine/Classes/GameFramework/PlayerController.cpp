@@ -96,11 +96,28 @@ void APlayerController::SetupInputComponent()
     }
 }
 
-void APlayerController::BindAction(const FString& Key, const std::function<void(float)>& Callback)
+void APlayerController::BindKeyPressAction(const FString& Key, const std::function<void(float)>& Callback)
 {
     if (InputComponent)
     {
-        InputComponent->BindAction(Key, Callback);
+        InputComponent->BindKeyPressAction(Key, Callback);
+    }
+}
+
+void APlayerController::BindOnKeyPressAction(const FString& Key, const std::function<void()>& Callback)
+{
+    if (InputComponent)
+    {
+        InputComponent->BindOnKeyPressAction(Key, Callback);
+    }
+
+}
+
+void APlayerController::BindOnKeyReleaseAction(const FString& Key, const std::function<void()>& Callback)
+{
+    if (InputComponent)
+    {
+        InputComponent->BindOnKeyReleasedAction(Key, Callback);
     }
 }
 
