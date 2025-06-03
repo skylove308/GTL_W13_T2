@@ -66,6 +66,7 @@ struct FRotator
     FQuat Quaternion() const;
     FVector ToVector() const;
     FVector RotateVector(const FVector& Vec) const;
+    FVector Vector() const;
     FMatrix ToMatrix() const;
 
     
