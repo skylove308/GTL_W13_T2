@@ -59,16 +59,7 @@ void ACar::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 
     if(GetActorLocation().Y > 9000.0f || GetActorLocation().Y < -9000.0f)
-    {
-        PxRigidDynamic* PhysXActor = Cast<UStaticMeshComponent>(GetRootComponent())->BodyInstance->BIGameObject->DynamicRigidBody;
-        if (PhysXActor)
-        {
-            // PhysXActor를 씬에서 제거
-            GEngine->PhysicsManager->GetScene(GetWorld())->removeActor(*PhysXActor);
-        }
         Destroy();
-        return;
-    }
 }
 
 UObject* ACar::Duplicate(UObject* InOuter)

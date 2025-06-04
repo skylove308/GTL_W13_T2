@@ -3,14 +3,14 @@
 #include "CollisionManager.h"
 #include "PhysicsManager.h"
 #include "Actors/Player.h"
-#include "BaseGizmos/TransformGizmo.h"
-#include "Classes/Components/StaticMeshComponent.h"
+#include "Actors/StreetLight.h"
 #include "Engine/FObjLoader.h"
 #include "Engine/Engine.h"
 #include "UnrealEd/SceneManager.h"
 #include "GameFramework/GameMode.h"
 #include "Classes/Components/TextComponent.h"
 #include "GameFramework/Character.h"
+#include "Actors/Road.h"
 
 class UEditorEngine;
 
@@ -151,7 +151,7 @@ bool UWorld::DestroyActor(AActor* ThisActor)
     {
         return true;
     }
-    
+
     // UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
     //
     // Engine->DeselectActor(ThisActor);

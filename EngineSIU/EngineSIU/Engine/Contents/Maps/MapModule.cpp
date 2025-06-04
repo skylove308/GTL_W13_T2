@@ -46,8 +46,8 @@ void FMapModule::SpawnRoadMap(int MaxRoadNum)
     
     SpawnLocation += FVector(600.0f, -0.0f, 0.0f);
 
-    int RandomCarRoadCount = FMath::RandHelper(4) + MaxRoadNum;
-
+    int RandomCarRoadCount = 1;// FMath::RandHelper(4) + MaxRoadNum;
+    
     for(int i= 0; i < RandomCarRoadCount; ++i)
     {
         ARoad* CarRoad = GEngine->ActiveWorld->SpawnActor<ARoad>();

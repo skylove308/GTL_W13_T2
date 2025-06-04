@@ -26,6 +26,7 @@ public:
     virtual void InitializeComponent() override;
     virtual void TickComponent(float DeltaTime) override;
     virtual void EndPhysicsTickComponent(float DeltaTime) override;
+    virtual void DestroyComponent(bool bPromoteChildren) override;
     
     bool IntersectRayTriangle(
         const FVector& RayOrigin, const FVector& RayDirection,

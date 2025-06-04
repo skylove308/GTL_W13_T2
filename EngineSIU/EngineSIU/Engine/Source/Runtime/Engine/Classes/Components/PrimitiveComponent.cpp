@@ -231,6 +231,16 @@ void UPrimitiveComponent::EndPhysicsTickComponent(float DeltaTime)
     }
 }
 
+void UPrimitiveComponent::DestroyComponent(bool bPromoteChildren)
+{
+    Super::DestroyComponent(bPromoteChildren);
+
+    if (BodyInstance)
+    {
+        BodyInstance->TermBody();
+    }
+}
+
 bool UPrimitiveComponent::IntersectRayTriangle(const FVector& RayOrigin, const FVector& RayDirection, const FVector& v0, const FVector& v1, const FVector& v2, float& OutHitDistance) const
 {
     const FVector Edge1 = v1 - v0;
