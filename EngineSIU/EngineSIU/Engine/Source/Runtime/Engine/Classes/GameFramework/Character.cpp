@@ -227,14 +227,14 @@ void ACharacter::DoCameraEffect(float DeltaTime)
                     GEngine->ActiveWorld->GetPlayerController()->ClientStartCameraShake(CameraShakeClass);
 
                     ACamera* DeathCam = GEngine->ActiveWorld->SpawnActor<ACamera>();
-                    DeathCam->SetActorLocation(GetActorLocation() + FVector(0.0f, 0.0f, 1000.0f));
+                    DeathCam->SetActorLocation(GetActorLocation() + FVector(0.0f, 0.0f, 200.0f));
                     if (Car->GetSpawnDirectionRight())
                     {
-                        DeathCam->SetActorRotation(FRotator(-30.0f, -90.0f, 0.0f));
+                        DeathCam->SetActorRotation(FRotator(-30.0f, 90.0f, 0.0f));
                     }
                     else
                     {
-                        DeathCam->SetActorRotation(FRotator(-30.0f, 90.0f, 0.0f));
+                        DeathCam->SetActorRotation(FRotator(-30.0f, -90.0f, 0.0f));
                     }
 
                     GEngine->ActiveWorld->GetPlayerController()->SetViewTarget(DeathCam, Params);
