@@ -80,7 +80,14 @@ void ACharacter::BeginPlay()
 
     // 액터는 Serialize로직이 없어서 하드코딩
     ExplosionParticle = UAssetManager::Get().GetParticleSystem("Contents/ParticleSystem/UParticleSystem_368");
+
     FSoundManager::GetInstance().PlaySound("Title");
+    FMOD::Channel* Channel = FSoundManager::GetInstance().GetChannelByName("Title");
+    if (Channel)
+    {
+        Channel->setVolume(0.1f);
+    }
+    FSoundManager::GetInstance().Update();
     //CapsuleComponent->BodyInstance->BIGameObject->DynamicRigidBody->setMass(10.0f);
 
     BindInput();
@@ -411,8 +418,10 @@ void ACharacter::UnbindInput()
 
 void ACharacter::Move(float DeltaTime)
 {
-    if (MoveInput.IsNearlyZero() || !CameraBoom)
+    if (MoveInput.IsNearlyZero() || !CameraBoom )
+    {
         return;
+    }
 
     // 1. 카메라 기준 방향 구하기
     FVector CameraForward = CameraBoom->GetCameraForwardVector();
@@ -441,6 +450,11 @@ void ACharacter::Move(float DeltaTime)
         FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, MeshRotationSpeed);
         CapsuleComponent->SetRelativeRotation(NewRotation);
         UpdatePhysXTransform(GetActorLocation(), NewRotation.Quaternion());
+    }
+
+    if (bIsRunning)
+    {
+        FSoundManager::GetInstance().PlaySound("FootStep");
     }
 }
 

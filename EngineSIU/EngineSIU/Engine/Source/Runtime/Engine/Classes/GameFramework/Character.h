@@ -53,6 +53,9 @@ public:
     bool bIsRunning = false;
     bool bIsDead = false;
     bool bIsStop = true;
+    bool bIsWalkSoundPlaying = false;
+    bool bIsWalkingSound = false;
+    bool bIsRunningSound = false;
 
     bool bCameraEffect = false;
     bool bSwitchCamera = false;
