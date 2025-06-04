@@ -88,6 +88,8 @@ int32 FEngineLoop::Init(HINSTANCE hInstance)
     PrimitiveDrawBatch.Initialize(&GraphicDevice);
     UIManager->Initialize(AppWnd, GraphicDevice.Device, GraphicDevice.DeviceContext);
     ResourceManager.Initialize(&Renderer, &GraphicDevice);
+    FSoundManager::GetInstance().Initialize();
+
     
     uint32 ClientWidth = 0;
     uint32 ClientHeight = 0;
@@ -97,7 +99,6 @@ int32 FEngineLoop::Init(HINSTANCE hInstance)
     GEngine = FObjectFactory::ConstructObject<UEditorEngine>(nullptr);
     GEngine->Init();
 
-    FSoundManager::GetInstance().Initialize();
     GameUI = std::make_shared<GameUIPanel>();
     GameUI->OnResize(AppWnd);
     UpdateUI();

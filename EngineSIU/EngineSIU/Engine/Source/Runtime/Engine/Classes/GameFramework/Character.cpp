@@ -55,9 +55,7 @@ ACharacter::ACharacter()
     CameraComponent = AddComponent<UCameraComponent>("FollowCamera");
     CameraComponent->SetupAttachment(CameraBoom);
 
-    FSoundManager::GetInstance().LoadSound("CarCrash", "Contents/Sounds/CarCrash.wav");
-    FSoundManager::GetInstance().LoadSound("Wasted", "Contents/Sounds/Wasted.wav");
-    FSoundManager::GetInstance().LoadSound("Title", "Contents/Sounds/Title.mp3");
+
 }
 
 void ACharacter::BeginPlay()
