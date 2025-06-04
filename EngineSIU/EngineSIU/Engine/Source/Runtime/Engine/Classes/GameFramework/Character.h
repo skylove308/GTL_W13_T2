@@ -53,9 +53,9 @@ public:
     bool bIsRunning = false;
     bool bIsDead = false;
     bool bIsStop = true;
-    bool bIsWalkSoundPlaying = false;
-    bool bIsWalkingSound = false;
-    bool bIsRunningSound = false;
+    float WalkingSoundTimer = 0.0f;
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, WalkingSoundInterval, = 0.40f)
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, RunningSoundInterval, = 0.25f)
 
     bool bCameraEffect = false;
     bool bSwitchCamera = false;

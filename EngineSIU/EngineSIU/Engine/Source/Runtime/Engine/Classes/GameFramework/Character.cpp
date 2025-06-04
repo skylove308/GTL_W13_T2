@@ -148,6 +148,35 @@ void ACharacter::Tick(float DeltaTime)
             SlomoTime = 0.0f;
         }
     }
+
+    WalkingSoundTimer += DeltaTime;
+
+    if (WalkingSoundTimer > 0.22f)
+    {
+        FSoundManager::GetInstance().StopSound("FootStep");
+    }
+
+    if (MoveInput.IsNearlyZero() || !CameraBoom)
+    {
+        return;
+    }
+
+    if (bIsRunning)
+    {
+        if (WalkingSoundTimer > RunningSoundInterval)
+        {
+            FSoundManager::GetInstance().PlaySound("FootStep");
+            WalkingSoundTimer = 0.0f;
+        }
+    }
+    else
+    {
+        if(WalkingSoundTimer > WalkingSoundInterval)
+        {
+            FSoundManager::GetInstance().PlaySound("FootStep");
+            WalkingSoundTimer = 0.0f;
+        }
+    }
 }
 
 void ACharacter::DoCameraEffect(float DeltaTime)
@@ -464,11 +493,6 @@ void ACharacter::Move(float DeltaTime)
         FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, MeshRotationSpeed);
         CapsuleComponent->SetRelativeRotation(NewRotation);
         UpdatePhysXTransform(GetActorLocation(), NewRotation.Quaternion());
-    }
-
-    if (bIsRunning)
-    {
-        FSoundManager::GetInstance().PlaySound("FootStep");
     }
 }
 

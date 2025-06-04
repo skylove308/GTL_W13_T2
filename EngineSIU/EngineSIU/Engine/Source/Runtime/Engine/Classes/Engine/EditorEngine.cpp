@@ -585,7 +585,7 @@ void UEditorEngine::BindEssentialObjects()
     FSoundManager::GetInstance().LoadSound("CarCrash", "Contents/Sounds/CarCrash.wav");
     FSoundManager::GetInstance().LoadSound("Wasted", "Contents/Sounds/Wasted.wav");
     FSoundManager::GetInstance().LoadSound("Title", "Contents/Sounds/Title.mp3");
-    FSoundManager::GetInstance().LoadSound("FootStep", "Contents/Sounds/footprint.mp3");
+    FSoundManager::GetInstance().LoadSound("FootStep", "Contents/Sounds/FootStep.mp3");
 }
 
 void UEditorEngine::SetPhysXScene(UWorld* World)
