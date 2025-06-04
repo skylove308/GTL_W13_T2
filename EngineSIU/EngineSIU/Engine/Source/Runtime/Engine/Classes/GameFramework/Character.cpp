@@ -132,6 +132,17 @@ void ACharacter::Tick(float DeltaTime)
     Move(DeltaTime);
     //Rotate(DeltaTime);
     DoCameraEffect(DeltaTime);
+    if (bOnSlomo)
+    {
+        assert(UEngine::TimeScale > KINDA_SMALL_NUMBER);
+        SlomoTime += DeltaTime * 1.f / UEngine::TimeScale;
+        if (SlomoTime >= SlomoDuration)
+        {
+            bOnSlomo = false;
+            UEngine::TimeScale = 1.0f; // 슬로우모션 종료
+            SlomoTime = 0.0f;
+        }
+    }
 }
 
 void ACharacter::DoCameraEffect(float DeltaTime)
@@ -265,6 +276,9 @@ void ACharacter::OnCollisionEnter(UPrimitiveComponent* HitComponent, UPrimitiveC
 
         FSoundManager::GetInstance().PlaySound("CarCrash");
         FSoundManager::GetInstance().PlaySound("Wasted", 1000);
+        UEngine::TimeScale = 0.1f;
+        bOnSlomo = true;
+        SlomoTime = 0.0f;
     }
 
     if (HitComponent &&

@@ -41,6 +41,9 @@ public:
     
     void LoadLevel(const FString& FileName) const;
     void SaveLevel(const FString& FileName) const;
+
+public:
+    static inline float TimeScale = 1.0f;
 };
 
 extern class UEngine* GEngine;
