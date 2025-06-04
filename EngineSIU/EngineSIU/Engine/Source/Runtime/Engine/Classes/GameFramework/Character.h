@@ -65,6 +65,8 @@ public:
     float CurrentForce = 0.0f;
     float TotalForce = 0.0f;
 
+    bool bOnSlomo = false;
+
     UPROPERTY_WITH_FLAGS(VisibleAnywhere, FVector2D, MoveInput);
     
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, DeathCameraTransitionTime,  = 3.0f)
@@ -81,6 +83,9 @@ public:
 
     UPROPERTY_WITH_FLAGS(EditAnywhere, float, MeshRotationSpeed, = 10.0f)
     UPROPERTY_WITH_FLAGS(EditAnywhere, FVector2D, ControllerRotation)
+
+    UPROPERTY_WITH_FLAGS(EditAnywhere, float, SlomoDuration, = 2.0f)
+    float SlomoTime = 0.0f;
 
 
     AGameManager* GameManager = nullptr;

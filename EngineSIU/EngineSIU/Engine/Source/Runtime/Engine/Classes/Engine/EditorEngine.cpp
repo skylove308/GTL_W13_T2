@@ -92,6 +92,7 @@ void UEditorEngine::Release()
 
 void UEditorEngine::Tick(float DeltaTime)
 {
+    DeltaTime *= TimeScale;
     for (FWorldContext* WorldContext : WorldList)
     {
         if (WorldContext->WorldType == EWorldType::Editor)
