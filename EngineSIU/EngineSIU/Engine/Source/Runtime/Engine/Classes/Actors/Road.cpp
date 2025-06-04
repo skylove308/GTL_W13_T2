@@ -13,6 +13,7 @@
 #include "Physics/PhysicsManager.h"
 #include "Components/Light/SpotLightComponent.h"
 #include "Engine/Contents/Maps/MapModule.h"
+#include "SoundManager.h"
 
 
 ARoad::ARoad()

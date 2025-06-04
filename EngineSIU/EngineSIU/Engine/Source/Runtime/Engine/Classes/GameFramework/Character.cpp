@@ -55,9 +55,7 @@ ACharacter::ACharacter()
     CameraComponent = AddComponent<UCameraComponent>("FollowCamera");
     CameraComponent->SetupAttachment(CameraBoom);
 
-    FSoundManager::GetInstance().LoadSound("CarCrash", "Contents/Sounds/CarCrash.wav");
-    FSoundManager::GetInstance().LoadSound("Wasted", "Contents/Sounds/Wasted.wav");
-    FSoundManager::GetInstance().LoadSound("Title", "Contents/Sounds/Title.mp3");
+
 }
 
 void ACharacter::BeginPlay()
@@ -157,7 +155,7 @@ void ACharacter::DoCameraEffect(float DeltaTime)
             float Width = ViewportClient->GetViewport()->GetD3DViewport().Width;
             float Height = ViewportClient->GetViewport()->GetD3DViewport().Height;
 
-            float LetterBoxWidth = Width;
+            float LetterBoxWidth = Width + 300;
             float LetterBoxHeight = (Height - Width * 0.5f) * (CurrentDeathLetterBoxTransitionTime / DeathLetterBoxTransitionTime) + (Width * 0.5f);
 
             GEngine->ActiveWorld->GetPlayerController()->SetLetterBoxWidthHeight(LetterBoxWidth, LetterBoxHeight);
