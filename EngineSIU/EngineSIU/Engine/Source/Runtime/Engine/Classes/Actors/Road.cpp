@@ -185,7 +185,6 @@ UObject* ARoad::Duplicate(UObject* InOuter)
     return NewActor;
 }
 
-
 void ARoad::RegisterLuaType(sol::state& Lua)
 {
     DEFINE_LUA_TYPE_WITH_PARENT(ARoad, sol::bases<AActor>(),

@@ -19,6 +19,8 @@ struct FBodyInstance
     FBodyInstance(UPrimitiveComponent* InOwner); // TODO: 초기값 설정?
 
     void SetGameObject(GameObject* InGameObject);
+    /** PhysX Actor를 Scene에서 제거하고 메모리를 해제하는 함수 */
+    void TermBody();
 
     // BodyInstance Name
     UPROPERTY_WITH_FLAGS(EditAnywhere, FName, BodyInstanceName)

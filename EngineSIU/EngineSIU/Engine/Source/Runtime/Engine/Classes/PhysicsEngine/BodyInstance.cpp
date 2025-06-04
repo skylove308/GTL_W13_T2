@@ -1,5 +1,6 @@
 #include "BodyInstance.h"
 #include "Components/PrimitiveComponent.h"
+#include "Engine/Engine.h"
 #include "Physics/PhysicsManager.h"
 
 
@@ -13,5 +14,10 @@ FBodyInstance::FBodyInstance(UPrimitiveComponent* InOwner) : OwnerComponent(InOw
 void FBodyInstance::SetGameObject(GameObject* InGameObject)
 {
     BIGameObject = InGameObject;
+}
+
+void FBodyInstance::TermBody()
+{
+    GEngine->PhysicsManager->DestroyGameObject(BIGameObject);
 }
 

@@ -40,4 +40,3 @@ void AStreetLight::BeginPlay()
 
     StreetLightMesh->CreatePhysXGameObject();
 }
-

@@ -667,13 +667,15 @@ void FPhysicsManager::CreateJoint(const GameObject* Obj1, const GameObject* Obj2
 
 void FPhysicsManager::DestroyGameObject(GameObject* GameObject) const
 {
-    // TODO: StaticRigidBody 분기 처리 필요
-    if (GameObject && GameObject->DynamicRigidBody)
-    {
-        CurrentScene->removeActor(*GameObject->DynamicRigidBody);
-        GameObject->DynamicRigidBody->release();
-        GameObject->DynamicRigidBody = nullptr;
-    }
+    if (!GameObject)
+        return;
+
+    PxRigidActor* RigidActor = GameObject->DynamicRigidBody
+                                 ? static_cast<physx::PxRigidActor*>(GameObject->DynamicRigidBody)
+                                 : static_cast<physx::PxRigidActor*>(GameObject->StaticRigidBody);
+    CurrentScene->removeActor(*RigidActor);
+    RigidActor->release();
+    RigidActor = nullptr;
     delete GameObject;
 }
 
