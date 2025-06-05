@@ -305,6 +305,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimDelegateNotify.cpp" />
     <ClCompile Include="Engine\Contents\AnimInstance\LuaScriptAnimInstance.cpp" />
     <ClCompile Include="Engine\Contents\Maps\MapModule.cpp" />
     <ClCompile Include="Engine\Contents\Objects\DamageCameraShake.cpp" />
@@ -654,6 +655,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimDelegateNotify.h" />
     <ClInclude Include="Engine\Contents\AnimInstance\LuaScriptAnimInstance.h" />
     <ClInclude Include="Engine\Contents\Maps\MapModule.h" />
     <ClInclude Include="Engine\Contents\Objects\DamageCameraShake.h" />
