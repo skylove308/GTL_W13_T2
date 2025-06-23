@@ -1651,6 +1651,8 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\GameManager.cpp" />
     <ClCompile Include="LuaScripts\LuaUIBind.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\Camera.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\StreetLight.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimDelegateNotify.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="EngineSIU.natvis" />
@@ -1823,6 +1825,8 @@
     <ClInclude Include="LuaScripts\LuaUIBind.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\Camera.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\StreetLight.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimDelegateNotify.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\CompositingShader.hlsl" />
